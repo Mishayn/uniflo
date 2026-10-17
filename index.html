@@ -78,15 +78,15 @@
             gap: 8px;
         }
 
-        .group-select {
+        .group-input {
             background: var(--bg-input);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
             font-size: 0.95rem;
             font-weight: 600;
-            cursor: pointer;
+            width: 120px;
             outline: none;
         }
 
@@ -327,6 +327,13 @@
             box-sizing: border-box;
         }
 
+        .empty-schedule-msg {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
         /* Map Screen */
         #map-container {
             width: 100%;
@@ -396,14 +403,6 @@
 
         .clock-time { font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 1rem; color: var(--text-secondary); margin-top: 6px; }
-
-        .next-class-timer {
-            background: rgba(249, 115, 22, 0.1);
-            border: 1px solid rgba(249, 115, 22, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-        }
 
         /* Bottom Nav */
         .bottom-nav {
@@ -503,12 +502,7 @@
     <div class="top-header">
         <div class="group-selector-container">
             <span style="font-size:0.85rem; color:var(--text-muted);">Skupina:</span>
-            <select id="group-select" class="group-select" onchange="changeGroup(this.value)">
-                <option value="5ZYR11">5ZYR11 (FRI)</option>
-                <option value="1ZIV01">1ZIV01 (FRI)</option>
-                <option value="1ZIV02">1ZIV02 (FRI)</option>
-                <option value="1ZIV03">1ZIV03 (FRI)</option>
-            </select>
+            <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Zadajte skupinu...">
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="openAddModal()">+ Pridať</button>
@@ -521,7 +515,7 @@
         <!-- Upcoming Day -->
         <div class="section-header">
             <div class="section-title">Najbližší deň</div>
-            <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026 • 10:00 – 17:40</div>
+            <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026</div>
         </div>
         <div class="card-list" id="upcoming-list"></div>
 
@@ -582,11 +576,11 @@
     <div id="screen-mapa" class="screen">
         <div class="section-title" style="margin-bottom:8px;">Mapa Kampusu UNIZA (Veľký Diel)</div>
         <div class="map-building-list">
-            <div class="chip" onclick="focusBuilding(49.2021, 18.7601, 'FRI UNIZA')">FRI (A/B/C)</div>
-            <div class="chip" onclick="focusBuilding(49.2018, 18.7588, 'Aula AR')">Aula AR</div>
-            <div class="chip" onclick="focusBuilding(49.2025, 18.7595, 'Budova RA/RB')">RA / RB</div>
-            <div class="chip" onclick="focusBuilding(49.2038, 18.7570, 'Knižnica & Rektorát')">Rektorát</div>
-            <div class="chip" onclick="focusBuilding(49.2050, 18.7610, 'Internáty Veľký Diel')">Internáty VD</div>
+            <div class="chip" onclick="focusBuilding(49.20160, 18.75620, 'FRI UNIZA')">FRI (RA, RB, RC)</div>
+            <div class="chip" onclick="focusBuilding(49.20230, 18.76100, 'Aula AR')">Aula AR</div>
+            <div class="chip" onclick="focusBuilding(49.20300, 18.76020, 'Rektorát')">Rektorát (AA–AF)</div>
+            <div class="chip" onclick="focusBuilding(49.20050, 18.76180, 'Knižnica & Menza')">Knižnica / Menza</div>
+            <div class="chip" onclick="focusBuilding(49.20100, 18.76350, 'Internáty VD')">Internáty VD</div>
         </div>
         <div id="map-container"></div>
     </div>
@@ -615,11 +609,6 @@
         <div class="clock-hero">
             <div class="clock-time" id="live-clock">10:00:00</div>
             <div class="clock-date" id="live-date">Pondelok, 19. Október 2026</div>
-        </div>
-        <div class="next-class-timer">
-            <div style="font-size:0.85rem; color:var(--text-secondary);">Aktuálny stav:</div>
-            <div style="font-size:1.3rem; font-weight:700; color:var(--accent-orange); margin-top:4px;">Na hodine: MpInf (AR1A3)</div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;">Koniec o 11:40 (ostáva 1 h 40 min)</div>
         </div>
     </div>
 
@@ -668,16 +657,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Predmet (Vyberte alebo napíšte)</label>
-                <input type="text" id="form-title" class="form-control" list="uniza-subjects-list" placeholder="napr. MpInf, INF1, Alg" required>
-                <datalist id="uniza-subjects-list">
-                    <option value="MpInf">
-                    <option value="INF1">
-                    <option value="ZE">
-                    <option value="PrzPr1">
-                    <option value="PCzM1">
-                    <option value="Alg">
-                </datalist>
+                <label>Názov predmetu</label>
+                <input type="text" id="form-title" class="form-control" placeholder="napr. MpInf, INF1, Alg" required>
             </div>
             <div class="form-group">
                 <label>Typ výučby</label>
@@ -693,24 +674,13 @@
                     <input type="time" id="form-start" class="form-control" value="10:00" required>
                 </div>
                 <div class="form-group" style="flex:1;">
-                    <label>Koniec (Štandard 1h40m)</label>
+                    <label>Koniec</label>
                     <input type="time" id="form-end" class="form-control" value="11:40" required>
                 </div>
             </div>
             <div class="form-group">
                 <label>Vyučujúci</label>
-                <input type="text" id="form-teacher" class="form-control" list="uniza-teachers-list" placeholder="napr. Hynek Bachratý">
-                <datalist id="uniza-teachers-list">
-                    <option value="Hynek Bachratý">
-                    <option value="Ján Janech">
-                    <option value="Zuzana Kozubíková">
-                    <option value="Vojtasová">
-                    <option value="M. Kvet">
-                    <option value="V. Lendel">
-                    <option value="D. Gonda">
-                    <option value="A. Kucharčíková">
-                    <option value="M. Straka">
-                </datalist>
+                <input type="text" id="form-teacher" class="form-control" placeholder="napr. Hynek Bachratý">
             </div>
             <div style="display:flex; gap:10px;">
                 <div class="form-group" style="flex:1;">
@@ -731,43 +701,25 @@
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Presets for UNIZA Groups
-    const groupSchedules = {
-        '5ZYR11': [
-            { id: '1', day: 1, title: 'MpInf', type: 'prednáška', start: '10:00', end: '11:40', teacher: 'Hynek Bachratý', room: 'AR1A3', building: 'aula • budova AR' },
-            { id: '2', day: 1, title: 'INF1', type: 'prednáška', start: '12:00', end: '13:40', teacher: 'Ján Janech', room: 'AR1A3', building: 'tá istá aula' },
-            { id: '3', day: 1, title: 'ZE', type: 'cvičenie', start: '14:00', end: '15:40', teacher: 'Zuzana Kozubíková', room: 'RB206', building: 'FRI • 2. posch.' },
-            { id: '4', day: 1, title: 'PrzPr1', type: 'cvičenie', start: '16:00', end: '17:40', teacher: 'Vojtasová', room: 'RB002', building: 'FRI • prízemie' },
-            { id: '5', day: 2, title: 'INF1', type: 'laboratórne', start: '08:00', end: '10:30', teacher: 'M. Kvet', room: 'RB052', building: 'FRI lab' },
-            { id: '6', day: 3, title: 'PCzM1', type: 'cvičenie', start: '07:00', end: '08:40', teacher: 'V. Lendel', room: 'RB002', building: 'FRI' },
-            { id: '7', day: 3, title: 'Alg', type: 'prednáška', start: '10:00', end: '11:40', teacher: 'D. Gonda', room: 'AR1A3', building: 'aula' },
-            { id: '8', day: 4, title: 'ZE', type: 'prednáška', start: '10:00', end: '11:40', teacher: 'A. Kucharčíková', room: 'AR1A3', building: 'aula' },
-            { id: '9', day: 5, title: 'Alg', type: 'cvičenie', start: '07:00', end: '08:40', teacher: 'M. Straka', room: 'RA320', building: 'FRI' }
-        ],
-        '1ZIV01': [
-            { id: '101', day: 1, title: 'Matematika 1', type: 'prednáška', start: '08:00', end: '09:40', teacher: 'J. Kompan', room: 'AR1A1', building: 'aula' },
-            { id: '102', day: 1, title: 'Informatika', type: 'cvičenie', start: '10:00', end: '11:40', teacher: 'M. Tarana', room: 'RA201', building: 'FRI' }
-        ]
-    };
-
     let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR11';
-    document.getElementById('group-select').value = currentGroup;
+    document.getElementById('group-input').value = currentGroup;
 
-    let schedule = JSON.parse(localStorage.getItem(`uniza_sched_${currentGroup}`)) || JSON.parse(JSON.stringify(groupSchedules[currentGroup] || groupSchedules['5ZYR11']));
+    let schedule = JSON.parse(localStorage.getItem(`uniza_sched_${currentGroup}`)) || [];
     let leafletMap = null;
     let mapMarkers = [];
 
     function changeGroup(groupName) {
-        currentGroup = groupName;
+        if (!groupName.trim()) return;
+        currentGroup = groupName.trim();
         localStorage.setItem('uniza_active_group', currentGroup);
-        schedule = JSON.parse(localStorage.getItem(`uniza_sched_${currentGroup}`)) || JSON.parse(JSON.stringify(groupSchedules[currentGroup] || groupSchedules['5ZYR11']));
+        schedule = JSON.parse(localStorage.getItem(`uniza_sched_${currentGroup}`)) || [];
         renderAll();
     }
 
+    // RESET CLEARS SCHEDULE TO COMPLETE ZERO
     function resetScheduleWithConfirm() {
-        if (confirm(`Naozaj chcete сбросить расписание pre skupinu ${currentGroup}? Všetky vaše zmeny budú vymazané.`)) {
-            const defaultData = groupSchedules[currentGroup] || groupSchedules['5ZYR11'];
-            schedule = JSON.parse(JSON.stringify(defaultData));
+        if (confirm(`Naozaj chcete úplne vymazať celé raspenie pre skupinu ${currentGroup}?`)) {
+            schedule = [];
             localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
             renderAll();
         }
@@ -791,6 +743,11 @@
         upcomingList.innerHTML = '';
         const dayLessons = schedule.filter(l => l.day === 1).sort((a,b) => a.start.localeCompare(b.start));
 
+        if (dayLessons.length === 0) {
+            upcomingList.innerHTML = '<div class="empty-schedule-msg">Žiadne hodiny na tento deň. Kliknite na "+ Pridať".</div>';
+            return;
+        }
+
         dayLessons.forEach((lesson) => {
             const badgeClass = lesson.type === 'prednáška' ? 'badge-prednaska' : (lesson.type === 'cvičenie' ? 'badge-cvicenie' : 'badge-laboratorne');
             const typeClass = lesson.type === 'prednáška' ? '' : (lesson.type === 'cvičenie' ? 'type-cvicenie' : 'type-laboratorne');
@@ -808,11 +765,11 @@
                         ${lesson.title}
                         <span class="badge ${badgeClass}">${lesson.type}</span>
                     </div>
-                    <div class="teacher-name">${lesson.teacher}</div>
+                    <div class="teacher-name">${lesson.teacher || ''}</div>
                 </div>
                 <div class="card-room">
-                    <div class="room-code">${lesson.room}</div>
-                    <div class="room-building">${lesson.building}</div>
+                    <div class="room-code">${lesson.room || ''}</div>
+                    <div class="room-building">${lesson.building || ''}</div>
                 </div>
             `;
             upcomingList.appendChild(item);
@@ -845,7 +802,7 @@
                 card.innerHTML = `
                     <div style="font-weight:700;">${l.title} <span style="font-size:0.65rem;opacity:0.8;">${l.type}</span></div>
                     <div style="font-size:0.65rem;">${l.start}–${l.end} | ${l.room}</div>
-                    <div style="font-size:0.65rem; color:var(--text-muted);">${l.teacher}</div>
+                    <div style="font-size:0.65rem; color:var(--text-muted);">${l.teacher || ''}</div>
                 `;
                 col.appendChild(card);
 
@@ -888,8 +845,7 @@
     }
 
     function initMap() {
-        // Precise UNIZA Veľký Diel Campus Coordinates
-        leafletMap = L.map('map-container').setView([49.2025, 18.7598], 17);
+        leafletMap = L.map('map-container').setView([49.2020, 18.7595], 16);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -897,11 +853,11 @@
         }).addTo(leafletMap);
 
         const buildings = [
-            { name: "FRI UNIZA (A/B/C)", lat: 49.2021, lng: 18.7601, desc: "Fakulta riadenia a informatiky (Aulá, RB002, RB206)" },
-            { name: "Aula AR", lat: 49.2018, lng: 18.7588, desc: "Hlavná prednášková aula AR1A3" },
-            { name: "Budova RA / RB", lat: 49.2025, lng: 18.7595, desc: "Laboratóriá a učebne RA320" },
-            { name: "Knižnica & Rektorát", lat: 49.2038, lng: 18.7570, desc: "Sídlo univerzity a knižnica" },
-            { name: "Internáty Veľký Diel", lat: 49.2050, lng: 18.7610, desc: "Študentské domovy & Menza" }
+            { name: "FRI UNIZA (RA, RB, RC)", lat: 49.20160, lng: 18.75620, desc: "Fakulta riadenia a informatiky" },
+            { name: "Aula AR", lat: 49.20230, lng: 18.76100, desc: "Hlavná prednášková aula AR1A3" },
+            { name: "Rektorát (AA–AF)", lat: 49.20300, lng: 18.76020, desc: "Центральный корпус, деканаты" },
+            { name: "Knižnica & Menza", lat: 49.20050, lng: 18.76180, desc: "Библиотека и столовая (Nová Menza)" },
+            { name: "Internáty Veľký Diel", lat: 49.20100, lng: 18.76350, desc: "Общежития Veľký Diel" }
         ];
 
         buildings.forEach(b => {
@@ -939,9 +895,9 @@
         document.getElementById('form-type').value = item.type;
         document.getElementById('form-start').value = item.start;
         document.getElementById('form-end').value = item.end;
-        document.getElementById('form-teacher').value = item.teacher;
-        document.getElementById('form-room').value = item.room;
-        document.getElementById('form-building').value = item.building;
+        document.getElementById('form-teacher').value = item.teacher || '';
+        document.getElementById('form-room').value = item.room || '';
+        document.getElementById('form-building').value = item.building || '';
 
         document.getElementById('btn-delete-lesson').style.display = 'block';
         document.getElementById('lesson-modal').classList.add('active');
