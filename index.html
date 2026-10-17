@@ -444,8 +444,8 @@
         .news-link { color: var(--accent-orange); text-decoration: none; font-weight: 600; }
         .news-link:hover { text-decoration: underline; }
 
-        /* Separate Promo Punkto Card Style (Non-intrusive bottom right block) */
-        .promo-punkto-card {
+        /* Promo Cards Style */
+        .promo-card {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -454,20 +454,24 @@
             align-items: center;
             gap: 12px;
         }
-        .promo-punkto-logo {
+        .promo-card.highlighted {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), var(--bg-main));
+        }
+        .promo-logo {
             width: 36px;
             height: 36px;
             border-radius: 8px;
             object-fit: cover;
             flex-shrink: 0;
         }
-        .promo-punkto-content {
+        .promo-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 2px;
         }
-        .promo-punkto-title {
+        .promo-title {
             font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-primary);
@@ -475,7 +479,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        .promo-punkto-desc {
+        .promo-desc {
             font-size: 0.72rem;
             color: var(--text-secondary);
             line-height: 1.3;
@@ -681,7 +685,7 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: Student Events & Separate Promo Punkto Card in Bottom Right -->
+        <!-- COLUMN 3: Student Events & Promo Cards (Punkto & YouTube) -->
         <div class="dash-column">
             <div id="screen-akcie" class="screen active">
                 <div class="dash-column-3">
@@ -730,21 +734,38 @@
                         </div>
                     </div>
 
-                    <!-- Отдельный аккуратный квадратик снизу справа для punkto.sk -->
+                    <!-- Карточка Punkto.sk -->
                     <div class="dash-card">
-                        <div class="promo-punkto-card">
-                            <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%2365a30d' rx='100'/%3E%3Cpath fill='%23fff' d='M256 96c-88.36 0-160 71.64-160 160 0 44.18 17.91 84.18 46.86 113.14L256 448l113.14-78.86C398.09 340.18 416 300.18 416 256c0-88.36-71.64-160-160-160zm0 213.33c-29.46 0-53.33-23.87-53.33-53.33s23.87-53.33 53.33-53.33 53.33 23.87 53.33 53.33-23.87 53.33-53.33 53.33z'/%3E%3Ccircle cx='256' cy='256' r='21.33' fill='%23121316'/%3E%3C/svg%3E" alt="Punkto Logo" class="promo-punkto-logo">
-                            <div class="promo-punkto-content">
-                                <div class="promo-punkto-title">
+                        <div class="promo-card">
+                            <img src="https://punkto.sk/icon-512.png" alt="Punkto Logo" class="promo-logo">
+                            <div class="promo-content">
+                                <div class="promo-title">
                                     <span>punkto.sk</span>
                                     <a href="https://punkto.sk" target="_blank" class="news-link" style="font-size:0.75rem;">Otvoriť ↗</a>
                                 </div>
-                                <div class="promo-punkto-desc">
-                                    Nový portál a mobilná aplikacija pre študentov.
+                                <div class="promo-desc">
+                                    Užitočný portál na vyhľadávanie miest na mape: obchody, služby, stravovanie a voľný čas.
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Подсвеченная карточка YouTube автора -->
+                    <div class="dash-card">
+                        <div class="promo-card highlighted">
+                            <svg class="promo-logo" viewBox="0 0 24 24" fill="#ef4444" style="padding:6px; background:rgba(239,68,68,0.15); border-radius:8px;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                            <div class="promo-content">
+                                <div class="promo-title">
+                                    <span>YouTube tvorcu</span>
+                                    <a href="https://www.youtube.com/@mishayn" target="_blank" class="news-link" style="font-size:0.75rem; color:#ef4444;">Odoberať ↗</a>
+                                </div>
+                                <div class="promo-desc">
+                                    YouTube kanál autora. Podporte tvorbu odberom!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
