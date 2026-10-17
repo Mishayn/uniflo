@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIZA Rozvrh & Mapa</title>
+    <!-- Фавиконка (значок вкладки) -->
+    <link rel="icon" type="image/jpeg" href="https://img.magnific.com/free-vector/calendar-red-glyph-style_78370-7233.jpg?semt=ais_hybrid&w=740&q=80">
     <!-- Leaflet CSS for Maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Google Fonts -->
@@ -416,7 +418,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 215px; /* Увеличено на 15px */
+            max-height: 215px;
             overflow-y: auto;
         }
 
@@ -434,7 +436,7 @@
         .note-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
         .note-preview { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Online Chat Styles (Увеличено еще на 30px до 255px) */
+        /* Online Chat Styles */
         .chat-box {
             display: flex;
             flex-direction: column;
@@ -803,7 +805,7 @@
             <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
 
-                    <!-- Блок Заметок (высота увеличена на 15px) -->
+                    <!-- Блок Заметок -->
                     <div class="dash-card">
                         <div class="section-header">
                             <div class="section-title">📝 Moje Poznámky</div>
@@ -812,7 +814,7 @@
                         <div class="notes-container" id="notes-list-container"></div>
                     </div>
 
-                    <!-- Блок Онлайн Чата (высота увеличена до 255px) -->
+                    <!-- Блок Онлайн Чата -->
                     <div class="dash-card">
                         <div class="section-header">
                             <div class="section-title">💬 Online Chat</div>
