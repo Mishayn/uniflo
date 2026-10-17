@@ -310,7 +310,6 @@
             border-color: var(--accent-green);
         }
 
-        /* Gap Box in Weekly View */
         .week-gap-box {
             position: absolute;
             left: 2px;
@@ -360,6 +359,13 @@
             font-size: 0.8rem;
             white-space: nowrap;
             cursor: pointer;
+        }
+
+        .chip-gps {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #60a5fa;
+            font-weight: 600;
         }
 
         .chip:hover {
@@ -576,11 +582,13 @@
     <div id="screen-mapa" class="screen">
         <div class="section-title" style="margin-bottom:8px;">Mapa Kampusu UNIZA (Veľký Diel)</div>
         <div class="map-building-list">
-            <div class="chip" onclick="focusBuilding(49.20160, 18.75620, 'FRI UNIZA')">FRI (RA, RB, RC)</div>
+            <div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>
+            <div class="chip" onclick="focusBuilding(49.20160, 18.75620, 'FRI')">FRI (RA-RC)</div>
             <div class="chip" onclick="focusBuilding(49.20230, 18.76100, 'Aula AR')">Aula AR</div>
-            <div class="chip" onclick="focusBuilding(49.20300, 18.76020, 'Rektorát')">Rektorát (AA–AF)</div>
-            <div class="chip" onclick="focusBuilding(49.20050, 18.76180, 'Knižnica & Menza')">Knižnica / Menza</div>
-            <div class="chip" onclick="focusBuilding(49.20100, 18.76350, 'Internáty VD')">Internáty VD</div>
+            <div class="chip" onclick="focusBuilding(49.20300, 18.76020, 'Rektorát')">Rektorát (AA-AF)</div>
+            <div class="chip" onclick="focusBuilding(49.20420, 18.75900, 'BA-BG')">Stroj./El. (BA-BG)</div>
+            <div class="chip" onclick="focusBuilding(49.20120, 18.76150, 'Knižnica')">Knižnica</div>
+            <div class="chip" onclick="focusBuilding(49.19850, 18.76100, 'Internáty')">Internáty VD</div>
         </div>
         <div id="map-container"></div>
     </div>
@@ -707,6 +715,8 @@
     let schedule = JSON.parse(localStorage.getItem(`uniza_sched_${currentGroup}`)) || [];
     let leafletMap = null;
     let mapMarkers = [];
+    let userLocationMarker = null;
+    let userLocationCircle = null;
 
     function changeGroup(groupName) {
         if (!groupName.trim()) return;
@@ -716,9 +726,8 @@
         renderAll();
     }
 
-    // RESET CLEARS SCHEDULE TO COMPLETE ZERO
     function resetScheduleWithConfirm() {
-        if (confirm(`Naozaj chcete úplne vymazať celé raspenie pre skupinu ${currentGroup}?`)) {
+        if (confirm(`Naozaj chcete úplne vymazať celé rozvrhnutie pre skupinu ${currentGroup}?`)) {
             schedule = [];
             localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
             renderAll();
@@ -806,7 +815,6 @@
                 `;
                 col.appendChild(card);
 
-                // Render Gap "Okno" in Week Column below class
                 if (idx < dayLessons.length - 1) {
                     const nextL = dayLessons[idx + 1];
                     const gapText = calculateGap(l.end, nextL.start);
@@ -845,19 +853,22 @@
     }
 
     function initMap() {
-        leafletMap = L.map('map-container').setView([49.2020, 18.7595], 16);
+        leafletMap = L.map('map-container').setView([49.2025, 18.7595], 16);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap & UNIZA Campus Layout'
+            attribution: '© OpenStreetMap & UNIZA Campus'
         }).addTo(leafletMap);
 
         const buildings = [
-            { name: "FRI UNIZA (RA, RB, RC)", lat: 49.20160, lng: 18.75620, desc: "Fakulta riadenia a informatiky" },
-            { name: "Aula AR", lat: 49.20230, lng: 18.76100, desc: "Hlavná prednášková aula AR1A3" },
-            { name: "Rektorát (AA–AF)", lat: 49.20300, lng: 18.76020, desc: "Центральный корпус, деканаты" },
-            { name: "Knižnica & Menza", lat: 49.20050, lng: 18.76180, desc: "Библиотека и столовая (Nová Menza)" },
-            { name: "Internáty Veľký Diel", lat: 49.20100, lng: 18.76350, desc: "Общежития Veľký Diel" }
+            { name: "FRI UNIZA (RA, RB, RC)", lat: 49.20160, lng: 18.75620, desc: "Fakulta riadenia a informatiky (RA, RB, RC)" },
+            { name: "Aula AR", lat: 49.20230, lng: 18.76100, desc: "Hlavná prednášková aula AR" },
+            { name: "Rektorát & Dekanáty (AA – AF)", lat: 49.20300, lng: 18.76020, desc: "Hlavná administratívna os (AA, AB, AC, AD, AE, AF)" },
+            { name: "Strojnícka & Elektrotechnika (BA – BG)", lat: 49.20420, lng: 18.75900, desc: "Strojnícka fakulta a fakulta elektrotechniky (BA až BG)" },
+            { name: "Univerzitný vedecký park (VA, VB)", lat: 49.20580, lng: 18.76120, desc: "Vedecký park a výskumné centrá VA, VB" },
+            { name: "Univerzitná knižnica (UK)", lat: 49.20120, lng: 18.76150, desc: "Hlavná knižnica UNIZA (UK)" },
+            { name: "Nová menza & UPC (NM)", lat: 49.19980, lng: 18.76200, desc: "Stravovacie zariadenie - Nová menza & Pastoračné centrum" },
+            { name: "Internáty Veľký Diel (DA – DH)", lat: 49.19850, lng: 18.76100, desc: "Ubytovacie zariadenia študentov Veľký Diel (DA až DH)" }
         ];
 
         buildings.forEach(b => {
@@ -866,7 +877,28 @@
             mapMarkers.push({ name: b.name.toLowerCase(), marker, lat: b.lat, lng: b.lng });
         });
 
+        leafletMap.on('locationfound', function(e) {
+            const radius = e.accuracy / 2;
+            if (userLocationMarker) leafletMap.removeLayer(userLocationMarker);
+            if (userLocationCircle) leafletMap.removeLayer(userLocationCircle);
+
+            userLocationMarker = L.marker(e.latlng).addTo(leafletMap)
+                .bindPopup(`<b>Vaša poloha</b><br>Presnosť: cca ${Math.round(radius)} metrov`).openPopup();
+            userLocationCircle = L.circle(e.latlng, radius, {
+                color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.2
+            }).addTo(leafletMap);
+        });
+
+        leafletMap.on('locationerror', function(e) {
+            alert("Nepodarilo sa zistiť polohu: " + e.message);
+        });
+
         setTimeout(() => { leafletMap.invalidateSize(); }, 300);
+    }
+
+    function locateUser() {
+        if (!leafletMap) initMap();
+        leafletMap.locate({ setView: true, maxZoom: 18 });
     }
 
     function focusBuilding(lat, lng, name) {
