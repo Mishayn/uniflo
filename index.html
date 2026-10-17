@@ -206,6 +206,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            height: 100%;
         }
 
         .section-header {
@@ -685,9 +686,9 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: Student Events & Promo Cards (Punkto & YouTube) -->
+        <!-- COLUMN 3: Student Events & Promo Cards (Punkto & YouTube) - Stretched to match height -->
         <div class="dash-column">
-            <div id="screen-akcie" class="screen active">
+            <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
                     <div class="dash-card">
                         <div class="section-header">
@@ -744,14 +745,14 @@
                                     <a href="https://punkto.sk" target="_blank" class="news-link" style="font-size:0.75rem;">Otvoriť ↗</a>
                                 </div>
                                 <div class="promo-desc">
-                                    Užitočný portál na vyhľadávanie miest na mape: obchody, služby, stravovanie a voľný čas.
+                                    Удобный поиск мест на карте: еда, магазины, услуги, досуг и многое другое.
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Подсвеченная карточка YouTube автора -->
-                    <div class="dash-card">
+                    <!-- Подсвеченная карточка YouTube автора (с flex:1 для идеального заполнения высоты) -->
+                    <div class="dash-card" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
                         <div class="promo-card highlighted">
                             <svg class="promo-logo" viewBox="0 0 24 24" fill="#ef4444" style="padding:6px; background:rgba(239,68,68,0.15); border-radius:8px;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                             <div class="promo-content">
@@ -760,7 +761,7 @@
                                     <a href="https://www.youtube.com/@mishayn" target="_blank" class="news-link" style="font-size:0.75rem; color:#ef4444;">Odoberať ↗</a>
                                 </div>
                                 <div class="promo-desc">
-                                    YouTube kanál autora. Podporte tvorbu odberom!
+                                    Ютуб создателя, поддержите подпиской!
                                 </div>
                             </div>
                         </div>
@@ -825,9 +826,9 @@
             <div class="form-group">
                 <label>Typ výučby</label>
                 <select id="form-type" class="form-control">
-                    <option value="prednáška">prednáška (Zelená)</option>
-                    <option value="cvičenie">cvičenie (Modrá)</option>
-                    <option value="laboratórne">laboratórne (Červená)</option>
+                    <option value="prednáška">prednáška</option>
+                    <option value="cvičenie">cvičenie</option>
+                    <option value="laboratórne">laboratórne</option>
                 </select>
             </div>
             <div style="display:flex; gap:10px;">
@@ -1050,6 +1051,7 @@
             calGrid.appendChild(h);
         });
 
+        // Дни предыдущего месяца (сентябрь 2026 заканчивается 30-м, но для красоты сетки опустим или покажем хвост)
         for (let p = 28; p <= 30; p++) {
             const cell = document.createElement('div');
             cell.className = 'cal-day other-month';
@@ -1057,9 +1059,15 @@
             calGrid.appendChild(cell);
         }
 
+        const todayDate = new Date();
+        const currentDayNum = todayDate.getDate(); // Реальное текущее число (17)
+        const currentMonthNum = todayDate.getMonth(); // 9 для октября
+
         for (let day = 1; day <= 31; day++) {
             const cell = document.createElement('div');
-            cell.className = 'cal-day' + (day === 19 ? ' active' : '');
+            // Подсвечиваем только если сейчас октябрь 2026 и число совпадает
+            const isToday = (day === currentDayNum && currentMonthNum === 9);
+            cell.className = 'cal-day' + (isToday ? ' active' : '');
             cell.innerText = day;
             calGrid.appendChild(cell);
         }
