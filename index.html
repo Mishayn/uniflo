@@ -781,8 +781,12 @@
         <form id="note-form" onsubmit="saveNote(event)">
             <input type="hidden" id="note-edit-id">
             <div class="form-group">
-                <label>Text poznámki (prvé slová budú nadpisom)</label>
-                <textarea id="note-text-content" class="form-control" rows="5" placeholder="Napíšte niečo..." required style="resize:vertical;"></textarea>
+                <label>Názov (voliteľné)</label>
+                <input type="text" id="note-title-input" class="form-control" placeholder="Ak necháte prázdne, použije sa začiatok textu">
+            </div>
+            <div class="form-group">
+                <label>Text poznámky</label>
+                <textarea id="note-text-content" class="form-control" rows="5" placeholder="Napíšte svoju poznámku..." required style="resize:vertical;"></textarea>
             </div>
             <button type="submit" class="btn-primary">Uložiť poznámku</button>
             <button type="button" class="btn-primary btn-delete" id="btn-delete-note" onclick="deleteNote()" style="display:none;">Odstrániť poznámku</button>
@@ -906,8 +910,8 @@
     let schedule = loadInitialSchedule(currentGroup);
     let customMapPoints = JSON.parse(localStorage.getItem('uniza_saved_map_points')) || [];
     let notesList = JSON.parse(localStorage.getItem('uniza_user_notes')) || [
-        { id: '1', text: 'Nezabudnúť odovzdať semestrálnku do piatku.' },
-        { id: '2', text: 'Kúpiť lístky na vlak domov.' }
+        { id: '1', title: 'Semestrálka', text: 'Nezabudnúť odovzdať semestrálnku do piatku.' },
+        { id: '2', title: '', text: 'Kúpiť lístky na vlak domov.' }
     ];
     
     let leafletMap = null;
@@ -988,19 +992,25 @@
         container.innerHTML = '';
 
         if (notesList.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">Žiadne poznámki. Kliknite na "+ Vytvoriť poznámku".</div>';
+            container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">Žiadne poznámky. Kliknite na "+ Vytvoriť poznámku".</div>';
             return;
         }
 
         notesList.forEach(note => {
-            const words = note.text.trim().split(/\s+/);
-            const title = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
+            let displayTitle = note.title ? note.title.trim() : '';
+            
+            // Если названия нет, берем первые слова из первого абзаца
+            if (!displayTitle) {
+                const firstParagraph = note.text.trim().split('\n')[0] || '';
+                const words = firstParagraph.split(/\s+/);
+                displayTitle = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
+            }
 
             const item = document.createElement('div');
             item.className = 'note-item';
             item.onclick = () => openEditNoteModal(note.id);
             item.innerHTML = `
-                <div class="note-title">📌 ${title}</div>
+                <div class="note-title">📌 ${displayTitle}</div>
                 <div class="note-preview">${note.text}</div>
             `;
             container.appendChild(item);
@@ -1010,6 +1020,7 @@
     function openNoteModal() {
         document.getElementById('note-edit-id').value = '';
         document.getElementById('note-modal-title').innerText = 'Nová poznámka';
+        document.getElementById('note-title-input').value = '';
         document.getElementById('note-text-content').value = '';
         document.getElementById('btn-delete-note').style.display = 'none';
         document.getElementById('note-modal').classList.add('active');
@@ -1021,6 +1032,7 @@
 
         document.getElementById('note-edit-id').value = note.id;
         document.getElementById('note-modal-title').innerText = 'Upraviť poznámku';
+        document.getElementById('note-title-input').value = note.title || '';
         document.getElementById('note-text-content').value = note.text;
         document.getElementById('btn-delete-note').style.display = 'block';
         document.getElementById('note-modal').classList.add('active');
@@ -1029,14 +1041,19 @@
     function saveNote(e) {
         e.preventDefault();
         const id = document.getElementById('note-edit-id').value;
+        const title = document.getElementById('note-title-input').value;
         const text = document.getElementById('note-text-content').value;
 
         if (id) {
             const note = notesList.find(n => n.id === id);
-            if (note) note.text = text;
+            if (note) {
+                note.title = title;
+                note.text = text;
+            }
         } else {
             notesList.push({
                 id: Date.now().toString(),
+                title: title,
                 text: text
             });
         }
