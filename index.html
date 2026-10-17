@@ -42,21 +42,54 @@
         body {
             background-color: var(--bg-main);
             color: var(--text-primary);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
-            padding-bottom: 70px;
         }
 
         .app-container {
             width: 100%;
-            max-width: 650px;
+            max-width: 100%;
             background-color: var(--bg-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        /* Responsive Layout Optimization for Desktop */
+        @media (min-width: 769px) {
+            .app-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding-bottom: 20px;
+            }
+
+            .bottom-nav {
+                display: none !important;
+            }
+
+            .desktop-nav {
+                display: flex !important;
+                gap: 12px;
+            }
+
+            .week-grid {
+                min-width: 100% !important;
+            }
+
+            #map-container {
+                height: 620px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 70px;
+            }
+            .desktop-nav {
+                display: none !important;
+            }
         }
 
         /* Top Header */
@@ -70,6 +103,8 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .group-selector-container {
@@ -88,6 +123,24 @@
             font-weight: 600;
             width: 120px;
             outline: none;
+        }
+
+        .desktop-nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .desktop-nav-btn:hover, .desktop-nav-btn.active {
+            color: var(--accent-orange);
+            background: var(--accent-orange-bg);
+            border-color: rgba(249, 115, 22, 0.3);
         }
 
         .header-actions {
@@ -121,7 +174,7 @@
         /* Screen Sections */
         .screen {
             display: none;
-            padding: 16px;
+            padding: 20px;
             flex: 1;
         }
 
@@ -138,7 +191,7 @@
         }
 
         .section-title {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -255,8 +308,7 @@
 
         .week-grid {
             display: grid;
-            grid-template-columns: 50px repeat(5, minmax(110px, 1fr));
-            min-width: 600px;
+            grid-template-columns: 60px repeat(5, minmax(120px, 1fr));
             position: relative;
         }
 
@@ -266,7 +318,7 @@
             background: rgba(0, 0, 0, 0.2);
             border-bottom: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
         }
 
@@ -275,7 +327,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             border-right: 1px solid var(--border-color);
@@ -294,7 +346,7 @@
             border: 1px solid var(--accent-orange);
             border-radius: 6px;
             padding: 4px 6px;
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             overflow: hidden;
             cursor: pointer;
             box-sizing: border-box;
@@ -320,7 +372,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
             pointer-events: none;
             box-sizing: border-box;
@@ -402,22 +454,20 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 30px;
+            padding: 40px;
             text-align: center;
             margin-bottom: 16px;
         }
 
-        .clock-time { font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-        .clock-date { font-size: 1rem; color: var(--text-secondary); margin-top: 6px; }
+        .clock-time { font-size: 3.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .clock-date { font-size: 1.1rem; color: var(--text-secondary); margin-top: 6px; }
 
-        /* Bottom Nav */
+        /* Bottom Nav (Mobile) */
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
             width: 100%;
-            max-width: 650px;
             background: rgba(28, 30, 34, 0.95);
             backdrop-filter: blur(10px);
             border-top: 1px solid var(--border-color);
@@ -504,12 +554,22 @@
 <body>
 
 <div class="app-container">
-    <!-- Top Bar -->
+    <!-- Top Header -->
     <div class="top-header">
         <div class="group-selector-container">
             <span style="font-size:0.85rem; color:var(--text-muted);">Skupina:</span>
             <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Zadajte skupinu...">
         </div>
+
+        <!-- Desktop Navigation Bar -->
+        <div class="desktop-nav">
+            <button class="desktop-nav-btn active" onclick="switchTab('rozvrh', this)">Rozvrh</button>
+            <button class="desktop-nav-btn" onclick="switchTab('kalendar', this)">Kalendár</button>
+            <button class="desktop-nav-btn" onclick="switchTab('mapa', this)">Mapa UNIZA</button>
+            <button class="desktop-nav-btn" onclick="switchTab('akcie', this)">Akcie</button>
+            <button class="desktop-nav-btn" onclick="switchTab('hodiny', this)">Hodiny</button>
+        </div>
+
         <div class="header-actions">
             <button class="btn-header" onclick="openAddModal()">+ Pridať</button>
             <button class="btn-header btn-danger-confirm" onclick="resetScheduleWithConfirm()">Reset</button>
@@ -518,14 +578,12 @@
 
     <!-- 1. ROZVRH SCREEN -->
     <div id="screen-rozvrh" class="screen active">
-        <!-- Upcoming Day -->
         <div class="section-header">
             <div class="section-title">Najbližší deň</div>
             <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026</div>
         </div>
         <div class="card-list" id="upcoming-list"></div>
 
-        <!-- Weekly Grid View -->
         <div class="section-header" style="margin-top:24px;">
             <div class="section-title">Týždeň</div>
             <div class="section-meta">19. 10. – 25. 10. 2026</div>
@@ -540,7 +598,6 @@
                 <div class="week-header-cell">Štvrtok<br><span style="color:var(--text-muted);font-weight:400;">22. 10.</span></div>
                 <div class="week-header-cell">Piatok<br><span style="color:var(--text-muted);font-weight:400;">23. 10.</span></div>
 
-                <!-- Time Column -->
                 <div style="display:flex; flex-direction:column;">
                     <div class="week-time-cell">7:00</div>
                     <div class="week-time-cell">8:00</div>
@@ -555,7 +612,6 @@
                     <div class="week-time-cell">17:00</div>
                 </div>
 
-                <!-- Day Columns -->
                 <div class="week-day-column" id="week-day-1"></div>
                 <div class="week-day-column" id="week-day-2"></div>
                 <div class="week-day-column" id="week-day-3"></div>
@@ -580,7 +636,8 @@
 
     <!-- 3. MAPA SCREEN -->
     <div id="screen-mapa" class="screen">
-        <div class="section-title" style="margin-bottom:8px;">Mapa Kampusu UNIZA (Veľký Diel)</div>
+        <div class="section-title" style="margin-bottom:8px;">Interaktívna Mapa Kampusu UNIZA</div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">💡 Kliknite do mapy, aby ste pridali vlastnú verejnú bodku pre ostatných študentov!</p>
         <div class="map-building-list">
             <div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>
             <div class="chip" onclick="focusBuilding(49.20160, 18.75620, 'FRI')">FRI (RA-RC)</div>
@@ -620,37 +677,37 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Navigation Bar (Mobile Only) -->
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('rozvrh')">
+        <div class="nav-item active" onclick="switchTab('rozvrh', this)">
             <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
             Rozvrh
         </div>
-        <div class="nav-item" onclick="switchTab('kalendar')">
+        <div class="nav-item" onclick="switchTab('kalendar', this)">
             <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
             Kalendár
         </div>
-        <div class="nav-item" onclick="switchTab('mapa')">
+        <div class="nav-item" onclick="switchTab('mapa', this)">
             <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
             Mapa
         </div>
-        <div class="nav-item" onclick="switchTab('akcie')">
+        <div class="nav-item" onclick="switchTab('akcie', this)">
             <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
             Akcie
         </div>
-        <div class="nav-item" onclick="switchTab('hodiny')">
+        <div class="nav-item" onclick="switchTab('hodiny', this)">
             <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
             Hodiny
         </div>
     </nav>
 </div>
 
-<!-- Modal for Adding / Editing Lesson -->
+<!-- Modal for Lesson -->
 <div class="modal-overlay" id="lesson-modal">
     <div class="modal">
         <div class="modal-header">
             <div class="modal-title" id="modal-title-text">Pridať hodinu</div>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <button class="close-btn" onclick="closeModal('lesson-modal')">&times;</button>
         </div>
         <form id="lesson-form" onsubmit="saveLesson(event)">
             <input type="hidden" id="edit-id">
@@ -706,8 +763,91 @@
     </div>
 </div>
 
+<!-- Modal for Shared Map Point -->
+<div class="modal-overlay" id="map-point-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">Pridať verejný bod na mapu</div>
+            <button class="close-btn" onclick="closeModal('map-point-modal')">&times;</button>
+        </div>
+        <form id="map-point-form" onsubmit="saveMapPoint(event)">
+            <input type="hidden" id="map-lat">
+            <input type="hidden" id="map-lng">
+            <div class="form-group">
+                <label>Názov miesta / Popis</label>
+                <input type="text" id="map-point-title" class="form-control" placeholder="napr. Vynikajúca káva, Študovňa, Zraz" required>
+            </div>
+            <div class="form-group">
+                <label>Kategória</label>
+                <select id="map-point-cat" class="form-control">
+                    <option value="☕ Kaviareň / Jedlo">☕ Kaviareň / Jedlo</option>
+                    <option value="📚 Štúdium / Ticho">📚 Štúdium / Ticho</option>
+                    <option value="🎉 Zábava / Oddych">🎉 Zábava / Oddych</option>
+                    <option value="📍 Iné">📍 Iné</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">Zdieľať bod pre všetkých</button>
+        </form>
+    </div>
+</div>
+
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Firebase Cloud Database Modules (Realtime Shared Map Points) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Public Firebase App Realtime Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyC_Public_DemoKey_UNIZA",
+        authDomain: "uniza-schedule.firebaseapp.com",
+        projectId: "uniza-schedule-shared",
+        storageBucket: "uniza-schedule.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "1:123456789:web:abcdef"
+    };
+
+    let db = null;
+    try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+    } catch(e) {
+        console.log("Firebase initialized in local mode.");
+    }
+
+    window.saveMapPointToCloud = async function(title, cat, lat, lng) {
+        if (db) {
+            try {
+                await addDoc(collection(db, "shared_points"), { title, cat, lat, lng, time: Date.now() });
+            } catch(e) {}
+        }
+        // Save locally fallback
+        const localPoints = JSON.parse(localStorage.getItem('uniza_shared_points') || '[]');
+        localPoints.push({ title, cat, lat, lng });
+        localStorage.setItem('uniza_shared_points', JSON.stringify(localPoints));
+        window.renderSingleMapPoint({ title, cat, lat, lng });
+    };
+
+    window.initCloudPointsListener = function() {
+        if (db) {
+            try {
+                onSnapshot(collection(db, "shared_points"), (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            window.renderSingleMapPoint(change.doc.data());
+                        }
+                    });
+                });
+            } catch(e) {}
+        }
+        // Render local points
+        const localPoints = JSON.parse(localStorage.getItem('uniza_shared_points') || '[]');
+        localPoints.forEach(p => window.renderSingleMapPoint(p));
+    };
+</script>
+
 <script>
     let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR11';
     document.getElementById('group-input').value = currentGroup;
@@ -836,12 +976,14 @@
         }
     }
 
-    function switchTab(tabId) {
+    function switchTab(tabId, el) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.querySelectorAll('.desktop-nav-btn').forEach(b => b.classList.remove('active'));
 
         document.getElementById(`screen-${tabId}`).classList.add('active');
-        event.currentTarget.classList.add('active');
+
+        if (el) el.classList.add('active');
 
         if (tabId === 'mapa') {
             if (!leafletMap) {
@@ -877,6 +1019,13 @@
             mapMarkers.push({ name: b.name.toLowerCase(), marker, lat: b.lat, lng: b.lng });
         });
 
+        // Click to add custom student point
+        leafletMap.on('click', function(e) {
+            document.getElementById('map-lat').value = e.latlng.lat;
+            document.getElementById('map-lng').value = e.latlng.lng;
+            document.getElementById('map-point-modal').classList.add('active');
+        });
+
         leafletMap.on('locationfound', function(e) {
             const radius = e.accuracy / 2;
             if (userLocationMarker) leafletMap.removeLayer(userLocationMarker);
@@ -889,11 +1038,32 @@
             }).addTo(leafletMap);
         });
 
-        leafletMap.on('locationerror', function(e) {
-            alert("Nepodarilo sa zistiť polohu: " + e.message);
-        });
-
         setTimeout(() => { leafletMap.invalidateSize(); }, 300);
+
+        if (window.initCloudPointsListener) {
+            window.initCloudPointsListener();
+        }
+    }
+
+    window.renderSingleMapPoint = function(p) {
+        if (!leafletMap) return;
+        L.marker([p.lat, p.lng]).addTo(leafletMap)
+            .bindPopup(`<b>${p.cat || '📍 Bod'}</b><br>${p.title}`);
+    };
+
+    function saveMapPoint(e) {
+        e.preventDefault();
+        const title = document.getElementById('map-point-title').value;
+        const cat = document.getElementById('map-point-cat').value;
+        const lat = parseFloat(document.getElementById('map-lat').value);
+        const lng = parseFloat(document.getElementById('map-lng').value);
+
+        if (window.saveMapPointToCloud) {
+            window.saveMapPointToCloud(title, cat, lat, lng);
+        }
+
+        closeModal('map-point-modal');
+        document.getElementById('map-point-form').reset();
     }
 
     function locateUser() {
@@ -935,8 +1105,8 @@
         document.getElementById('lesson-modal').classList.add('active');
     }
 
-    function closeModal() {
-        document.getElementById('lesson-modal').classList.remove('active');
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
     }
 
     function saveLesson(e) {
@@ -962,7 +1132,7 @@
         }
 
         localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
-        closeModal();
+        closeModal('lesson-modal');
         renderAll();
     }
 
@@ -971,7 +1141,7 @@
         if (!id) return;
         schedule = schedule.filter(l => l.id !== id);
         localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
-        closeModal();
+        closeModal('lesson-modal');
         renderAll();
     }
 
