@@ -261,7 +261,7 @@
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--bg-main);
-            max-height: 505px; /* Зафиксированная высота, чтобы сетка не растягивала страницу */
+            max-height: 505px;
         }
 
         .week-grid {
@@ -416,7 +416,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 200px;
+            max-height: 215px; /* Увеличено на 15px */
             overflow-y: auto;
         }
 
@@ -434,11 +434,11 @@
         .note-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
         .note-preview { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Online Chat Styles (Увеличена высота примерно на 30px до 225px) */
+        /* Online Chat Styles (Увеличено еще на 30px до 255px) */
         .chat-box {
             display: flex;
             flex-direction: column;
-            height: 225px;
+            height: 255px;
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -539,7 +539,7 @@
             object-fit: cover;
         }
 
-        /* Promo Cards Style (Кликабельные карточки + зеленая подсветка для Punkto) */
+        /* Promo Cards Style */
         .promo-card-link {
             text-decoration: none;
             display: block;
@@ -560,7 +560,6 @@
             background: var(--bg-card-hover);
         }
         
-        /* Зеленая подсветка для Punkto.sk */
         .promo-card.punkto-highlight {
             border-color: rgba(34, 197, 94, 0.4);
             background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), var(--bg-main));
@@ -804,7 +803,7 @@
             <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
 
-                    <!-- Блок Заметок -->
+                    <!-- Блок Заметок (высота увеличена на 15px) -->
                     <div class="dash-card">
                         <div class="section-header">
                             <div class="section-title">📝 Moje Poznámky</div>
@@ -813,7 +812,7 @@
                         <div class="notes-container" id="notes-list-container"></div>
                     </div>
 
-                    <!-- Блок Онлайн Чата (высота увеличена до 225px) -->
+                    <!-- Блок Онлайн Чата (высота увеличена до 255px) -->
                     <div class="dash-card">
                         <div class="section-header">
                             <div class="section-title">💬 Online Chat</div>
