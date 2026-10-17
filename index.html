@@ -49,37 +49,57 @@
 
         .app-container {
             width: 100%;
-            max-width: 100%;
+            max-width: 680px; /* Квадратный аккуратный центр */
             background-color: var(--bg-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.6);
         }
 
-        /* Responsive Layout Optimization for Desktop */
-        @media (min-width: 769px) {
-            .app-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding-bottom: 20px;
+        /* Desktop side widgets styling for wide screens */
+        @media (min-width: 1100px) {
+            body::before {
+                content: "UNIZA FRI 2026\A📅 Skupina: Aktívna\A🚀 Rýchly prístup k mapám";
+                white-space: pre;
+                position: fixed;
+                left: 40px;
+                top: 100px;
+                width: 220px;
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                padding: 20px;
+                border-radius: 12px;
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                line-height: 1.5;
             }
 
+            body::after {
+                content: "💡 Tip:\AKliknutím do mapy môžete pridávať vlastné body pre všetkých spolužiakov!";
+                white-space: pre;
+                position: fixed;
+                right: 40px;
+                top: 100px;
+                width: 240px;
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                padding: 20px;
+                border-radius: 12px;
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                line-height: 1.5;
+            }
+        }
+
+        @media (min-width: 769px) {
             .bottom-nav {
                 display: none !important;
             }
-
             .desktop-nav {
                 display: flex !important;
-                gap: 12px;
-            }
-
-            .week-grid {
-                min-width: 100% !important;
-            }
-
-            #map-container {
-                height: 620px !important;
+                gap: 8px;
             }
         }
 
@@ -103,7 +123,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
@@ -121,7 +141,7 @@
             border-radius: 8px;
             font-size: 0.95rem;
             font-weight: 600;
-            width: 120px;
+            width: 100px;
             outline: none;
         }
 
@@ -129,10 +149,10 @@
             background: transparent;
             border: 1px solid transparent;
             color: var(--text-secondary);
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -146,16 +166,16 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-header {
             background: var(--bg-input);
             color: var(--text-secondary);
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -174,7 +194,7 @@
         /* Screen Sections */
         .screen {
             display: none;
-            padding: 20px;
+            padding: 16px;
             flex: 1;
         }
 
@@ -191,7 +211,7 @@
         }
 
         .section-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -308,7 +328,8 @@
 
         .week-grid {
             display: grid;
-            grid-template-columns: 60px repeat(5, minmax(120px, 1fr));
+            grid-template-columns: 50px repeat(5, minmax(110px, 1fr));
+            min-width: 600px;
             position: relative;
         }
 
@@ -318,7 +339,7 @@
             background: rgba(0, 0, 0, 0.2);
             border-bottom: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
         }
 
@@ -327,7 +348,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             border-right: 1px solid var(--border-color);
@@ -346,7 +367,7 @@
             border: 1px solid var(--accent-orange);
             border-radius: 6px;
             padding: 4px 6px;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             overflow: hidden;
             cursor: pointer;
             box-sizing: border-box;
@@ -372,7 +393,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             pointer-events: none;
             box-sizing: border-box;
@@ -454,20 +475,22 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 40px;
+            padding: 30px;
             text-align: center;
             margin-bottom: 16px;
         }
 
-        .clock-time { font-size: 3.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-        .clock-date { font-size: 1.1rem; color: var(--text-secondary); margin-top: 6px; }
+        .clock-time { font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .clock-date { font-size: 1rem; color: var(--text-secondary); margin-top: 6px; }
 
         /* Bottom Nav (Mobile) */
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
+            max-width: 680px;
             background: rgba(28, 30, 34, 0.95);
             backdrop-filter: blur(10px);
             border-top: 1px solid var(--border-color);
@@ -558,14 +581,14 @@
     <div class="top-header">
         <div class="group-selector-container">
             <span style="font-size:0.85rem; color:var(--text-muted);">Skupina:</span>
-            <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Zadajte skupinu...">
+            <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Skupina...">
         </div>
 
         <!-- Desktop Navigation Bar -->
         <div class="desktop-nav">
             <button class="desktop-nav-btn active" onclick="switchTab('rozvrh', this)">Rozvrh</button>
             <button class="desktop-nav-btn" onclick="switchTab('kalendar', this)">Kalendár</button>
-            <button class="desktop-nav-btn" onclick="switchTab('mapa', this)">Mapa UNIZA</button>
+            <button class="desktop-nav-btn" onclick="switchTab('mapa', this)">Mapa</button>
             <button class="desktop-nav-btn" onclick="switchTab('akcie', this)">Akcie</button>
             <button class="desktop-nav-btn" onclick="switchTab('hodiny', this)">Hodiny</button>
         </div>
@@ -637,15 +660,14 @@
     <!-- 3. MAPA SCREEN -->
     <div id="screen-mapa" class="screen">
         <div class="section-title" style="margin-bottom:8px;">Interaktívna Mapa Kampusu UNIZA</div>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">💡 Kliknite do mapy, aby ste pridali vlastnú verejnú bodku pre ostatných študentov!</p>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">💡 Kliknite do mapy pre pridanie verejnej bodky pre všetkých!</p>
         <div class="map-building-list">
             <div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>
-            <div class="chip" onclick="focusBuilding(49.20160, 18.75620, 'FRI')">FRI (RA-RC)</div>
+            <div class="chip" onclick="focusBuilding(49.20160, 18.75620, 'FRI')">FRI</div>
             <div class="chip" onclick="focusBuilding(49.20230, 18.76100, 'Aula AR')">Aula AR</div>
-            <div class="chip" onclick="focusBuilding(49.20300, 18.76020, 'Rektorát')">Rektorát (AA-AF)</div>
-            <div class="chip" onclick="focusBuilding(49.20420, 18.75900, 'BA-BG')">Stroj./El. (BA-BG)</div>
+            <div class="chip" onclick="focusBuilding(49.20300, 18.76020, 'Rektorát')">Rektorát</div>
             <div class="chip" onclick="focusBuilding(49.20120, 18.76150, 'Knižnica')">Knižnica</div>
-            <div class="chip" onclick="focusBuilding(49.19850, 18.76100, 'Internáty')">Internáty VD</div>
+            <div class="chip" onclick="focusBuilding(49.19850, 18.76100, 'Internáty')">Internáty</div>
         </div>
         <div id="map-container"></div>
     </div>
@@ -658,12 +680,6 @@
                 <div class="card-main">
                     <div class="subject-title">Študentská kvapka krvi <span class="badge badge-prednaska">akcia</span></div>
                     <div class="teacher-name">Menza Veľký Diel • 22. Október 08:00</div>
-                </div>
-            </div>
-            <div class="card-item">
-                <div class="card-main">
-                    <div class="subject-title">FRI Club Board Game Night <span class="badge badge-laboratorne">zábava</span></div>
-                    <div class="teacher-name">Chodba B-suterén • 21. Október 18:00</div>
                 </div>
             </div>
         </div>
@@ -723,7 +739,7 @@
             </div>
             <div class="form-group">
                 <label>Názov predmetu</label>
-                <input type="text" id="form-title" class="form-control" placeholder="napr. MpInf, INF1, Alg" required>
+                <input type="text" id="form-title" class="form-control" placeholder="napr. MpInf, INF1" required>
             </div>
             <div class="form-group">
                 <label>Typ výučby</label>
@@ -754,16 +770,16 @@
                 </div>
                 <div class="form-group" style="flex:1;">
                     <label>Budova / Poznámka</label>
-                    <input type="text" id="form-building" class="form-control" placeholder="napr. FRI • 2. posch.">
+                    <input type="text" id="form-building" class="form-control" placeholder="napr. FRI">
                 </div>
             </div>
             <button type="submit" class="btn-primary">Uložiť hodinu</button>
-            <button type="button" class="btn-primary btn-delete" id="btn-delete-lesson" onclick="deleteLesson()" style="display:none;">Odstrániť hodinu</button>
+            <button type="button" class="btn-primary btn-delete" id="btn-delete-lesson" onclick="deleteLesson()" style="display:none;">Odstrániť</button>
         </form>
     </div>
 </div>
 
-<!-- Modal for Shared Map Point -->
+<!-- Modal for Map Point -->
 <div class="modal-overlay" id="map-point-modal">
     <div class="modal">
         <div class="modal-header">
@@ -774,8 +790,8 @@
             <input type="hidden" id="map-lat">
             <input type="hidden" id="map-lng">
             <div class="form-group">
-                <label>Názov miesta / Popis</label>
-                <input type="text" id="map-point-title" class="form-control" placeholder="napr. Vynikajúca káva, Študovňa, Zraz" required>
+                <label>Názov miesta</label>
+                <input type="text" id="map-point-title" class="form-control" placeholder="napr. Najlepšia káva" required>
             </div>
             <div class="form-group">
                 <label>Kategória</label>
@@ -786,7 +802,7 @@
                     <option value="📍 Iné">📍 Iné</option>
                 </select>
             </div>
-            <button type="submit" class="btn-primary">Zdieľať bod pre všetkých</button>
+            <button type="submit" class="btn-primary">Zdieľať bod</button>
         </form>
     </div>
 </div>
@@ -794,12 +810,11 @@
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Firebase Cloud Database Modules (Realtime Shared Map Points) -->
+<!-- Firebase Cloud Database Modules -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Public Firebase App Realtime Config
     const firebaseConfig = {
         apiKey: "AIzaSyC_Public_DemoKey_UNIZA",
         authDomain: "uniza-schedule.firebaseapp.com",
@@ -813,9 +828,7 @@
     try {
         const app = initializeApp(firebaseConfig);
         db = getFirestore(app);
-    } catch(e) {
-        console.log("Firebase initialized in local mode.");
-    }
+    } catch(e) {}
 
     window.saveMapPointToCloud = async function(title, cat, lat, lng) {
         if (db) {
@@ -823,7 +836,6 @@
                 await addDoc(collection(db, "shared_points"), { title, cat, lat, lng, time: Date.now() });
             } catch(e) {}
         }
-        // Save locally fallback
         const localPoints = JSON.parse(localStorage.getItem('uniza_shared_points') || '[]');
         localPoints.push({ title, cat, lat, lng });
         localStorage.setItem('uniza_shared_points', JSON.stringify(localPoints));
@@ -842,7 +854,6 @@
                 });
             } catch(e) {}
         }
-        // Render local points
         const localPoints = JSON.parse(localStorage.getItem('uniza_shared_points') || '[]');
         localPoints.forEach(p => window.renderSingleMapPoint(p));
     };
@@ -867,7 +878,7 @@
     }
 
     function resetScheduleWithConfirm() {
-        if (confirm(`Naozaj chcete úplne vymazať celé rozvrhnutie pre skupinu ${currentGroup}?`)) {
+        if (confirm(`Naozaj chcete úplne vymazať rozvrh pre skupinu ${currentGroup}?`)) {
             schedule = [];
             localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
             renderAll();
@@ -982,7 +993,6 @@
         document.querySelectorAll('.desktop-nav-btn').forEach(b => b.classList.remove('active'));
 
         document.getElementById(`screen-${tabId}`).classList.add('active');
-
         if (el) el.classList.add('active');
 
         if (tabId === 'mapa') {
@@ -1003,14 +1013,12 @@
         }).addTo(leafletMap);
 
         const buildings = [
-            { name: "FRI UNIZA (RA, RB, RC)", lat: 49.20160, lng: 18.75620, desc: "Fakulta riadenia a informatiky (RA, RB, RC)" },
+            { name: "FRI UNIZA (RA, RB, RC)", lat: 49.20160, lng: 18.75620, desc: "Fakulta riadenia a informatiky" },
             { name: "Aula AR", lat: 49.20230, lng: 18.76100, desc: "Hlavná prednášková aula AR" },
-            { name: "Rektorát & Dekanáty (AA – AF)", lat: 49.20300, lng: 18.76020, desc: "Hlavná administratívna os (AA, AB, AC, AD, AE, AF)" },
-            { name: "Strojnícka & Elektrotechnika (BA – BG)", lat: 49.20420, lng: 18.75900, desc: "Strojnícka fakulta a fakulta elektrotechniky (BA až BG)" },
-            { name: "Univerzitný vedecký park (VA, VB)", lat: 49.20580, lng: 18.76120, desc: "Vedecký park a výskumné centrá VA, VB" },
-            { name: "Univerzitná knižnica (UK)", lat: 49.20120, lng: 18.76150, desc: "Hlavná knižnica UNIZA (UK)" },
-            { name: "Nová menza & UPC (NM)", lat: 49.19980, lng: 18.76200, desc: "Stravovacie zariadenie - Nová menza & Pastoračné centrum" },
-            { name: "Internáty Veľký Diel (DA – DH)", lat: 49.19850, lng: 18.76100, desc: "Ubytovacie zariadenia študentov Veľký Diel (DA až DH)" }
+            { name: "Rektorát & Dekanáty (AA – AF)", lat: 49.20300, lng: 18.76020, desc: "Hlavná administratívna os" },
+            { name: "Strojnícka & Elektrotechnika", lat: 49.20420, lng: 18.75900, desc: "Strojnícka fakulta a FEIT" },
+            { name: "Univerzitná knižnica (UK)", lat: 49.20120, lng: 18.76150, desc: "Hlavná knižnica UNIZA" },
+            { name: "Internáty Veľký Diel", lat: 49.19850, lng: 18.76100, desc: "Ubytovacie zariadenia" }
         ];
 
         buildings.forEach(b => {
@@ -1019,23 +1027,10 @@
             mapMarkers.push({ name: b.name.toLowerCase(), marker, lat: b.lat, lng: b.lng });
         });
 
-        // Click to add custom student point
         leafletMap.on('click', function(e) {
             document.getElementById('map-lat').value = e.latlng.lat;
             document.getElementById('map-lng').value = e.latlng.lng;
             document.getElementById('map-point-modal').classList.add('active');
-        });
-
-        leafletMap.on('locationfound', function(e) {
-            const radius = e.accuracy / 2;
-            if (userLocationMarker) leafletMap.removeLayer(userLocationMarker);
-            if (userLocationCircle) leafletMap.removeLayer(userLocationCircle);
-
-            userLocationMarker = L.marker(e.latlng).addTo(leafletMap)
-                .bindPopup(`<b>Vaša poloha</b><br>Presnosť: cca ${Math.round(radius)} metrov`).openPopup();
-            userLocationCircle = L.circle(e.latlng, radius, {
-                color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.2
-            }).addTo(leafletMap);
         });
 
         setTimeout(() => { leafletMap.invalidateSize(); }, 300);
@@ -1061,7 +1056,6 @@
         if (window.saveMapPointToCloud) {
             window.saveMapPointToCloud(title, cat, lat, lng);
         }
-
         closeModal('map-point-modal');
         document.getElementById('map-point-form').reset();
     }
@@ -1071,11 +1065,9 @@
         leafletMap.locate({ setView: true, maxZoom: 18 });
     }
 
-    function focusBuilding(lat, lng, name) {
+    function focusBuilding(lat, lng) {
         if (!leafletMap) initMap();
         leafletMap.setView([lat, lng], 18);
-        const m = mapMarkers.find(item => Math.abs(item.lat - lat) < 0.001);
-        if (m) m.marker.openPopup();
     }
 
     function openAddModal() {
