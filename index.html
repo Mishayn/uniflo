@@ -92,8 +92,28 @@
             border-radius: 8px;
             font-size: 0.95rem;
             font-weight: 600;
-            width: 120px;
+            width: 110px;
             outline: none;
+        }
+
+        /* e-vzd quick link button */
+        .btn-evzd {
+            background: var(--bg-input);
+            color: var(--accent-orange);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .btn-evzd:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-orange);
         }
 
         /* Action Buttons above Najbližší deň */
@@ -135,13 +155,14 @@
 
         .btn-square-reset:hover { background: rgba(239, 68, 68, 0.3); }
 
-        /* Desktop Grid Layout (3 Columns Aligned) */
+        /* Desktop Grid Layout (3 Columns Aligned Perfectly) */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 16px;
             padding: 16px;
             flex: 1;
+            align-items: stretch;
         }
 
         @media (min-width: 1200px) {
@@ -165,12 +186,17 @@
             .screen.active { display: block; }
         }
 
+        .dash-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
         .dash-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 14px;
-            margin-bottom: 16px;
         }
 
         .section-header {
@@ -305,7 +331,7 @@
         /* Map Container */
         #map-container {
             width: 100%;
-            height: 310px;
+            height: 300px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             overflow: hidden;
@@ -338,7 +364,7 @@
 
         .chip-gps { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; font-weight: 600; }
 
-        /* Compact Calendar with matched padding */
+        /* Compact Calendar with matched dimensions */
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -370,22 +396,29 @@
         .clock-time { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 0.78rem; color: var(--text-secondary); }
 
-        /* Events & News Card (Extended to match left column height) */
+        /* Column 3 wrapper to match total height perfectly */
+        .events-column-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
         .news-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .news-item {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 12px 14px;
+            padding: 10px 12px;
         }
-        .news-title { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
-        .news-desc { font-size: 0.76rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 6px; }
-        .news-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        .news-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+        .news-desc { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; margin-bottom: 5px; }
+        .news-meta { font-size: 0.68rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
         .news-link { color: var(--accent-orange); text-decoration: none; font-weight: 600; }
         .news-link:hover { text-decoration: underline; }
 
@@ -489,7 +522,8 @@
         </div>
         <div class="group-selector-container">
             <span style="font-size:0.82rem; color:var(--text-muted);">Skupina:</span>
-            <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Skupina...">
+            <input type="text" id="group-input" class="group-input" value="5ZYR12" onchange="changeGroup(this.value)" placeholder="Skupina...">
+            <a href="https://vzdelavanie.uniza.sk/vzdelavanie/rozvrh2.php?list=2026Z" target="_blank" class="btn-evzd">e-vzd ↗</a>
         </div>
     </div>
 
@@ -500,7 +534,6 @@
         <div class="dash-column">
             <div id="screen-rozvrh" class="screen active">
                 
-                <!-- Action Buttons placed above Najbližší deň -->
                 <div class="schedule-actions-bar">
                     <button class="btn-main-action" onclick="openAddModal()">+ Pridať hodinu</button>
                     <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" title="Reset rozvrhu">⟳</button>
@@ -588,49 +621,51 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: Student Events & News (Balanced Height) -->
+        <!-- COLUMN 3: Student Events & News (Matched height) -->
         <div class="dash-column">
             <div id="screen-akcie" class="screen active">
-                <div class="dash-card">
-                    <div class="section-header">
-                        <div class="section-title">🔥 Študentský Život & Akcie</div>
-                        <span class="section-meta">Žilina / UNIZA</span>
-                    </div>
-                    
-                    <div class="news-container">
-                        <div class="news-item">
-                            <div class="news-title">🍻 FRIčkovica 2026 (FRI Club)</div>
-                            <div class="news-desc">Tradičné neoficiálne otvorenie semestra pre študentov FRI UNIZA! Živá hudba, pivo, guláš a zoznamka prvohlavov pred budovou FRI.</div>
-                            <div class="news-meta">
-                                <span>Október 2026 • Chodba FRI</span>
-                                <a href="https://www.fri.uniza.sk/stranka/aktualne-informacie-novinky" target="_blank" class="news-link">fri.uniza.sk ↗</a>
-                            </div>
+                <div class="dash-card events-column-card">
+                    <div>
+                        <div class="section-header">
+                            <div class="section-title">🔥 Študentský Život & Akcie</div>
+                            <span class="section-meta">Žilina / UNIZA</span>
                         </div>
-
-                        <div class="news-item">
-                            <div class="news-title">🎮 FRI LAN Party & Boardgames Night</div>
-                            <div class="news-desc">Celonočný turnaj v League of Legends, CS2 a spoločenských hrách. Pizza, energetické nápoje a hodnotné ceny pre víťazov!</div>
-                            <div class="news-meta">
-                                <span>21. Október 2026 • 18:00</span>
-                                <a href="https://www.fri.uniza.sk" target="_blank" class="news-link">fri.uniza.sk ↗</a>
+                        
+                        <div class="news-container">
+                            <div class="news-item">
+                                <div class="news-title">🍻 FRIčkovica 2026 (FRI Club)</div>
+                                <div class="news-desc">Tradičné neoficiálne otvorenie semestra pre študentov FRI UNIZA! Živá hudba, pivo, guláš a zoznamka prvohlavov pred budovou FRI.</div>
+                                <div class="news-meta">
+                                    <span>Október 2026 • Chodba FRI</span>
+                                    <a href="https://www.fri.uniza.sk/stranka/aktualne-informacie-novinky" target="_blank" class="news-link">fri.uniza.sk ↗</a>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="news-item">
-                            <div class="news-title">🩸 Študentská kvapka krvi UNIZA</div>
-                            <div class="news-desc">Príďte darovať krv v priestoroch Novej Menzy na Veľkom Diele. Získajte odpustenie absentérskych hodín a voľno z výučby!</div>
-                            <div class="news-meta">
-                                <span>22. Október 2026 • 08:00</span>
-                                <a href="https://www.uniza.sk/index.php/studenti/vseobecne-informacie/oznamy" target="_blank" class="news-link">uniza.sk ↗</a>
+                            <div class="news-item">
+                                <div class="news-title">🎮 FRI LAN Party & Boardgames Night</div>
+                                <div class="news-desc">Celonočný turnaj v League of Legends, CS2 a spoločenských hrách. Pizza, energetické nápoje a hodnotné ceny pre víťazov!</div>
+                                <div class="news-meta">
+                                    <span>21. Október 2026 • 18:00</span>
+                                    <a href="https://www.fri.uniza.sk" target="_blank" class="news-link">fri.uniza.sk ↗</a>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="news-item">
-                            <div class="news-title">🧗 Študentské lezenie & Bouldering</div>
-                            <div class="news-desc">Športové centrum UNIZA ponúka voľné vstupy pre študentov na novú lezeckú stenu T1 na Veľkom Diele.</div>
-                            <div class="news-meta">
-                                <span>Každý Utorok & Štvrtok</span>
-                                <a href="https://www.sportoviska.uniza.sk" target="_blank" class="news-link">sportoviska.uniza.sk ↗</a>
+                            <div class="news-item">
+                                <div class="news-title">🩸 Študentská kvapka krvi UNIZA</div>
+                                <div class="news-desc">Príďte darovať krv v priestoroch Novej Menzy na Veľkom Diele. Získajte odpustenie absentérskych hodín a voľno z výučby!</div>
+                                <div class="news-meta">
+                                    <span>22. Október 2026 • 08:00</span>
+                                    <a href="https://www.uniza.sk/index.php/studenti/vseobecne-informacie/oznamy" target="_blank" class="news-link">uniza.sk ↗</a>
+                                </div>
+                            </div>
+
+                            <div class="news-item">
+                                <div class="news-title">🧗 Študentské lezenie & Bouldering</div>
+                                <div class="news-desc">Športové centrum UNIZA ponúka voľné vstupy pre študentov na novú lezeckú stenu T1 na Veľkom Diele.</div>
+                                <div class="news-meta">
+                                    <span>Každý Utorok & Štvrtok</span>
+                                    <a href="https://www.sportoviska.uniza.sk" target="_blank" class="news-link">sportoviska.uniza.sk ↗</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -761,19 +796,17 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR11';
+    let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR12';
     document.getElementById('group-input').value = currentGroup;
 
-    // Presets for groups (auto-filling schedule if empty)
     const groupPresets = {
+        '5ZYR12': [
+            { id: 'p1', day: 1, title: 'Úvod do štúdia', type: 'prednáška', start: '09:00', end: '10:30', teacher: 'Dekanát FRI', room: 'AR1A3' },
+            { id: 'p2', day: 3, title: 'Počítačové siete', type: 'cvičenie', start: '11:00', end: '12:40', teacher: 'Ing. Jozef Oravec', room: 'RB002' }
+        ],
         '5ZYR11': [
             { id: 'p1', day: 1, title: 'MpInf', type: 'prednáška', start: '10:00', end: '11:40', teacher: 'Doc. Ing. Hynek Bachratý, PhD.', room: 'AR1A3' },
-            { id: 'p2', day: 2, title: 'Algoritmy', type: 'cvičenie', start: '12:00', end: '13:40', teacher: 'Ing. Peter Novák', room: 'RB001' },
-            { id: 'p3', day: 3, title: 'Databázy', type: 'laboratórne', start: '14:00', end: '15:40', teacher: 'Prof. Ing. Ján Kováč', room: 'RC012' }
-        ],
-        '1ZYR01': [
-            { id: 'd1', day: 1, title: 'Matematika 1', type: 'prednáška', start: '08:00', end: '09:40', teacher: 'Prof. RNDr. Jozef Mišák, CSc.', room: 'Velka Aula' },
-            { id: 'd2', day: 4, title: 'Programovanie', type: 'cvičenie', start: '10:00', end: '11:40', teacher: 'Ing. Marek Hrivnák', room: 'RA104' }
+            { id: 'p2', day: 2, title: 'Algoritmy', type: 'cvičenie', start: '12:00', end: '13:40', teacher: 'Ing. Peter Novák', room: 'RB001' }
         ]
     };
 
@@ -781,7 +814,7 @@
         let sched = JSON.parse(localStorage.getItem(`uniza_sched_${group}`));
         if (!sched || sched.length === 0) {
             sched = groupPresets[group] || [
-                { id: 'def1', day: 1, title: 'Úvod do štúdia', type: 'prednáška', start: '09:00', end: '10:30', teacher: 'Dekanát FRI', room: 'AR1A3' }
+                { id: 'def1', day: 1, title: 'Predmet odboru', type: 'prednáška', start: '09:00', end: '10:30', teacher: 'Katedra FRI', room: 'AR1A3' }
             ];
             localStorage.setItem(`uniza_sched_${group}`, JSON.stringify(sched));
         }
@@ -804,7 +837,7 @@
     }
 
     function resetScheduleWithConfirm() {
-        if (confirm(`Naozaj chcete vymazať a obnovить rozvrh pre skupinu ${currentGroup}?`)) {
+        if (confirm(`Naozaj chcete vymazať rozvrh pre skupinu ${currentGroup}?`)) {
             localStorage.removeItem(`uniza_sched_${currentGroup}`);
             schedule = loadInitialSchedule(currentGroup);
             renderAll();
@@ -1046,9 +1079,7 @@
             marker = L.marker([p.lat, p.lng]).addTo(leafletMap);
         }
 
-        const deleteBtnHtml = p.isAdmin 
-            ? `<br><span style="color:#ef4444; font-size:0.75rem; font-weight:700;">🔒 Chránená admin lokácia</span>`
-            : `<br><button onclick="deleteCustomPoint('${p.id}')" style="margin-top:6px; background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">🗑 Odstrániť bod</button>`;
+        const deleteBtnHtml = `<br><button onclick="deleteCustomPoint('${p.id}')" style="margin-top:6px; background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">🗑 Odstrániť bod</button>`;
 
         marker.bindPopup(`<b>${p.cat}</b><br>${p.title} ${deleteBtnHtml}`);
         mapMarkers.push(marker);
@@ -1056,16 +1087,21 @@
 
     window.deleteCustomPoint = function(id) {
         const point = customMapPoints.find(p => p.id === id);
-        if (point && point.isAdmin) {
-            alert("Túto super-lokáciu môže odstrániť iba administrátor!");
-            return;
+        if (!point) return;
+
+        if (point.isAdmin) {
+            const pass = prompt("Toto je chránená admin lokácia. Zadajte heslo 454 pre odstránenie:");
+            if (pass !== "454") {
+                alert("Nesprávne heslo! Bod nebol odstránený.");
+                return;
+            }
+        } else {
+            if (!confirm("Naozaj chcete vymazať tento bod z mapy?")) return;
         }
 
-        if (confirm("Naozaj chcete vymazať tento bod z mapy?")) {
-            customMapPoints = customMapPoints.filter(p => p.id !== id);
-            localStorage.setItem('uniza_saved_map_points', JSON.stringify(customMapPoints));
-            location.reload();
-        }
+        customMapPoints = customMapPoints.filter(p => p.id !== id);
+        localStorage.setItem('uniza_saved_map_points', JSON.stringify(customMapPoints));
+        location.reload();
     };
 
     function locateUser() {
