@@ -97,7 +97,6 @@
             text-transform: uppercase;
         }
 
-        /* e-vzd quick dynamic link button */
         .btn-evzd {
             background: var(--bg-input);
             color: var(--accent-orange);
@@ -117,7 +116,6 @@
             border-color: var(--accent-orange);
         }
 
-        /* Action Buttons above Najbližší deň */
         .schedule-actions-bar {
             display: flex;
             gap: 8px;
@@ -157,7 +155,6 @@
 
         .btn-square-reset:hover { background: rgba(239, 68, 68, 0.3); }
 
-        /* Desktop Grid Layout (3 Columns) */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -171,14 +168,8 @@
                 grid-template-columns: 1.15fr 0.85fr 0.7fr; 
                 align-items: start;
             }
-
-            .bottom-nav {
-                display: none !important;
-            }
-
-            .screen {
-                display: block !important;
-            }
+            .bottom-nav { display: none !important; }
+            .screen { display: block !important; }
         }
 
         @media (max-width: 1199px) {
@@ -188,7 +179,6 @@
             .screen.active { display: block; }
         }
 
-        /* Universal Column Layout */
         .dash-column {
             display: flex;
             flex-direction: column;
@@ -227,7 +217,6 @@
             color: var(--text-muted);
         }
 
-        /* Cards & Badges */
         .card-list {
             display: flex;
             flex-direction: column;
@@ -266,7 +255,6 @@
         .teacher-name { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
         .room-code { font-size: 0.92rem; font-weight: 700; }
 
-        /* Weekly View Grid Fixed Size */
         .week-container {
             overflow-x: auto;
             border-radius: 8px;
@@ -342,7 +330,6 @@
             box-sizing: border-box;
         }
 
-        /* Map Container */
         #map-container {
             width: 100%;
             height: 352px;
@@ -378,7 +365,6 @@
 
         .chip-gps { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; font-weight: 600; }
 
-        /* Google-like GPS Pulse Marker Styles */
         .user-pulse-marker {
             background: rgba(59, 130, 246, 0.3);
             border-radius: 50%;
@@ -395,7 +381,6 @@
             box-shadow: 0 0 6px rgba(0,0,0,0.5);
         }
 
-        /* Compact Calendar with matched dimensions */
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -416,7 +401,6 @@
         .cal-day.active { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.15); font-weight: 700; color: var(--accent-orange); }
         .cal-day.other-month { opacity: 0.25; }
 
-        /* Clock Box */
         .clock-box {
             text-align: center;
             background: var(--bg-input);
@@ -427,7 +411,6 @@
         .clock-time { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 0.78rem; color: var(--text-secondary); }
 
-        /* Notes Styles */
         .notes-container {
             display: flex;
             flex-direction: column;
@@ -478,13 +461,21 @@
         }
         .chat-msg-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 2px;
+            gap: 6px;
+            margin-bottom: 3px;
+        }
+        .chat-msg-avatar {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
         }
         .chat-msg-author {
             font-weight: 700;
             color: var(--accent-orange);
+            cursor: pointer;
+            position: relative;
         }
         .chat-input-area {
             display: flex;
@@ -514,7 +505,6 @@
             font-size: 0.8rem;
         }
 
-        /* Google Login Button & User Badge */
         .btn-google-login {
             background: #ffffff;
             color: #1f1f1f;
@@ -585,7 +575,6 @@
             line-height: 1.3;
         }
 
-        /* Bottom Nav Mobile */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -615,7 +604,6 @@
         .nav-item svg { width: 20px; height: 20px; fill: currentColor; }
         .nav-item.active { color: var(--accent-orange); font-weight: 600; }
 
-        /* Modals */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -790,15 +778,13 @@
             <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
 
-                    <!-- Блок Заметок (ВЕРНУЛ ОБРАТНО!) -->
+                    <!-- Блок Заметок -->
                     <div class="dash-card">
                         <div class="section-header">
                             <div class="section-title">📝 Moje Poznámky</div>
                             <button onclick="openNoteModal()" style="background:none; border:none; color:var(--accent-orange); font-size:0.8rem; font-weight:600; cursor:pointer;">+ Vytvoriť poznámku</button>
                         </div>
-                        <div class="notes-container" id="notes-list-container">
-                            <!-- Заметки рендерятся через JS -->
-                        </div>
+                        <div class="notes-container" id="notes-list-container"></div>
                     </div>
 
                     <!-- Блок Онлайн Чата -->
@@ -816,7 +802,9 @@
                         <div class="chat-box">
                             <div class="chat-messages" id="chat-messages-list">
                                 <div class="chat-msg">
-                                    <div class="chat-msg-author">Systém</div>
+                                    <div class="chat-msg-header">
+                                        <span class="chat-msg-author">Systém</span>
+                                    </div>
                                     <div>Vitajte v online chate UNIZA!</div>
                                 </div>
                             </div>
@@ -1032,7 +1020,6 @@
     let currentUser = null;
     let customNickname = localStorage.getItem('uniza_custom_nickname') || null;
 
-    // Google Auth Login
     function loginWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
         auth.signInWithPopup(provider).catch((error) => {
@@ -1041,13 +1028,16 @@
     }
 
     function logoutUser() {
-        auth.signOut();
+        if (confirm("Naozaj sa chcete odhlásiť z účtu?")) {
+            auth.signOut();
+        }
     }
 
     function changeCustomNickname() {
-        const newNick = prompt("Zadajte váš nový nick v chate:", customNickname || currentUser.displayName);
-        if (newNick && newNick.trim()) {
-            customNickname = newNick.trim();
+        const currentNick = customNickname || (currentUser ? currentUser.displayName : "");
+        const newNick = prompt("Zadajte váš nový nick v chate:", currentNick);
+        if (newNick !== null) {
+            customNickname = newNick.trim() || currentUser.displayName;
             localStorage.setItem('uniza_custom_nickname', customNickname);
             updateChatUserUI();
         }
@@ -1055,6 +1045,10 @@
 
     auth.onAuthStateChanged((user) => {
         currentUser = user;
+        if (user && !customNickname) {
+            customNickname = user.displayName;
+            localStorage.setItem('uniza_custom_nickname', customNickname);
+        }
         updateChatUserUI();
     });
 
@@ -1070,9 +1064,9 @@
             authContainer.innerHTML = `
                 <div class="chat-user-profile">
                     <img src="${photoURL}" class="chat-avatar" alt="Avatar">
-                    <span style="font-weight:600; color:var(--text-primary);">${escapeHtml(displayName)}</span>
+                    <span style="font-weight:600; color:var::text-primary;" title="Google: ${currentUser.displayName}">${escapeHtml(displayName)}</span>
                     <button onclick="changeCustomNickname()" title="Zmeniť nick" style="background:none; border:none; cursor:pointer; font-size:0.75rem;">✏️</button>
-                    <button onclick="logoutUser()" title="Odhlásiť sa" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.7rem; margin-left:2px;">✕</button>
+                    <button onclick="logoutUser()" title="Odhlásiť sa" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; margin-left:2px;">✕</button>
                 </div>
             `;
             input.disabled = false;
@@ -1102,9 +1096,13 @@
         if (!text) return;
 
         const displayName = customNickname || currentUser.displayName || "Študent";
+        const photoURL = currentUser.photoURL || '';
+        const originalName = currentUser.displayName || displayName;
 
         db.ref('messages').push({
             author: displayName,
+            originalName: originalName,
+            photoURL: photoURL,
             text: text,
             timestamp: Date.now()
         });
@@ -1118,23 +1116,28 @@
         }
     }
 
-    // Слушаем новые сообщения в реальном времени
     db.ref('messages').limitToLast(50).on('value', (snapshot) => {
         const list = document.getElementById('chat-messages-list');
         list.innerHTML = '';
         
         const data = snapshot.val();
         if (!data) {
-            list.innerHTML = '<div class="chat-msg"><div class="chat-msg-author">Systém</div><div>Zatiaľ žiadne správy. Napíšte prvú!</div></div>';
+            list.innerHTML = '<div class="chat-msg"><div class="chat-msg-header"><span class="chat-msg-author">Systém</span></div><div>Zatiaľ žiadne správy. Napíšte prvú!</div></div>';
             return;
         }
 
         Object.values(data).forEach(msg => {
             const div = document.createElement('div');
             div.className = 'chat-msg';
+            
+            const avatarHtml = msg.photoURL ? `<img src="${msg.photoURL}" class="chat-msg-avatar" alt="">` : '';
+            const origName = msg.originalName || msg.author;
+            const tooltipText = `Pôvodné meno: ${origName}\nAktuálny nick: ${msg.author}`;
+
             div.innerHTML = `
                 <div class="chat-msg-header">
-                    <span class="chat-msg-author">${escapeHtml(msg.author)}</span>
+                    ${avatarHtml}
+                    <span class="chat-msg-author" title="${escapeHtml(tooltipText)}">${escapeHtml(msg.author)}</span>
                 </div>
                 <div>${escapeHtml(msg.text)}</div>
             `;
@@ -1145,7 +1148,7 @@
     });
 
     function escapeHtml(text) {
-        return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+        return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
     }
 
     // NOTES LOGIC
