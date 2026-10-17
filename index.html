@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIZA Rozvrh & Mapa</title>
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #121316;
+            --bg-card: #1c1e22;
+            --bg-card-hover: #25282e;
+            --bg-input: #292d34;
+            --border-color: #2e323b;
+            --text-primary: #f0f2f5;
+            --text-secondary: #9aa0a6;
+            --text-muted: #626873;
+            --accent-orange: #f97316;
+            --accent-orange-bg: rgba(249, 115, 22, 0.12);
+            --accent-blue: #3b82f6;
+            --accent-blue-bg: rgba(59, 130, 246, 0.12);
+            --accent-green: #22c55e;
+            --accent-purple: #a855f7;
+            --badge-prednaska: rgba(249, 115, 22, 0.2);
+            --badge-prednaska-txt: #fb923c;
+            --badge-cvicenie: rgba(148, 163, 184, 0.2);
+            --badge-cvicenie-txt: #cbd5e1;
+            --badge-lab: rgba(34, 197, 94, 0.2);
+            --badge-lab-txt: #4ade80;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 650px;
+            background-color: var(--bg-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        /* Top Header */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .group-selector-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-select {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .group-input {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            width: 100px;
+            outline: none;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-header {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-header:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+        }
+
+        .btn-danger-confirm {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger-confirm:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* Screen Sections */
+        .screen {
+            display: none;
+            padding: 16px;
+            flex: 1;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Section Titles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 12px;
+            margin-top: 8px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Subject Cards */
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.15s, border-color 0.15s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-orange);
+        }
+
+        .card-item.type-cvicenie::before { background: var(--text-secondary); }
+        .card-item.type-laboratorne::before { background: var(--accent-green); }
+
+        .card-item:hover {
+            border-color: #3f4450;
+            transform: translateY(-1px);
+        }
+
+        .card-time {
+            display: flex;
+            flex-direction: column;
+            min-width: 95px;
+        }
+
+        .time-range {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .time-block {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .card-main {
+            flex: 1;
+            padding: 0 12px;
+        }
+
+        .subject-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-transform: lowercase;
+        }
+
+        .badge-prednaska { background: var(--badge-prednaska); color: var(--badge-prednaska-txt); }
+        .badge-cvicenie { background: var(--badge-cvicenie); color: var(--badge-cvicenie-txt); }
+        .badge-laboratorne { background: var(--badge-lab); color: var(--badge-lab-txt); }
+
+        .teacher-name {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .card-room {
+            text-align: right;
+        }
+
+        .room-code {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .room-building {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Gaps / Window Display */
+        .window-gap {
+            border: 1px dashed var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Weekly View Grid */
+        .week-container {
+            overflow-x: auto;
+            margin-top: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: 50px repeat(5, minmax(110px, 1fr));
+            min-width: 600px;
+        }
+
+        .week-header-cell {
+            padding: 10px 6px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .week-time-cell {
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .week-day-column {
+            border-right: 1px solid var(--border-color);
+            position: relative;
+            background-size: 100% 40px;
+            background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+
+        .week-card {
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid var(--accent-orange);
+            border-radius: 6px;
+            padding: 4px 6px;
+            font-size: 0.72rem;
+            margin: 2px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .week-card.cvicenie {
+            background: rgba(148, 163, 184, 0.12);
+            border-color: #64748b;
+        }
+
+        .week-card.laboratorne {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: var(--accent-green);
+        }
+
+        /* Map Screen */
+        #map-container {
+            width: 100%;
+            height: 480px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .map-search {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        .map-building-list {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .chip {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .chip:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        /* Calendar View */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            text-align: center;
+        }
+
+        .cal-day-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding-bottom: 6px;
+        }
+
+        .cal-day {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cal-day.active {
+            border-color: var(--accent-orange);
+            background: var(--accent-orange-bg);
+            font-weight: 700;
+        }
+
+        .cal-day .dot {
+            width: 4px;
+            height: 4px;
+            background: var(--accent-orange);
+            border-radius: 50%;
+            margin-top: 2px;
+        }
+
+        /* Clock View */
+        .clock-hero {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .clock-time {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .clock-date {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .next-class-timer {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 650px;
+            background: rgba(28, 30, 34, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.72rem;
+            cursor: pointer;
+            width: 20%;
+            transition: color 0.2s;
+        }
+
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .nav-item.active {
+            color: var(--accent-orange);
+            font-weight: 600;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title { font-size: 1.1rem; font-weight: 700; }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-orange);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Top Bar -->
+    <div class="top-header">
+        <div class="group-selector-container">
+            <span style="font-size:0.85rem; color:var(--text-muted);">Rozvrh:</span>
+            <input type="text" id="group-input" class="group-input" value="5ZYR11" placeholder="Skupina" onchange="saveGroup(this.value)">
+        </div>
+        <div class="header-actions">
+            <button class="btn-header" onclick="openAddModal()">+ Pridať</button>
+            <button class="btn-header btn-danger-confirm" onclick="confirmResetSchedule()">Reset</button>
+        </div>
+    </div>
+
+    <!-- 1. ROZVRH SCREEN -->
+    <div id="screen-rozvrh" class="screen active">
+        <!-- Upcoming Day -->
+        <div class="section-header">
+            <div class="section-title">Najbližší deň</div>
+            <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026 • 10:00 – 17:40</div>
+        </div>
+        <div class="card-list" id="upcoming-list"></div>
+
+        <!-- Weekly Grid View -->
+        <div class="section-header" style="margin-top:24px;">
+            <div class="section-title">Týždeň</div>
+            <div class="section-meta">19. 10. – 25. 10. 2026</div>
+        </div>
+
+        <div class="week-container">
+            <div class="week-grid">
+                <div class="week-header-cell"></div>
+                <div class="week-header-cell">Pon<br><span style="color:var(--text-muted);font-weight:400;">19.10.</span></div>
+                <div class="week-header-cell">Uto<br><span style="color:var(--text-muted);font-weight:400;">20.10.</span></div>
+                <div class="week-header-cell">Str<br><span style="color:var(--text-muted);font-weight:400;">21.10.</span></div>
+                <div class="week-header-cell">Štv<br><span style="color:var(--text-muted);font-weight:400;">22.10.</span></div>
+                <div class="week-header-cell">Pia<br><span style="color:var(--text-muted);font-weight:400;">23.10.</span></div>
+
+                <!-- Time Column -->
+                <div style="display:flex; flex-direction:column;">
+                    <div class="week-time-cell">7:00</div>
+                    <div class="week-time-cell">8:00</div>
+                    <div class="week-time-cell">9:00</div>
+                    <div class="week-time-cell">10:00</div>
+                    <div class="week-time-cell">11:00</div>
+                    <div class="week-time-cell">12:00</div>
+                    <div class="week-time-cell">13:00</div>
+                    <div class="week-time-cell">14:00</div>
+                    <div class="week-time-cell">15:00</div>
+                    <div class="week-time-cell">16:00</div>
+                    <div class="week-time-cell">17:00</div>
+                </div>
+
+                <!-- Day Columns -->
+                <div class="week-day-column" id="week-day-1"></div>
+                <div class="week-day-column" id="week-day-2"></div>
+                <div class="week-day-column" id="week-day-3"></div>
+                <div class="week-day-column" id="week-day-4"></div>
+                <div class="week-day-column" id="week-day-5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. KALENDÁR SCREEN -->
+    <div id="screen-kalendar" class="screen">
+        <div class="calendar-header">
+            <div class="section-title">Október 2026</div>
+            <div class="section-meta">Žilinská univerzita</div>
+        </div>
+        <div class="cal-grid">
+            <div class="cal-day-label">Po</div>
+            <div class="cal-day-label">Ut</div>
+            <div class="cal-day-label">St</div>
+            <div class="cal-day-label">Št</div>
+            <div class="cal-day-label">Pi</div>
+            <div class="cal-day-label">So</div>
+            <div class="cal-day-label">Ne</div>
+
+            <!-- Days -->
+            <div class="cal-day" style="opacity:0.3;">28</div>
+            <div class="cal-day" style="opacity:0.3;">29</div>
+            <div class="cal-day" style="opacity:0.3;">30</div>
+            <div class="cal-day">1 <div class="dot"></div></div>
+            <div class="cal-day">2 <div class="dot"></div></div>
+            <div class="cal-day">3</div>
+            <div class="cal-day">4</div>
+            <div class="cal-day">5 <div class="dot"></div></div>
+            <div class="cal-day">6 <div class="dot"></div></div>
+            <div class="cal-day">7 <div class="dot"></div></div>
+            <div class="cal-day">8 <div class="dot"></div></div>
+            <div class="cal-day">9 <div class="dot"></div></div>
+            <div class="cal-day">10</div>
+            <div class="cal-day">11</div>
+            <div class="cal-day">12 <div class="dot"></div></div>
+            <div class="cal-day">13 <div class="dot"></div></div>
+            <div class="cal-day">14 <div class="dot"></div></div>
+            <div class="cal-day">15 <div class="dot"></div></div>
+            <div class="cal-day">16 <div class="dot"></div></div>
+            <div class="cal-day">17</div>
+            <div class="cal-day">18</div>
+            <div class="cal-day active">19 <div class="dot"></div></div>
+            <div class="cal-day">20 <div class="dot"></div></div>
+            <div class="cal-day">21 <div class="dot"></div></div>
+            <div class="cal-day">22 <div class="dot"></div></div>
+            <div class="cal-day">23 <div class="dot"></div></div>
+            <div class="cal-day">24</div>
+            <div class="cal-day">25</div>
+        </div>
+        <div style="margin-top:20px;">
+            <div class="section-title" style="margin-bottom:10px;">Program na 19. Október</div>
+            <div class="card-list" id="calendar-day-agenda"></div>
+        </div>
+    </div>
+
+    <!-- 3. MAPA SCREEN -->
+    <div id="screen-mapa" class="screen">
+        <div class="section-title" style="margin-bottom:8px;">Mapa Kampusu UNIZA (Veľký Diel)</div>
+        <input type="text" class="map-search" placeholder="Hľadať budovu (napr. FRI, AR, RA, Internáty)..." oninput="filterMapBuildings(this.value)">
+        <div class="map-building-list">
+            <div class="chip" onclick="focusBuilding(49.2023, 18.7610, 'FRI UNIZA')">FRI (A/B/C)</div>
+            <div class="chip" onclick="focusBuilding(49.2018, 18.7592, 'Aula AR')">Aula AR</div>
+            <div class="chip" onclick="focusBuilding(49.2035, 18.7602, 'Budova RA/RB')">RA / RB</div>
+            <div class="chip" onclick="focusBuilding(49.2045, 18.7562, 'Rektorát UNIZA')">Rektorát</div>
+            <div class="chip" onclick="focusBuilding(49.2040, 18.7580, 'Knižnica UNIZA')">Knižnica</div>
+            <div class="chip" onclick="focusBuilding(49.2052, 18.7615, 'Internáty Veľký Diel')">Internáty VD</div>
+        </div>
+        <div id="map-container"></div>
+    </div>
+
+    <!-- 4. AKCIE SCREEN -->
+    <div id="screen-akcie" class="screen">
+        <div class="section-title" style="margin-bottom:12px;">Univerzitné Akcie & Správy</div>
+        <div class="card-list">
+            <div class="card-item">
+                <div class="card-main">
+                    <div class="subject-title">Študentská kvapka krvi <span class="badge badge-prednaska">akcia</span></div>
+                    <div class="teacher-name">Menza Veľký Diel • 22. Október 08:00</div>
+                </div>
+            </div>
+            <div class="card-item">
+                <div class="card-main">
+                    <div class="subject-title">FRI Club Board Game Night <span class="badge badge-laboratorne">zábava</span></div>
+                    <div class="teacher-name">Chodba B-suterén • 21. Október 18:00</div>
+                </div>
+            </div>
+            <div class="card-item">
+                <div class="card-main">
+                    <div class="subject-title">Imatrikulácie Prvákov UNIZA <span class="badge badge-cvicenie">slávnosť</span></div>
+                    <div class="teacher-name">Dom Odborov Žilina • 28. Október 19:00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. HODINY SCREEN -->
+    <div id="screen-hodiny" class="screen">
+        <div class="clock-hero">
+            <div class="clock-time" id="live-clock">10:00:00</div>
+            <div class="clock-date" id="live-date">Pondelok, 19. Október 2026</div>
+        </div>
+        <div class="next-class-timer">
+            <div style="font-size:0.85rem; color:var(--text-secondary);">Aktuálny stav:</div>
+            <div style="font-size:1.3rem; font-weight:700; color:var(--accent-orange); margin-top:4px;" id="current-class-status">Na hodine: MpInf (AR1A3)</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;" id="current-class-sub">Koniec o 11:40 (ostáva 1 h 40 min)</div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('rozvrh')">
+            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+            Rozvrh
+        </div>
+        <div class="nav-item" onclick="switchTab('kalendar')">
+            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+            Kalendár
+        </div>
+        <div class="nav-item" onclick="switchTab('mapa')">
+            <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+            Mapa
+        </div>
+        <div class="nav-item" onclick="switchTab('akcie')">
+            <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            Akcie
+        </div>
+        <div class="nav-item" onclick="switchTab('hodiny')">
+            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            Hodiny
+        </div>
+    </nav>
+</div>
+
+<!-- Modal for Adding / Editing Lesson -->
+<div class="modal-overlay" id="lesson-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-title-text">Pridať hodinu</div>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="lesson-form" onsubmit="saveLesson(event)">
+            <input type="hidden" id="edit-id">
+            <div class="form-group">
+                <label>Deň v týždni</label>
+                <select id="form-day" class="form-control">
+                    <option value="1">Pondelok</option>
+                    <option value="2">Utorok</option>
+                    <option value="3">Streda</option>
+                    <option value="4">Štvrtok</option>
+                    <option value="5">Piatok</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Názov predmetu (Skratka)</label>
+                <input type="text" id="form-title" class="form-control" placeholder="napr. MpInf, INF1, Alg" required>
+            </div>
+            <div class="form-group">
+                <label>Typ výučby</label>
+                <select id="form-type" class="form-control">
+                    <option value="prednáška">prednáška</option>
+                    <option value="cvičenie">cvičenie</option>
+                    <option value="laboratórne">laboratórne</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Začiatok</label>
+                    <input type="time" id="form-start" class="form-control" value="10:00" required>
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Koniec (Štandard +1h40m)</label>
+                    <input type="time" id="form-end" class="form-control" value="11:40" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Vyučujúci</label>
+                <input type="text" id="form-teacher" class="form-control" placeholder="napr. Hynek Bachratý">
+            </div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Miestnosť</label>
+                    <input type="text" id="form-room" class="form-control" placeholder="napr. AR1A3">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Budova / Poznámka</label>
+                    <input type="text" id="form-building" class="form-control" placeholder="napr. aula • budova AR">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">Uložiť hodinu</button>
+            <button type="button" class="btn-primary btn-delete" id="btn-delete-lesson" onclick="deleteLesson()" style="display:none;">Odstrániť hodinu</button>
+        </form>
+    </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Initial Default Data (UNIZA FRI Schedule)
+    const defaultSchedule = [
+        { id: '1', day: 1, title: 'MpInf', type: 'prednáška', start: '10:00', end: '11:40', teacher: 'Hynek Bachratý', room: 'AR1A3', building: 'aula • budova AR' },
+        { id: '2', day: 1, title: 'INF1', type: 'prednáška', start: '12:00', end: '13:40', teacher: 'Ján Janech', room: 'AR1A3', building: 'tá istá aula' },
+        { id: '3', day: 1, title: 'ZE', type: 'cvičenie', start: '14:00', end: '15:40', teacher: 'Zuzana Kozubíková', room: 'RB206', building: 'FRI • 2. posch.' },
+        { id: '4', day: 1, title: 'PrzPr1', type: 'cvičenie', start: '16:00', end: '17:40', teacher: 'Vojtasová', room: 'RB002', building: 'FRI • prízemie' },
+        { id: '5', day: 2, title: 'INF1', type: 'laboratórne', start: '08:00', end: '10:30', teacher: 'M. Kvet', room: 'RB052', building: 'FRI lab' },
+        { id: '6', day: 3, title: 'PCzM1', type: 'cvičenie', start: '07:00', end: '08:40', teacher: 'V. Lendel', room: 'RB002', building: 'FRI' },
+        { id: '7', day: 3, title: 'Alg', type: 'prednáška', start: '10:00', end: '11:40', teacher: 'D. Gonda', room: 'AR1A3', building: 'aula' },
+        { id: '8', day: 4, title: 'ZE', type: 'prednáška', start: '10:00', end: '11:40', teacher: 'A. Kucharčíková', room: 'AR1A3', building: 'aula' },
+        { id: '9', day: 5, title: 'Alg', type: 'cvičenie', start: '07:00', end: '08:40', teacher: 'M. Straka', room: 'RA320', building: 'FRI' }
+    ];
+
+    let schedule = JSON.parse(localStorage.getItem('uniza_schedule')) || defaultSchedule;
+    let currentGroup = localStorage.getItem('uniza_group') || '5ZYR11';
+    let leafletMap = null;
+    let mapMarkers = [];
+
+    document.getElementById('group-input').value = currentGroup;
+
+    function saveGroup(val) {
+        localStorage.setItem('uniza_group', val);
+    }
+
+    function confirmResetSchedule() {
+        if (confirm("Naozaj chcete сбросить расписание do pôvodného stavu z obrázka? Všetky vaše úpravy budú vymazané.")) {
+            schedule = JSON.parse(JSON.stringify(defaultSchedule));
+            localStorage.setItem('uniza_schedule', JSON.stringify(schedule));
+            renderAll();
+        }
+    }
+
+    // Helper: Calculate Gap / Okno between classes
+    function calculateGap(time1, time2) {
+        const [h1, m1] = time1.split(':').map(Number);
+        const [h2, m2] = time2.split(':').map(Number);
+        const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+        if (diff <= 0) return null;
+        const hrs = Math.floor(diff / 60);
+        const mins = diff % 60;
+        let str = 'okno ';
+        if (hrs > 0) str += `${hrs} h `;
+        if (mins > 0) str += `${mins} min`;
+        return str.trim();
+    }
+
+    // Render Main Screen
+    function renderUpcomingDay() {
+        const upcomingList = document.getElementById('upcoming-list');
+        upcomingList.innerHTML = '';
+
+        // Pondelok (Day 1) as reference
+        const dayLessons = schedule.filter(l => l.day === 1).sort((a,b) => a.start.localeCompare(b.start));
+
+        dayLessons.forEach((lesson, idx) => {
+            // Render class card
+            const badgeClass = lesson.type === 'prednáška' ? 'badge-prednaska' : (lesson.type === 'cvičenie' ? 'badge-cvicenie' : 'badge-laboratorne');
+            const typeClass = lesson.type === 'prednáška' ? '' : (lesson.type === 'cvičenie' ? 'type-cvicenie' : 'type-laboratorne');
+
+            const item = document.createElement('div');
+            item.className = `card-item ${typeClass}`;
+            item.onclick = () => openEditModal(lesson.id);
+            item.innerHTML = `
+                <div class="card-time">
+                    <span class="time-range">${lesson.start} – ${lesson.end}</span>
+                    <span class="time-block">blok</span>
+                </div>
+                <div class="card-main">
+                    <div class="subject-title">
+                        ${lesson.title}
+                        <span class="badge ${badgeClass}">${lesson.type}</span>
+                    </div>
+                    <div class="teacher-name">${lesson.teacher}</div>
+                </div>
+                <div class="card-room">
+                    <div class="room-code">${lesson.room}</div>
+                    <div class="room-building">${lesson.building}</div>
+                </div>
+            `;
+            upcomingList.appendChild(item);
+
+            // Calculate Gap if next lesson exists
+            if (idx < dayLessons.length - 1) {
+                const gapText = calculateGap(lesson.end, dayLessons[idx+1].start);
+                if (gapText) {
+                    const gapDiv = document.createElement('div');
+                    gapDiv.className = 'window-gap';
+                    gapDiv.innerHTML = `⏱️ ${gapText}`;
+                    upcomingList.appendChild(gapDiv);
+                }
+            }
+        });
+
+        // Agenda inside calendar view
+        const calAgenda = document.getElementById('calendar-day-agenda');
+        calAgenda.innerHTML = upcomingList.innerHTML;
+    }
+
+    // Render Weekly Grid
+    function renderWeekGrid() {
+        for (let d = 1; d <= 5; d++) {
+            const col = document.getElementById(`week-day-${d}`);
+            col.innerHTML = '';
+            const dayLessons = schedule.filter(l => l.day === d).sort((a,b) => a.start.localeCompare(b.start));
+
+            dayLessons.forEach(l => {
+                const [sh, sm] = l.start.split(':').map(Number);
+                const [eh, em] = l.end.split(':').map(Number);
+                const topPx = (sh - 7) * 40 + (sm / 60) * 40;
+                const durationHrs = (eh * 60 + em - (sh * 60 + sm)) / 60;
+                const heightPx = durationHrs * 40;
+
+                const card = document.createElement('div');
+                const typeCls = l.type === 'cvičenie' ? 'cvicenie' : (l.type === 'laboratórne' ? 'laboratorne' : '');
+                card.className = `week-card ${typeCls}`;
+                card.style.position = 'absolute';
+                card.style.top = `${topPx}px`;
+                card.style.height = `${heightPx - 2}px`;
+                card.style.left = '2px';
+                card.style.right = '2px';
+                card.onclick = () => openEditModal(l.id);
+
+                card.innerHTML = `
+                    <div style="font-weight:700;">${l.title} <span style="font-size:0.65rem;opacity:0.8;">${l.type}</span></div>
+                    <div style="font-size:0.65rem;">${l.start}–${l.end} | ${l.room}</div>
+                    <div style="font-size:0.65rem; color:var(--text-muted);">${l.teacher}</div>
+                `;
+                col.appendChild(card);
+            });
+        }
+    }
+
+    // Navigation Switcher
+    function switchTab(tabId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+        document.getElementById(`screen-${tabId}`).classList.add('active');
+        event.currentTarget.classList.add('active');
+
+        if (tabId === 'mapa' && !leafletMap) {
+            initMap();
+        }
+    }
+
+    // Leaflet Map Setup (UNIZA Veľký Diel Campus)
+    function initMap() {
+        leafletMap = L.map('map-container').setView([49.2030, 18.7600], 16);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap & UNIZA Campus Layout'
+        }).addTo(leafletMap);
+
+        const buildings = [
+            { name: "Fakulta riadenia a informatiky (FRI A/B/C)", lat: 49.2023, lng: 18.7610, desc: "Hlavné sídlo FRI, učebne RB002, RB206, RB052" },
+            { name: "Aula AR", lat: 49.2018, lng: 18.7592, desc: "Hlavná prednášková aula UNIZA" },
+            { name: "Budova RA / RB", lat: 49.2035, lng: 18.7602, desc: "Prednáškové miestnosti RA320, RB" },
+            { name: "Rektorát UNIZA (Budova AA)", lat: 49.2045, lng: 18.7562, desc: "Sídlo vedenia univerzity" },
+            { name: "Univerzitná Knižnica", lat: 49.2040, lng: 18.7580, desc: "Študovne a knižničný fond" },
+            { name: "Internáty Veľký Diel (VD)", lat: 49.2052, lng: 18.7615, desc: "Študentské domovy a Menza" }
+        ];
+
+        buildings.forEach(b => {
+            const marker = L.marker([b.lat, b.lng]).addTo(leafletMap)
+                .bindPopup(`<b>${b.name}</b><br>${b.desc}`);
+            mapMarkers.push({ name: b.name.toLowerCase(), marker, lat: b.lat, lng: b.lng });
+        });
+    }
+
+    function focusBuilding(lat, lng, name) {
+        if (!leafletMap) initMap();
+        leafletMap.setView([lat, lng], 18);
+        const m = mapMarkers.find(item => item.lat === lat);
+        if (m) m.marker.openPopup();
+    }
+
+    function filterMapBuildings(query) {
+        const q = query.toLowerCase();
+        mapMarkers.forEach(item => {
+            if (item.name.includes(q)) {
+                item.marker.addTo(leafletMap);
+            } else {
+                leafletMap.removeLayer(item.marker);
+            }
+        });
+    }
+
+    // Modal Operations
+    function openAddModal() {
+        document.getElementById('edit-id').value = '';
+        document.getElementById('modal-title-text').innerText = 'Pridať hodinu';
+        document.getElementById('lesson-form').reset();
+        document.getElementById('btn-delete-lesson').style.display = 'none';
+        document.getElementById('lesson-modal').classList.add('active');
+    }
+
+    function openEditModal(id) {
+        const item = schedule.find(l => l.id === id);
+        if (!item) return;
+
+        document.getElementById('edit-id').value = item.id;
+        document.getElementById('modal-title-text').innerText = 'Upraviť hodinu';
+        document.getElementById('form-day').value = item.day;
+        document.getElementById('form-title').value = item.title;
+        document.getElementById('form-type').value = item.type;
+        document.getElementById('form-start').value = item.start;
+        document.getElementById('form-end').value = item.end;
+        document.getElementById('form-teacher').value = item.teacher;
+        document.getElementById('form-room').value = item.room;
+        document.getElementById('form-building').value = item.building;
+
+        document.getElementById('btn-delete-lesson').style.display = 'block';
+        document.getElementById('lesson-modal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('lesson-modal').classList.remove('active');
+    }
+
+    function saveLesson(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit-id').value;
+        const newLesson = {
+            id: id || Date.now().toString(),
+            day: parseInt(document.getElementById('form-day').value),
+            title: document.getElementById('form-title').value,
+            type: document.getElementById('form-type').value,
+            start: document.getElementById('form-start').value,
+            end: document.getElementById('form-end').value,
+            teacher: document.getElementById('form-teacher').value,
+            room: document.getElementById('form-room').value,
+            building: document.getElementById('form-building').value
+        };
+
+        if (id) {
+            const idx = schedule.findIndex(l => l.id === id);
+            schedule[idx] = newLesson;
+        } else {
+            schedule.push(newLesson);
+        }
+
+        localStorage.setItem('uniza_schedule', JSON.stringify(schedule));
+        closeModal();
+        renderAll();
+    }
+
+    function deleteLesson() {
+        const id = document.getElementById('edit-id').value;
+        if (!id) return;
+        schedule = schedule.filter(l => l.id !== id);
+        localStorage.setItem('uniza_schedule', JSON.stringify(schedule));
+        closeModal();
+        renderAll();
+    }
+
+    function renderAll() {
+        renderUpcomingDay();
+        renderWeekGrid();
+    }
+
+    // Live Clock Update
+    setInterval(() => {
+        const now = new Date();
+        const clockEl = document.getElementById('live-clock');
+        if (clockEl) {
+            clockEl.innerText = now.toTimeString().split(' ')[0];
+        }
+    }, 1000);
+
+    // Initial Render
+    renderAll();
+</script>
+</body>
+</html>
