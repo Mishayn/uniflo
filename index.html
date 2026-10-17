@@ -71,6 +71,12 @@
             z-index: 100;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .header-title {
             font-size: 1.1rem;
             font-weight: 700;
@@ -78,6 +84,66 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        /* Кнопка выбора языка с планеткой */
+        .lang-dropdown-container {
+            position: relative;
+        }
+
+        .btn-lang-toggle {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+        .btn-lang-toggle:hover {
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+        }
+
+        .lang-menu {
+            display: none;
+            position: absolute;
+            top: 44px;
+            left: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            overflow: hidden;
+            z-index: 200;
+            min-width: 150px;
+        }
+        .lang-menu.active {
+            display: block;
+        }
+
+        .lang-item {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .lang-item:hover {
+            background: var(--bg-card-hover);
+            color: var(--accent-orange);
+        }
+        .lang-item.active {
+            font-weight: 700;
+            color: var(--accent-orange);
+            background: rgba(249, 115, 22, 0.1);
         }
 
         .group-selector-container {
@@ -695,11 +761,27 @@
 <div class="app-container">
     <!-- Header Bar -->
     <div class="top-header">
-        <div class="header-title">
-            <span>🌊 UniFlo</span>
+        <div class="header-left">
+            <!-- Кнопка выбора языка с планетой -->
+            <div class="lang-dropdown-container">
+                <button class="btn-lang-toggle" onclick="toggleLangMenu()" title="Zvoliť jazyk / Language">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </button>
+                <div class="lang-menu" id="lang-menu">
+                    <div class="lang-item" onclick="setLanguage('sk')">🇸🇰 Slovenčina</div>
+                    <div class="lang-item" onclick="setLanguage('en')">🇬🇧 English</div>
+                    <div class="lang-item" onclick="setLanguage('ru')">🇷🇺 Русский</div>
+                    <div class="lang-item" onclick="setLanguage('uk')">🇺🇦 Українська</div>
+                </div>
+            </div>
+
+            <div class="header-title">
+                <span>📅 UniFlo</span>
+            </div>
         </div>
+
         <div class="group-selector-container">
-            <span style="font-size:0.82rem; color:var(--text-muted);">Skupina:</span>
+            <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
             <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Skupina...">
             <a href="#" id="evzd-link" target="_blank" class="btn-evzd">e-vzd ↗</a>
         </div>
@@ -713,13 +795,13 @@
             <div id="screen-rozvrh" class="screen active">
                 
                 <div class="schedule-actions-bar">
-                    <button class="btn-main-action" onclick="openAddModal()">+ Pridať hodinu</button>
-                    <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" title="Reset rozvrhu">⟳</button>
+                    <button class="btn-main-action" onclick="openAddModal()" data-i18n="add_lesson">+ Pridať hodinu</button>
+                    <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
                 </div>
 
                 <div class="dash-card">
                     <div class="section-header">
-                        <div class="section-title">Najbližší deň</div>
+                        <div class="section-title" data-i18n="upcoming_day">Najbližší deň</div>
                         <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026</div>
                     </div>
                     <div class="card-list" id="upcoming-list"></div>
@@ -727,17 +809,17 @@
 
                 <div class="dash-card">
                     <div class="section-header">
-                        <div class="section-title">Týždenný rozvrh</div>
+                        <div class="section-title" data-i18n="weekly_schedule">Týždenný rozvrh</div>
                         <div class="section-meta">19. 10. – 25. 10. 2026 (07:00 – 20:00)</div>
                     </div>
                     <div class="week-container">
                         <div class="week-grid">
                             <div class="week-header-cell"></div>
-                            <div class="week-header-cell">Pondelok<br><span style="color:var(--text-muted);font-weight:400;">19. 10.</span></div>
-                            <div class="week-header-cell">Utorok<br><span style="color:var(--text-muted);font-weight:400;">20. 10.</span></div>
-                            <div class="week-header-cell">Streda<br><span style="color:var(--text-muted);font-weight:400;">21. 10.</span></div>
-                            <div class="week-header-cell">Štvrtok<br><span style="color:var(--text-muted);font-weight:400;">22. 10.</span></div>
-                            <div class="week-header-cell">Piatok<br><span style="color:var(--text-muted);font-weight:400;">23. 10.</span></div>
+                            <div class="week-header-cell" data-i18n="day_mon">Pondelok<br><span style="color:var(--text-muted);font-weight:400;">19. 10.</span></div>
+                            <div class="week-header-cell" data-i18n="day_tue">Utorok<br><span style="color:var(--text-muted);font-weight:400;">20. 10.</span></div>
+                            <div class="week-header-cell" data-i18n="day_wed">Streda<br><span style="color:var(--text-muted);font-weight:400;">21. 10.</span></div>
+                            <div class="week-header-cell" data-i18n="day_thu">Štvrtok<br><span style="color:var(--text-muted);font-weight:400;">22. 10.</span></div>
+                            <div class="week-header-cell" data-i18n="day_fri">Piatok<br><span style="color:var(--text-muted);font-weight:400;">23. 10.</span></div>
 
                             <div style="display:flex; flex-direction:column;">
                                 <div class="week-time-cell">7:00</div>
@@ -773,11 +855,11 @@
                 <div id="screen-mapa" class="screen active">
                     <div class="dash-card">
                         <div class="section-header">
-                            <div class="section-title">Mapa Kampusu UNIZA</div>
-                            <span class="section-meta">Pravý klik = nová bodka</span>
+                            <div class="section-title" data-i18n="campus_map">Mapa Kampusu UNIZA</div>
+                            <span class="section-meta" data-i18n="map_hint">Pravý klik = nová bodka</span>
                         </div>
                         <div class="map-building-list" id="map-category-chips">
-                            <div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>
+                            <div class="chip chip-gps" onclick="locateUser()" data-i18n="my_location">📍 Moja poloha</div>
                         </div>
                         <div id="map-container"></div>
                     </div>
@@ -791,7 +873,7 @@
                             <div class="clock-date" id="live-date">Piatok, 17. Október 2026</div>
                         </div>
                         <div class="section-header" style="margin-bottom:6px;">
-                            <div class="section-title">Kalendár</div>
+                            <div class="section-title" data-i18n="calendar">Kalendár</div>
                             <span class="section-meta" id="cal-month-title">Október 2026</span>
                         </div>
                         <div class="cal-grid" id="compact-calendar-grid"></div>
@@ -808,8 +890,8 @@
                     <!-- Блок Заметок -->
                     <div class="dash-card">
                         <div class="section-header">
-                            <div class="section-title">📝 Moje Poznámky</div>
-                            <button onclick="openNoteModal()" style="background:none; border:none; color:var(--accent-orange); font-size:0.8rem; font-weight:600; cursor:pointer;">+ Vytvoriť poznámku</button>
+                            <div class="section-title" data-i18n="my_notes">📝 Moje Poznámky</div>
+                            <button onclick="openNoteModal()" style="background:none; border:none; color:var(--accent-orange); font-size:0.8rem; font-weight:600; cursor:pointer;" data-i18n="create_note">+ Vytvoriť poznámku</button>
                         </div>
                         <div class="notes-container" id="notes-list-container"></div>
                     </div>
@@ -817,11 +899,11 @@
                     <!-- Блок Онлайн Чата -->
                     <div class="dash-card">
                         <div class="section-header">
-                            <div class="section-title">💬 Online Chat</div>
+                            <div class="section-title" data-i18n="online_chat">💬 Online Chat</div>
                             <div id="chat-auth-container">
                                 <button class="btn-google-login" onclick="loginWithGoogle()">
                                     <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-                                    Prihlásiť cez Google
+                                    <span data-i18n="login_google">Prihlásiť cez Google</span>
                                 </button>
                             </div>
                         </div>
@@ -830,14 +912,14 @@
                             <div class="chat-messages" id="chat-messages-list">
                                 <div class="chat-msg">
                                     <div class="chat-msg-header">
-                                        <span class="chat-msg-author">Systém</span>
+                                        <span class="chat-msg-author" data-i18n="chat_system">Systém</span>
                                     </div>
-                                    <div>Vitajte v online chate UniFlo!</div>
+                                    <div data-i18n="chat_welcome">Vitajte v online chate UniFlo!</div>
                                 </div>
                             </div>
                             <div class="chat-input-area">
-                                <input type="text" id="chat-input-msg" class="chat-input" placeholder="Prihláste sa pre odoslanie správy..." disabled onkeypress="handleChatKeyPress(event)">
-                                <button class="chat-send-btn" id="chat-send-btn" disabled onclick="sendChatMessage()">Odoslať</button>
+                                <input type="text" id="chat-input-msg" class="chat-input" placeholder="Prihláste sa pre odoslanie správy..." data-i18n-placeholder="chat_placeholder_login" disabled onkeypress="handleChatKeyPress(event)">
+                                <button class="chat-send-btn" id="chat-send-btn" disabled onclick="sendChatMessage()" data-i18n="chat_send">Odoslať</button>
                             </div>
                         </div>
                     </div>
@@ -850,9 +932,9 @@
                                 <div class="promo-content">
                                     <div class="promo-title">
                                         <span>punkto.sk</span>
-                                        <span class="news-link" style="font-size:0.75rem; color:#22c55e;">Otvoriť ↗</span>
+                                        <span class="news-link" style="font-size:0.75rem; color:#22c55e;" data-i18n="btn_open">Otvoriť ↗</span>
                                     </div>
-                                    <div class="promo-desc">
+                                    <div class="promo-desc" data-i18n="promo_punkto_desc">
                                         Удобный поиск мест на карте: еда, магазины, услуги, досуг и многое другое.
                                     </div>
                                 </div>
@@ -867,10 +949,10 @@
                                 <svg class="promo-logo" viewBox="0 0 24 24" fill="#ef4444" style="padding:6px; background:rgba(239,68,68,0.15); border-radius:8px;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                                 <div class="promo-content">
                                     <div class="promo-title">
-                                        <span>YouTube tvorcu</span>
-                                        <span class="news-link" style="font-size:0.75rem; color:#ef4444;">Odoberať ↗</span>
+                                        <span data-i18n="youtube_creator">YouTube tvorcu</span>
+                                        <span class="news-link" style="font-size:0.75rem; color:#ef4444;" data-i18n="btn_subscribe">Odoberať ↗</span>
                                     </div>
-                                    <div class="promo-desc">
+                                    <div class="promo-desc" data-i18n="promo_yt_desc">
                                         Ютуб создателя, поддержите подпиской!
                                     </div>
                                 </div>
@@ -890,23 +972,23 @@
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchMobileTab('rozvrh', this)">
             <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-            Rozvrh
+            <span data-i18n="nav_schedule">Rozvrh</span>
         </div>
         <div class="nav-item" onclick="switchMobileTab('kalendar', this)">
             <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
-            Kalendár
+            <span data-i18n="nav_calendar">Kalendár</span>
         </div>
         <div class="nav-item" onclick="switchMobileTab('mapa', this)">
             <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
-            Mapa
+            <span data-i18n="nav_map">Mapa</span>
         </div>
         <div class="nav-item" onclick="switchMobileTab('akcie', this)">
             <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-            Poznámky
+            <span data-i18n="nav_notes">Poznámky</span>
         </div>
         <div class="nav-item" onclick="switchMobileTab('hodiny', this)">
             <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-            Hodiny
+            <span data-i18n="nav_hours">Hodiny</span>
         </div>
     </nav>
 </div>
@@ -921,15 +1003,15 @@
         <form id="note-form" onsubmit="saveNote(event)">
             <input type="hidden" id="note-edit-id">
             <div class="form-group">
-                <label>Názov (voliteľné)</label>
+                <label data-i18n="note_title_label">Názov (voliteľné)</label>
                 <input type="text" id="note-title-input" class="form-control" placeholder="Ak necháte prázdne, použije sa začiatok textu">
             </div>
             <div class="form-group">
-                <label>Text poznámky</label>
+                <label data-i18n="note_text_label">Text poznámky</label>
                 <textarea id="note-text-content" class="form-control" rows="5" placeholder="Napíšte svoju poznámku..." required style="resize:vertical;"></textarea>
             </div>
-            <button type="submit" class="btn-primary">Uložiť poznámku</button>
-            <button type="button" class="btn-primary btn-delete" id="btn-delete-note" onclick="deleteNote()" style="display:none;">Odstrániť poznámku</button>
+            <button type="submit" class="btn-primary" data-i18n="save_note">Uložiť poznámku</button>
+            <button type="button" class="btn-primary btn-delete" id="btn-delete-note" onclick="deleteNote()" style="display:none;" data-i18n="delete_note">Odstrániť poznámku</button>
         </form>
     </div>
 </div>
@@ -938,55 +1020,55 @@
 <div class="modal-overlay" id="lesson-modal">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-title" id="modal-title-text">Pridať hodinu</div>
+            <div class="modal-title" id="modal-title-text" data-i18n="modal_lesson_title">Pridať hodinu</div>
             <button class="close-btn" onclick="closeModal('lesson-modal')">&times;</button>
         </div>
         <form id="lesson-form" onsubmit="saveLesson(event)">
             <input type="hidden" id="edit-id">
             <div class="form-group">
-                <label>Deň v týždni</label>
+                <label data-i18n="form_day">Deň v týždni</label>
                 <select id="form-day" class="form-control">
-                    <option value="1">Pondelok</option>
-                    <option value="2">Utorok</option>
-                    <option value="3">Streda</option>
-                    <option value="4">Štvrtok</option>
-                    <option value="5">Piatok</option>
+                    <option value="1" data-i18n="day_mon">Pondelok</option>
+                    <option value="2" data-i18n="day_tue">Utorok</option>
+                    <option value="3" data-i18n="day_wed">Streda</option>
+                    <option value="4" data-i18n="day_thu">Štvrtok</option>
+                    <option value="5" data-i18n="day_fri">Piatok</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Názov predmetu</label>
+                <label data-i18n="form_subject">Názov predmetu</label>
                 <input type="text" id="form-title" class="form-control" placeholder="napr. MpInf, INF1" required>
             </div>
             <div class="form-group">
-                <label>Typ výučby</label>
+                <label data-i18n="form_type">Typ výučby</label>
                 <select id="form-type" class="form-control">
-                    <option value="prednáška">prednáška</option>
-                    <option value="cvičenie">cvičenie</option>
-                    <option value="laboratórne">laboratórne</option>
+                    <option value="prednáška" data-i18n="type_lecture">prednáška</option>
+                    <option value="cvičenie" data-i18n="type_practice">cvičenie</option>
+                    <option value="laboratórne" data-i18n="type_lab">laboratórne</option>
                 </select>
             </div>
             <div style="display:flex; gap:10px;">
                 <div class="form-group" style="flex:1;">
-                    <label>Začiatok (07:00 - 20:00)</label>
+                    <label data-i18n="form_start">Začiatok (07:00 - 20:00)</label>
                     <input type="time" id="form-start" class="form-control" value="10:00" min="07:00" max="20:00" required>
                 </div>
                 <div class="form-group" style="flex:1;">
-                    <label>Koniec (07:00 - 20:00)</label>
+                    <label data-i18n="form_end">Koniec (07:00 - 20:00)</label>
                     <input type="time" id="form-end" class="form-control" value="11:40" min="07:00" max="20:00" required>
                 </div>
             </div>
             <div class="form-group">
-                <label>Vyučujúci</label>
+                <label data-i18n="form_teacher">Vyučujúci</label>
                 <input type="text" id="form-teacher" class="form-control" placeholder="napr. Hynek Bachratý">
             </div>
             <div style="display:flex; gap:10px;">
                 <div class="form-group" style="flex:1;">
-                    <label>Miestnosť</label>
+                    <label data-i18n="form_room">Miestnosť</label>
                     <input type="text" id="form-room" class="form-control" placeholder="napr. AR1A3">
                 </div>
             </div>
-            <button type="submit" class="btn-primary">Uložiť hodinu</button>
-            <button type="button" class="btn-primary btn-delete" id="btn-delete-lesson" onclick="deleteLesson()" style="display:none;">Odstrániť</button>
+            <button type="submit" class="btn-primary" data-i18n="save_lesson">Uložiť hodinu</button>
+            <button type="button" class="btn-primary btn-delete" id="btn-delete-lesson" onclick="deleteLesson()" style="display:none;" data-i18n="delete">Odstrániť</button>
         </form>
     </div>
 </div>
@@ -995,18 +1077,18 @@
 <div class="modal-overlay" id="map-point-modal">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-title">Pridať bod na mapu</div>
+            <div class="modal-title" data-i18n="modal_map_title">Pridať bod na mapu</div>
             <button class="close-btn" onclick="closeModal('map-point-modal')">&times;</button>
         </div>
         <form id="map-point-form" onsubmit="saveMapPoint(event)">
             <input type="hidden" id="map-lat">
             <input type="hidden" id="map-lng">
             <div class="form-group">
-                <label>Názov miesta</label>
+                <label data-i18n="map_point_name">Názov miesta</label>
                 <input type="text" id="map-point-title" class="form-control" placeholder="napr. Kaviareň, FRI, Zraz" required>
             </div>
             <div class="form-group">
-                <label>Kategória</label>
+                <label data-i18n="map_point_cat">Kategória</label>
                 <select id="map-point-cat" class="form-control">
                     <option value="☕ Kaviareň / Jedlo">☕ Kaviareň / Jedlo</option>
                     <option value="📚 Štúdium / Ticho">📚 Štúdium / Ticho</option>
@@ -1016,10 +1098,10 @@
             </div>
             <div class="form-group" style="margin-top:12px; background:rgba(239, 68, 68, 0.1); padding:8px; border-radius:6px;">
                 <label style="color:#fca5a5; display:flex; align-items:center; gap:6px; cursor:pointer;">
-                    <input type="checkbox" id="map-is-admin-check"> Vytvoriť ako АДМИН-БОД (официальный)
+                    <input type="checkbox" id="map-is-admin-check"> <span data-i18n="admin_point">Vytvoriť ako АДМИН-БОД (официальный)</span>
                 </label>
             </div>
-            <button type="submit" class="btn-primary">Uložiť bod na mapu</button>
+            <button type="submit" class="btn-primary" data-i18n="save_map_point">Uložiť bod na mapu</button>
         </form>
     </div>
 </div>
@@ -1033,6 +1115,278 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
 <script>
+    // TRANSLATIONS DICTIONARY
+    const translations = {
+        sk: {
+            group_label: "Skupina:",
+            add_lesson: "+ Pridať hodinu",
+            reset_title: "Reset rozvrhu",
+            upcoming_day: "Najbližší deň",
+            weekly_schedule: "Týždenný rozvrh",
+            day_mon: "Pondelok",
+            day_tue: "Utorok",
+            day_wed: "Streda",
+            day_thu: "Štvrtok",
+            day_fri: "Piatok",
+            campus_map: "Mapa Kampusu UNIZA",
+            map_hint: "Pravý klik = nová bodka",
+            my_location: "📍 Moja poloha",
+            calendar: "Kalendár",
+            my_notes: "📝 Moje Poznámky",
+            create_note: "+ Vytvoriť poznámku",
+            online_chat: "💬 Online Chat",
+            login_google: "Prihlásiť cez Google",
+            chat_system: "Systém",
+            chat_welcome: "Vitajte v online chate UniFlo!",
+            chat_placeholder_login: "Prihláste sa pre odoslanie správy...",
+            chat_placeholder_active: "Napíšte správu...",
+            chat_send: "Odoslať",
+            btn_open: "Otvoriť ↗",
+            btn_subscribe: "Odoberať ↗",
+            promo_punkto_desc: "Pohodlné vyhľadávanie miest na mape: jedlo, obchody, služby, voľný čas a veľa ďalšieho.",
+            youtube_creator: "YouTube tvorcu",
+            promo_yt_desc: "YouTube kanál tvorcu, podporte odberom!",
+            nav_schedule: "Rozvrh",
+            nav_calendar: "Kalendár",
+            nav_map: "Mapa",
+            nav_notes: "Poznámky",
+            nav_hours: "Hodiny",
+            note_title_label: "Názov (voliteľné)",
+            note_text_label: "Text poznámky",
+            save_note: "Uložiť poznámku",
+            delete_note: "Odstrániť poznámku",
+            modal_lesson_title: "Pridať hodinu",
+            form_day: "Deň v týždni",
+            form_subject: "Názov predmetu",
+            form_type: "Typ výučby",
+            type_lecture: "prednáška",
+            type_practice: "cvičenie",
+            type_lab: "laboratórne",
+            form_start: "Začiatok (07:00 - 20:00)",
+            form_end: "Koniec (07:00 - 20:00)",
+            form_teacher: "Vyučujúci",
+            form_room: "Miestnosť",
+            save_lesson: "Uložiť hodinu",
+            delete: "Odstrániť",
+            modal_map_title: "Pridať bod na mapu",
+            map_point_name: "Názov miesta",
+            map_point_cat: "Kategória",
+            admin_point: "Vytvoriť ako admin bod (oficiálny)",
+            save_map_point: "Uložiť bod na mapu"
+        },
+        en: {
+            group_label: "Group:",
+            add_lesson: "+ Add Lesson",
+            reset_title: "Reset schedule",
+            upcoming_day: "Upcoming Day",
+            weekly_schedule: "Weekly Schedule",
+            day_mon: "Monday",
+            day_tue: "Tuesday",
+            day_wed: "Wednesday",
+            day_thu: "Thursday",
+            day_fri: "Friday",
+            campus_map: "UNIZA Campus Map",
+            map_hint: "Right click = new pin",
+            my_location: "📍 My Location",
+            calendar: "Calendar",
+            my_notes: "📝 My Notes",
+            create_note: "+ Create Note",
+            online_chat: "💬 Online Chat",
+            login_google: "Sign in with Google",
+            chat_system: "System",
+            chat_welcome: "Welcome to UniFlo online chat!",
+            chat_placeholder_login: "Sign in to send messages...",
+            chat_placeholder_active: "Type a message...",
+            chat_send: "Send",
+            btn_open: "Open ↗",
+            btn_subscribe: "Subscribe ↗",
+            promo_punkto_desc: "Convenient place search on map: food, shops, services, leisure and more.",
+            youtube_creator: "Creator's YouTube",
+            promo_yt_desc: "Creator's YouTube channel, support with a subscription!",
+            nav_schedule: "Schedule",
+            nav_calendar: "Calendar",
+            nav_map: "Map",
+            nav_notes: "Notes",
+            nav_hours: "Hours",
+            note_title_label: "Title (optional)",
+            note_text_label: "Note text",
+            save_note: "Save Note",
+            delete_note: "Delete Note",
+            modal_lesson_title: "Add Lesson",
+            form_day: "Day of week",
+            form_subject: "Subject Name",
+            form_type: "Lesson Type",
+            type_lecture: "lecture",
+            type_practice: "practice",
+            type_lab: "laboratory",
+            form_start: "Start (07:00 - 20:00)",
+            form_end: "End (07:00 - 20:00)",
+            form_teacher: "Teacher",
+            form_room: "Room",
+            save_lesson: "Save Lesson",
+            delete: "Delete",
+            modal_map_title: "Add Map Point",
+            map_point_name: "Place Name",
+            map_point_cat: "Category",
+            admin_point: "Create as admin pin (official)",
+            save_map_point: "Save Map Point"
+        },
+        ru: {
+            group_label: "Группа:",
+            add_lesson: "+ Добавить пару",
+            reset_title: "Сбросить расписание",
+            upcoming_day: "Ближайший день",
+            weekly_schedule: "Расписание на неделю",
+            day_mon: "Понедельник",
+            day_tue: "Вторник",
+            day_wed: "Среда",
+            day_thu: "Четверг",
+            day_fri: "Пятница",
+            campus_map: "Карта кампуса УНИЗА",
+            map_hint: "Правый клик = новая точка",
+            my_location: "📍 Моя геолокация",
+            calendar: "Календарь",
+            my_notes: "📝 Мои Заметки",
+            create_note: "+ Создать заметку",
+            online_chat: "💬 Онлайн Чат",
+            login_google: "Войти через Google",
+            chat_system: "Система",
+            chat_welcome: "Добро пожаловать в онлайн-чат UniFlo!",
+            chat_placeholder_login: "Войдите для отправки сообщений...",
+            chat_placeholder_active: "Введите сообщение...",
+            chat_send: "Отправить",
+            btn_open: "Открыть ↗",
+            btn_subscribe: "Подписаться ↗",
+            promo_punkto_desc: "Удобный поиск мест на карте: еда, магазины, услуги, досуг и многое другое.",
+            youtube_creator: "YouTube создателя",
+            promo_yt_desc: "Ютуб создателя, поддержите подпиской!",
+            nav_schedule: "Расписание",
+            nav_calendar: "Календарь",
+            nav_map: "Карта",
+            nav_notes: "Заметки",
+            nav_hours: "Часы",
+            note_title_label: "Заголовок (необязательно)",
+            note_text_label: "Текст заметки",
+            save_note: "Сохранить заметку",
+            delete_note: "Удалить заметку",
+            modal_lesson_title: "Добавить пару",
+            form_day: "День недели",
+            form_subject: "Название предмета",
+            form_type: "Тип занятия",
+            type_lecture: "лекция",
+            type_practice: "практика",
+            type_lab: "лабораторная",
+            form_start: "Начало (07:00 - 20:00)",
+            form_end: "Конец (07:00 - 20:00)",
+            form_teacher: "Преподаватель",
+            form_room: "Аудитория",
+            save_lesson: "Сохранить пару",
+            delete: "Удалить",
+            modal_map_title: "Добавить точку на карту",
+            map_point_name: "Название места",
+            map_point_cat: "Категория",
+            admin_point: "Создать как админ-метку (официальная)",
+            save_map_point: "Сохранить точку"
+        },
+        uk: {
+            group_label: "Група:",
+            add_lesson: "+ Додати пару",
+            reset_title: "Скинути розклад",
+            upcoming_day: "Найближчий день",
+            weekly_schedule: "Тижневий розклад",
+            day_mon: "Понеділок",
+            day_tue: "Вівторок",
+            day_wed: "Середа",
+            day_thu: "Четвер",
+            day_fri: "П'ятниця",
+            campus_map: "Карта кампусу УНІЗА",
+            map_hint: "Правий клік = нова точка",
+            my_location: "📍 Моє розташування",
+            calendar: "Календар",
+            my_notes: "📝 Мої Нотатки",
+            create_note: "+ Створити нотатку",
+            online_chat: "💬 Онлайн Чат",
+            login_google: "Увійти через Google",
+            chat_system: "Система",
+            chat_welcome: "Ласкаво просимо до онлайн-чату UniFlo!",
+            chat_placeholder_login: "Увійдіть для надсилання повідомлень...",
+            chat_placeholder_active: "Введіть повідомлення...",
+            chat_send: "Надіслати",
+            btn_open: "Відкрити ↗",
+            btn_subscribe: "Підписатись ↗",
+            promo_punkto_desc: "Зручний пошук місць на карті: їжа, магазини, послуги, дозвілля та багато іншого.",
+            youtube_creator: "YouTube творця",
+            promo_yt_desc: "Ютуб творця, підтримайте підпискою!",
+            nav_schedule: "Розклад",
+            nav_calendar: "Календар",
+            nav_map: "Карта",
+            nav_notes: "Нотатки",
+            nav_hours: "Години",
+            note_title_label: "Назва (необов'язково)",
+            note_text_label: "Текст нотатки",
+            save_note: "Зберегти нотатку",
+            delete_note: "Видалити нотатку",
+            modal_lesson_title: "Додати пару",
+            form_day: "День тижня",
+            form_subject: "Назва предмету",
+            form_type: "Тип заняття",
+            type_lecture: "лекція",
+            type_practice: "практика",
+            type_lab: "лабораторна",
+            form_start: "Початок (07:00 - 20:00)",
+            form_end: "Кінець (07:00 - 20:00)",
+            form_teacher: "Викладач",
+            form_room: "Аудиторія",
+            save_lesson: "Зберегти пару",
+            delete: "Видалити",
+            modal_map_title: "Додати точку на карту",
+            map_point_name: "Назва місця",
+            map_point_cat: "Категорія",
+            admin_point: "Створити як адмін-мітку (офіційна)",
+            save_map_point: "Зберегти точку"
+        }
+    };
+
+    let currentLang = localStorage.getItem('uniza_lang') || 'sk';
+
+    function toggleLangMenu() {
+        document.getElementById('lang-menu').classList.toggle('active');
+    }
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('uniza_lang', lang);
+        document.getElementById('lang-menu').classList.remove('active');
+        applyTranslations();
+    }
+
+    function applyTranslations() {
+        const t = translations[currentLang];
+        if (!t) return;
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (t[key]) el.innerText = t[key];
+        });
+
+        const chatInput = document.getElementById('chat-input-msg');
+        if (chatInput) {
+            chatInput.placeholder = currentUser ? t.chat_placeholder_active : t.chat_placeholder_login;
+        }
+
+        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+            const key = el.getAttribute('data-i18n-title');
+            if (t[key]) el.title = t[key];
+        });
+    }
+
+    window.addEventListener('click', function(e) {
+        if (!e.target.closest('.lang-dropdown-container')) {
+            const menu = document.getElementById('lang-menu');
+            if (menu) menu.classList.remove('active');
+        }
+    });
+
     // FIREBASE CONFIGURATION
     const firebaseConfig = {
         apiKey: "AIzaSyB8Ra6zgICw2Og0-xiIHwyNLxx52aM-Y3s",
@@ -1087,6 +1441,7 @@
         const authContainer = document.getElementById('chat-auth-container');
         const input = document.getElementById('chat-input-msg');
         const sendBtn = document.getElementById('chat-send-btn');
+        const t = translations[currentLang];
 
         if (currentUser) {
             const displayName = customNickname || currentUser.displayName || "Študent";
@@ -1102,26 +1457,22 @@
             `;
             input.disabled = false;
             sendBtn.disabled = false;
-            input.placeholder = "Napíšte správu...";
+            input.placeholder = t.chat_placeholder_active;
         } else {
             authContainer.innerHTML = `
                 <button class="btn-google-login" onclick="loginWithGoogle()">
                     <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-                    Prihlásiť cez Google
+                    <span>${t.login_google}</span>
                 </button>
             `;
             input.disabled = true;
             sendBtn.disabled = true;
-            input.placeholder = "Prihláste sa pre odoslanie správy...";
+            input.placeholder = t.chat_placeholder_login;
         }
     }
 
     function sendChatMessage() {
-        if (!currentUser) {
-            alert("Pre odoslanie správy sa musíte prihlásiť cez Google.");
-            return;
-        }
-
+        if (!currentUser) return;
         const input = document.getElementById('chat-input-msg');
         const text = input.value.trim();
         if (!text) return;
@@ -1142,18 +1493,17 @@
     }
 
     function handleChatKeyPress(e) {
-        if (e.key === 'Enter') {
-            sendChatMessage();
-        }
+        if (e.key === 'Enter') sendChatMessage();
     }
 
     db.ref('messages').limitToLast(50).on('value', (snapshot) => {
         const list = document.getElementById('chat-messages-list');
         list.innerHTML = '';
+        const t = translations[currentLang];
         
         const data = snapshot.val();
         if (!data) {
-            list.innerHTML = '<div class="chat-msg"><div class="chat-msg-header"><span class="chat-msg-author">Systém</span></div><div>Zatiaľ žiadne správy. Napíšte prvú!</div></div>';
+            list.innerHTML = `<div class="chat-msg"><div class="chat-msg-header"><span class="chat-msg-author">${t.chat_system}</span></div><div>Zatiaľ žiadne správy.</div></div>`;
             return;
         }
 
@@ -1195,7 +1545,7 @@
         container.innerHTML = '';
 
         if (notesList.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">Žiadne poznámky. Kliknite na "+ Vytvoriť poznámku".</div>';
+            container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">Žiadne poznámky.</div>';
             return;
         }
 
@@ -1220,7 +1570,7 @@
 
     function openNoteModal() {
         document.getElementById('note-edit-id').value = '';
-        document.getElementById('note-modal-title').innerText = 'Nová poznámka';
+        document.getElementById('note-modal-title').innerText = currentLang === 'sk' ? 'Nová poznámka' : (currentLang === 'en' ? 'New Note' : (currentLang === 'ru' ? 'Новая заметка' : 'Нова нотатка'));
         document.getElementById('note-title-input').value = '';
         document.getElementById('note-text-content').value = '';
         document.getElementById('btn-delete-note').style.display = 'none';
@@ -1232,7 +1582,7 @@
         if (!note) return;
 
         document.getElementById('note-edit-id').value = note.id;
-        document.getElementById('note-modal-title').innerText = 'Upraviť poznámku';
+        document.getElementById('note-modal-title').innerText = currentLang === 'sk' ? 'Upraviť poznámku' : (currentLang === 'en' ? 'Edit Note' : (currentLang === 'ru' ? 'Редактировать заметку' : 'Редагувати нотатку'));
         document.getElementById('note-title-input').value = note.title || '';
         document.getElementById('note-text-content').value = note.text;
         document.getElementById('btn-delete-note').style.display = 'block';
@@ -1305,7 +1655,7 @@
     }
 
     function resetScheduleWithConfirm() {
-        if (confirm(`Naozaj chcete úplne vymazať rozvrh pre skupinu ${currentGroup}?`)) {
+        if (confirm(currentLang === 'sk' ? `Naozaj chcete vymazať rozvrh pre skupinu ${currentGroup}?` : 'Reset schedule?')) {
             schedule = [];
             localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
             renderAll();
@@ -1319,7 +1669,7 @@
         if (diff <= 0) return null;
         const hrs = Math.floor(diff / 60);
         const mins = diff % 60;
-        let str = 'okno ';
+        let str = currentLang === 'sk' ? 'okno ' : (currentLang === 'en' ? 'gap ' : 'окно ');
         if (hrs > 0) str += `${hrs} h `;
         if (mins > 0) str += `${mins} min`;
         return str.trim();
@@ -1331,7 +1681,7 @@
         const dayLessons = schedule.filter(l => l.day === 1).sort((a,b) => a.start.localeCompare(b.start));
 
         if (dayLessons.length === 0) {
-            upcomingList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem;">Žiadne hodiny na tento deň. Kliknite na "+ Pridať hodinu".</div>';
+            upcomingList.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem;">${currentLang==='sk'?'Žiadne hodiny.':(currentLang==='en'?'No lessons.':'Нет пар.')}</div>`;
             return;
         }
 
@@ -1496,11 +1846,11 @@
 
         let isAdmin = false;
         if (isAdminRequested) {
-            const pass = prompt("Zadajte heslo pre vytvorenie Admin bodu:");
+            const pass = prompt("Zadajte heslo pre vytvorenie Admin bodu / Enter password:");
             if (pass === "454") {
                 isAdmin = true;
             } else {
-                alert("Nesprávne heslo! Bod bude vytvorený ako obyčajný.");
+                alert("Nesprávne heslo!");
             }
         }
 
@@ -1530,7 +1880,7 @@
 
     function updateAdminCategoryChips() {
         const chipsContainer = document.getElementById('map-category-chips');
-        chipsContainer.innerHTML = '<div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>';
+        chipsContainer.innerHTML = `<div class="chip chip-gps" onclick="locateUser()">${translations[currentLang].my_location}</div>`;
 
         const adminPoints = customMapPoints.filter(p => p.isAdmin);
         adminPoints.forEach(p => {
@@ -1560,7 +1910,7 @@
             marker = L.marker([p.lat, p.lng]).addTo(leafletMap);
         }
 
-        const deleteBtnHtml = `<br><button onclick="deleteCustomPoint('${p.id}')" style="margin-top:6px; background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">🗑 Odstrániť bod</button>`;
+        const deleteBtnHtml = `<br><button onclick="deleteCustomPoint('${p.id}')" style="margin-top:6px; background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">🗑 Odstrániť</button>`;
 
         marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br>${escapeHtml(p.title)} ${deleteBtnHtml}`);
         mapMarkers.push(marker);
@@ -1571,13 +1921,13 @@
         if (!point) return;
 
         if (point.isAdmin) {
-            const pass = prompt("Toto je chránená admin lokácia. Zadajte heslo 454 pre odstránenie:");
+            const pass = prompt("Zadajte heslo 454:");
             if (pass !== "454") {
-                alert("Nesprávne heslo! Bod nebol odstránený.");
+                alert("Nesprávne heslo!");
                 return;
             }
         } else {
-            if (!confirm("Naozaj chcete vymazať tento bod z mapy?")) return;
+            if (!confirm("Vymazať bod?")) return;
         }
 
         customMapPoints = customMapPoints.filter(p => p.id !== id);
@@ -1585,11 +1935,12 @@
         location.reload();
     };
 
+    // Ускоренное определение геолокации без долгих зависаний
     function locateUser() {
         if (!leafletMap) initMap();
         
         if (!navigator.geolocation) {
-            alert("Váš prehliadač nepodporuje geolokáciu.");
+            alert("Geolocation error.");
             return;
         }
 
@@ -1621,9 +1972,13 @@
                     .openPopup();
             },
             (error) => {
-                alert("Nepodarilo sa zistiť vašu polohu. Skontrolujte povolenia v prehliadači.");
+                alert("GPS error / Nepodarilo sa zistiť polohu.");
             },
-            { enableHighAccuracy: true }
+            { 
+                enableHighAccuracy: false, // Отключено для скорости (чтобы не ждать холодный GPS-модуль)
+                timeout: 7000,             // Максимум 7 секунд ожидания
+                maximumAge: 10000          // Использовать кэшированные данные до 10 секунд
+            }
         );
     }
 
@@ -1634,7 +1989,7 @@
 
     function openAddModal() {
         document.getElementById('edit-id').value = '';
-        document.getElementById('modal-title-text').innerText = 'Pridať hodinu';
+        document.getElementById('modal-title-text').innerText = translations[currentLang].modal_lesson_title;
         document.getElementById('lesson-form').reset();
         document.getElementById('btn-delete-lesson').style.display = 'none';
         document.getElementById('lesson-modal').classList.add('active');
@@ -1645,7 +2000,7 @@
         if (!item) return;
 
         document.getElementById('edit-id').value = item.id;
-        document.getElementById('modal-title-text').innerText = 'Upraviť hodinu';
+        document.getElementById('modal-title-text').innerText = translations[currentLang].modal_lesson_title;
         document.getElementById('form-day').value = item.day;
         document.getElementById('form-title').value = item.title;
         document.getElementById('form-type').value = item.type;
@@ -1668,7 +2023,7 @@
         const endVal = document.getElementById('form-end').value;
 
         if (startVal < "07:00" || endVal > "20:00" || startVal >= endVal) {
-            alert("Hodina musí byť v rozmedzí od 07:00 do 20:00 a čas začiatku musí byť skôr ako koniec!");
+            alert("Error time range 07:00 - 20:00");
             return;
         }
 
@@ -1711,6 +2066,7 @@
         renderCompactCalendar();
         renderNotes();
         initMap();
+        applyTranslations();
     }
 
     setInterval(() => {
