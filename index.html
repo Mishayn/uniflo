@@ -910,8 +910,8 @@
     let schedule = loadInitialSchedule(currentGroup);
     let customMapPoints = JSON.parse(localStorage.getItem('uniza_saved_map_points')) || [];
     let notesList = JSON.parse(localStorage.getItem('uniza_user_notes')) || [
-        { id: '1', title: 'Semestrálka', text: 'Nezabudnúť odovzdať semestrálnku do piatku.' },
-        { id: '2', title: '', text: 'Kúpiť lístky na vlak domov.' }
+        { id: '2', title: '', text: 'Kúpiť lístky na vlak domov.' },
+        { id: '1', title: 'Semestrálka', text: 'Nezabudnúť odovzdať semestrálnku do piatku.' }
     ];
     
     let leafletMap = null;
@@ -999,7 +999,7 @@
         notesList.forEach(note => {
             let displayTitle = note.title ? note.title.trim() : '';
             
-            // Если названия нет, берем первые слова из первого абзаца
+            // Ak názov chýba, použije sa prvé slovo/slová z prvého odseku
             if (!displayTitle) {
                 const firstParagraph = note.text.trim().split('\n')[0] || '';
                 const words = firstParagraph.split(/\s+/);
@@ -1045,13 +1045,17 @@
         const text = document.getElementById('note-text-content').value;
 
         if (id) {
-            const note = notesList.find(n => n.id === id);
-            if (note) {
-                note.title = title;
-                note.text = text;
-            }
+            // Odstránime starú verziu poznámky
+            notesList = notesList.filter(n => n.id !== id);
+            // Pridáme ju na začiatok zoznamu (navrch)
+            notesList.unshift({
+                id: id,
+                title: title,
+                text: text
+            });
         } else {
-            notesList.push({
+            // Novú poznámku vkladáme na začiatok
+            notesList.unshift({
                 id: Date.now().toString(),
                 title: title,
                 text: text
