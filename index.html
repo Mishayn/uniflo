@@ -257,10 +257,11 @@
 
         .week-container {
             overflow-x: auto;
+            overflow-y: auto;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--bg-main);
-            max-height: 545px;
+            max-height: 505px; /* Зафиксированная высота, чтобы сетка не растягивала страницу */
         }
 
         .week-grid {
@@ -433,11 +434,11 @@
         .note-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
         .note-preview { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Online Chat Styles (Высота 195px) */
+        /* Online Chat Styles (Увеличена высота примерно на 30px до 225px) */
         .chat-box {
             display: flex;
             flex-direction: column;
-            height: 195px;
+            height: 225px;
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -781,7 +782,7 @@
                     </div>
                 </div>
 
-                <!-- Calendar Section (добавлен отступ 15px) -->
+                <!-- Calendar Section -->
                 <div id="screen-kalendar" class="screen active" style="margin-top: 15px;">
                     <div class="dash-card">
                         <div class="clock-box">
@@ -812,7 +813,7 @@
                         <div class="notes-container" id="notes-list-container"></div>
                     </div>
 
-                    <!-- Блок Онлайн Чата (высота 195px) -->
+                    <!-- Блок Онлайн Чата (высота увеличена до 225px) -->
                     <div class="dash-card">
                         <div class="section-header">
                             <div class="section-title">💬 Online Chat</div>
@@ -840,7 +841,7 @@
                         </div>
                     </div>
 
-                    <!-- Карточка Punkto.sk (кликабельная + зелененькая подсветка) -->
+                    <!-- Карточка Punkto.sk -->
                     <div class="dash-card" style="padding: 0; overflow: hidden;">
                         <a href="https://punkto.sk" target="_blank" class="promo-card-link">
                             <div class="promo-card punkto-highlight" style="border: none; border-radius: 0;">
@@ -858,7 +859,7 @@
                         </a>
                     </div>
 
-                    <!-- Подсвеченная карточка YouTube автора (кликабельная) -->
+                    <!-- Карточка YouTube автора -->
                     <div class="dash-card" style="flex:1; display:flex; flex-direction:column; justify-content:center; padding: 0; overflow: hidden;">
                         <a href="https://www.youtube.com/@mishayn" target="_blank" class="promo-card-link" style="height: 100%;">
                             <div class="promo-card highlighted" style="border: none; border-radius: 0; height: 100%;">
