@@ -212,7 +212,7 @@
         .section-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
             margin-bottom: 10px;
         }
 
@@ -427,11 +427,34 @@
         .clock-time { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 0.78rem; color: var(--text-secondary); }
 
+        /* Notes Styles */
+        .notes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .note-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .note-item:hover {
+            border-color: var(--accent-orange);
+        }
+        .note-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+        .note-preview { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
         /* Online Chat Styles */
         .chat-box {
             display: flex;
             flex-direction: column;
-            height: 250px;
+            height: 240px;
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -453,10 +476,15 @@
             font-size: 0.78rem;
             line-height: 1.3;
         }
+        .chat-msg-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
         .chat-msg-author {
             font-weight: 700;
             color: var(--accent-orange);
-            margin-bottom: 2px;
         }
         .chat-input-area {
             display: flex;
@@ -484,6 +512,36 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 0.8rem;
+        }
+
+        /* Google Login Button & User Badge */
+        .btn-google-login {
+            background: #ffffff;
+            color: #1f1f1f;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s;
+        }
+        .btn-google-login:hover { opacity: 0.9; }
+
+        .chat-user-profile {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+        }
+        .chat-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         /* Promo Cards Style */
@@ -727,14 +785,32 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: Online Chat & Promo Cards (Punkto & YouTube) -->
+        <!-- COLUMN 3: Notes, Online Chat & Promo Cards -->
         <div class="dash-column">
             <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
+
+                    <!-- Блок Заметок (ВЕРНУЛ ОБРАТНО!) -->
                     <div class="dash-card">
                         <div class="section-header">
-                            <div class="section-title">💬 Online Chat študentov</div>
-                            <span class="section-meta" id="chat-status" style="color:#22c55e;">● Pripojené</span>
+                            <div class="section-title">📝 Moje Poznámky</div>
+                            <button onclick="openNoteModal()" style="background:none; border:none; color:var(--accent-orange); font-size:0.8rem; font-weight:600; cursor:pointer;">+ Vytvoriť poznámku</button>
+                        </div>
+                        <div class="notes-container" id="notes-list-container">
+                            <!-- Заметки рендерятся через JS -->
+                        </div>
+                    </div>
+
+                    <!-- Блок Онлайн Чата -->
+                    <div class="dash-card">
+                        <div class="section-header">
+                            <div class="section-title">💬 Online Chat</div>
+                            <div id="chat-auth-container">
+                                <button class="btn-google-login" onclick="loginWithGoogle()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                                    Prihlásiť cez Google
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="chat-box">
@@ -745,8 +821,8 @@
                                 </div>
                             </div>
                             <div class="chat-input-area">
-                                <input type="text" id="chat-input-msg" class="chat-input" placeholder="Napíšte správu..." onkeypress="handleChatKeyPress(event)">
-                                <button class="chat-send-btn" onclick="sendChatMessage()">Odoslať</button>
+                                <input type="text" id="chat-input-msg" class="chat-input" placeholder="Prihláste sa pre odoslanie správy..." disabled onkeypress="handleChatKeyPress(event)">
+                                <button class="chat-send-btn" id="chat-send-btn" disabled onclick="sendChatMessage()">Odoslať</button>
                             </div>
                         </div>
                     </div>
@@ -767,7 +843,7 @@
                         </div>
                     </div>
 
-                    <!-- Подсвеченная карточка YouTube автора (с flex:1 для идеального заполнения высоты) -->
+                    <!-- Подсвеченная карточка YouTube автора -->
                     <div class="dash-card" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
                         <div class="promo-card highlighted">
                             <svg class="promo-logo" viewBox="0 0 24 24" fill="#ef4444" style="padding:6px; background:rgba(239,68,68,0.15); border-radius:8px;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
@@ -807,13 +883,36 @@
         </div>
         <div class="nav-item" onclick="switchMobileTab('akcie', this)">
             <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-            Chat
+            Poznámky
         </div>
         <div class="nav-item" onclick="switchMobileTab('hodiny', this)">
             <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
             Hodiny
         </div>
     </nav>
+</div>
+
+<!-- Modal for Note Creation/Editing -->
+<div class="modal-overlay" id="note-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="note-modal-title">Nová poznámka</div>
+            <button class="close-btn" onclick="closeModal('note-modal')">&times;</button>
+        </div>
+        <form id="note-form" onsubmit="saveNote(event)">
+            <input type="hidden" id="note-edit-id">
+            <div class="form-group">
+                <label>Názov (voliteľné)</label>
+                <input type="text" id="note-title-input" class="form-control" placeholder="Ak necháte prázdne, použije sa začiatok textu">
+            </div>
+            <div class="form-group">
+                <label>Text poznámky</label>
+                <textarea id="note-text-content" class="form-control" rows="5" placeholder="Napíšte svoju poznámku..." required style="resize:vertical;"></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Uložiť poznámku</button>
+            <button type="button" class="btn-primary btn-delete" id="btn-delete-note" onclick="deleteNote()" style="display:none;">Odstrániť poznámku</button>
+        </form>
+    </div>
 </div>
 
 <!-- Modal for Lesson -->
@@ -912,9 +1011,10 @@
 <!-- Firebase SDK scripts -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
 <script>
-    // НАСТРОЙКИ FIREBASE (С твоим проектом unizarozvrhchat)
+    // FIREBASE CONFIGURATION
     const firebaseConfig = {
         apiKey: "AIzaSyB8Ra6zgICw2Og0-xiIHwyNLxx52aM-Y3s",
         authDomain: "unizarozvrhchat.firebaseapp.com",
@@ -927,21 +1027,84 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const auth = firebase.auth();
 
-    // Логика чата
-    let userName = localStorage.getItem('uniza_chat_username');
-    if (!userName) {
-        userName = prompt("Zadajte vaše meno pre chat:") || "Študent " + Math.floor(Math.random() * 1000);
-        localStorage.setItem('uniza_chat_username', userName);
+    let currentUser = null;
+    let customNickname = localStorage.getItem('uniza_custom_nickname') || null;
+
+    // Google Auth Login
+    function loginWithGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch((error) => {
+            alert("Chyba pri prihlásení cez Google: " + error.message);
+        });
+    }
+
+    function logoutUser() {
+        auth.signOut();
+    }
+
+    function changeCustomNickname() {
+        const newNick = prompt("Zadajte váš nový nick v chate:", customNickname || currentUser.displayName);
+        if (newNick && newNick.trim()) {
+            customNickname = newNick.trim();
+            localStorage.setItem('uniza_custom_nickname', customNickname);
+            updateChatUserUI();
+        }
+    }
+
+    auth.onAuthStateChanged((user) => {
+        currentUser = user;
+        updateChatUserUI();
+    });
+
+    function updateChatUserUI() {
+        const authContainer = document.getElementById('chat-auth-container');
+        const input = document.getElementById('chat-input-msg');
+        const sendBtn = document.getElementById('chat-send-btn');
+
+        if (currentUser) {
+            const displayName = customNickname || currentUser.displayName || "Študent";
+            const photoURL = currentUser.photoURL || 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg';
+
+            authContainer.innerHTML = `
+                <div class="chat-user-profile">
+                    <img src="${photoURL}" class="chat-avatar" alt="Avatar">
+                    <span style="font-weight:600; color:var(--text-primary);">${escapeHtml(displayName)}</span>
+                    <button onclick="changeCustomNickname()" title="Zmeniť nick" style="background:none; border:none; cursor:pointer; font-size:0.75rem;">✏️</button>
+                    <button onclick="logoutUser()" title="Odhlásiť sa" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.7rem; margin-left:2px;">✕</button>
+                </div>
+            `;
+            input.disabled = false;
+            sendBtn.disabled = false;
+            input.placeholder = "Napíšte správu...";
+        } else {
+            authContainer.innerHTML = `
+                <button class="btn-google-login" onclick="loginWithGoogle()">
+                    <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                    Prihlásiť cez Google
+                </button>
+            `;
+            input.disabled = true;
+            sendBtn.disabled = true;
+            input.placeholder = "Prihláste sa pre odoslanie správy...";
+        }
     }
 
     function sendChatMessage() {
+        if (!currentUser) {
+            alert("Pre odoslanie správy sa musíte prihlásiť cez Google.");
+            return;
+        }
+
         const input = document.getElementById('chat-input-msg');
         const text = input.value.trim();
         if (!text) return;
 
+        const displayName = customNickname || currentUser.displayName || "Študent";
+
         db.ref('messages').push({
-            author: userName,
+            author: displayName,
             text: text,
             timestamp: Date.now()
         });
@@ -970,7 +1133,9 @@
             const div = document.createElement('div');
             div.className = 'chat-msg';
             div.innerHTML = `
-                <div class="chat-msg-author">${escapeHtml(msg.author)}</div>
+                <div class="chat-msg-header">
+                    <span class="chat-msg-author">${escapeHtml(msg.author)}</span>
+                </div>
                 <div>${escapeHtml(msg.text)}</div>
             `;
             list.appendChild(div);
@@ -980,9 +1145,93 @@
     });
 
     function escapeHtml(text) {
-        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
     }
 
+    // NOTES LOGIC
+    let notesList = JSON.parse(localStorage.getItem('uniza_user_notes')) || [
+        { id: '2', title: '', text: 'Kúpiť lístky na vlak domov.' },
+        { id: '1', title: 'Semestrálka', text: 'Nezabudnúť odovzdať semestrálnku do piatku.' }
+    ];
+
+    function renderNotes() {
+        const container = document.getElementById('notes-list-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (notesList.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">Žiadne poznámky. Kliknite na "+ Vytvoriť poznámku".</div>';
+            return;
+        }
+
+        notesList.forEach(note => {
+            let displayTitle = note.title ? note.title.trim() : '';
+            if (!displayTitle) {
+                const firstParagraph = note.text.trim().split('\n')[0] || '';
+                const words = firstParagraph.split(/\s+/);
+                displayTitle = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
+            }
+
+            const item = document.createElement('div');
+            item.className = 'note-item';
+            item.onclick = () => openEditNoteModal(note.id);
+            item.innerHTML = `
+                <div class="note-title">📌 ${escapeHtml(displayTitle)}</div>
+                <div class="note-preview">${escapeHtml(note.text)}</div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function openNoteModal() {
+        document.getElementById('note-edit-id').value = '';
+        document.getElementById('note-modal-title').innerText = 'Nová poznámka';
+        document.getElementById('note-title-input').value = '';
+        document.getElementById('note-text-content').value = '';
+        document.getElementById('btn-delete-note').style.display = 'none';
+        document.getElementById('note-modal').classList.add('active');
+    }
+
+    function openEditNoteModal(id) {
+        const note = notesList.find(n => n.id === id);
+        if (!note) return;
+
+        document.getElementById('note-edit-id').value = note.id;
+        document.getElementById('note-modal-title').innerText = 'Upraviť poznámku';
+        document.getElementById('note-title-input').value = note.title || '';
+        document.getElementById('note-text-content').value = note.text;
+        document.getElementById('btn-delete-note').style.display = 'block';
+        document.getElementById('note-modal').classList.add('active');
+    }
+
+    function saveNote(e) {
+        e.preventDefault();
+        const id = document.getElementById('note-edit-id').value;
+        const title = document.getElementById('note-title-input').value;
+        const text = document.getElementById('note-text-content').value;
+
+        if (id) {
+            notesList = notesList.filter(n => n.id !== id);
+            notesList.unshift({ id: id, title: title, text: text });
+        } else {
+            notesList.unshift({ id: Date.now().toString(), title: title, text: text });
+        }
+
+        localStorage.setItem('uniza_user_notes', JSON.stringify(notesList));
+        closeModal('note-modal');
+        renderNotes();
+    }
+
+    function deleteNote() {
+        const id = document.getElementById('note-edit-id').value;
+        if (!id) return;
+        notesList = notesList.filter(n => n.id !== id);
+        localStorage.setItem('uniza_user_notes', JSON.stringify(notesList));
+        closeModal('note-modal');
+        renderNotes();
+    }
+
+    // SCHEDULE LOGIC
     let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR11';
     document.getElementById('group-input').value = currentGroup;
 
@@ -1065,13 +1314,13 @@
                 </div>
                 <div class="card-main">
                     <div class="subject-title">
-                        ${lesson.title}
+                        ${escapeHtml(lesson.title)}
                         <span class="badge ${badgeClass}">${lesson.type}</span>
                     </div>
-                    <div class="teacher-name">${lesson.teacher || ''}</div>
+                    <div class="teacher-name">${escapeHtml(lesson.teacher || '')}</div>
                 </div>
                 <div class="card-room">
-                    <div class="room-code">${lesson.room || ''}</div>
+                    <div class="room-code">${escapeHtml(lesson.room || '')}</div>
                 </div>
             `;
             upcomingList.appendChild(item);
@@ -1102,8 +1351,8 @@
                 card.onclick = () => openEditModal(l.id);
 
                 card.innerHTML = `
-                    <div style="font-weight:700;">${l.title}</div>
-                    <div style="font-size:0.62rem;">${l.start}–${l.end} | ${l.room}</div>
+                    <div style="font-weight:700;">${escapeHtml(l.title)}</div>
+                    <div style="font-size:0.62rem;">${l.start}–${l.end} | ${escapeHtml(l.room)}</div>
                 `;
                 col.appendChild(card);
 
@@ -1278,7 +1527,7 @@
 
         const deleteBtnHtml = `<br><button onclick="deleteCustomPoint('${p.id}')" style="margin-top:6px; background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">🗑 Odstrániť bod</button>`;
 
-        marker.bindPopup(`<b>${p.cat}</b><br>${p.title} ${deleteBtnHtml}`);
+        marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br>${escapeHtml(p.title)} ${deleteBtnHtml}`);
         mapMarkers.push(marker);
     }
 
@@ -1425,6 +1674,7 @@
         renderUpcomingDay();
         renderWeekGrid();
         renderCompactCalendar();
+        renderNotes();
         initMap();
     }
 
