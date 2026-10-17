@@ -157,7 +157,7 @@
 
         .btn-square-reset:hover { background: rgba(239, 68, 68, 0.3); }
 
-        /* Desktop Grid Layout (3 Columns with fixed height harmonization) */
+        /* Desktop Grid Layout (3 Columns) */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -202,7 +202,6 @@
             padding: 14px;
         }
 
-        /* Column 2 inner sections */
         .dash-column-2 {
             display: flex;
             flex-direction: column;
@@ -272,7 +271,7 @@
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--bg-main);
-            max-height: 540px; /* Фиксированная высота расписания во избежание скачков */
+            max-height: 545px;
         }
 
         .week-grid {
@@ -342,10 +341,10 @@
             box-sizing: border-box;
         }
 
-        /* Map Container */
+        /* Map Container - чуть увеличен для идеального выравнивания по высоте */
         #map-container {
             width: 100%;
-            height: 330px; /* Фиксированная высота карты */
+            height: 352px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             overflow: hidden;
@@ -444,6 +443,21 @@
         .news-meta { font-size: 0.68rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
         .news-link { color: var(--accent-orange); text-decoration: none; font-weight: 600; }
         .news-link:hover { text-decoration: underline; }
+
+        /* Promo Punkto Card Style */
+        .promo-punkto-card {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(59, 130, 246, 0.12));
+            border: 1px dashed var(--accent-orange);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .promo-punkto-title { font-size: 0.85rem; font-weight: 700; color: var(--accent-orange); display: flex; align-items: center; gap: 6px; }
+        .promo-punkto-desc { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; }
+        .promo-punkto-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
 
         /* Bottom Nav Mobile */
         .bottom-nav {
@@ -645,7 +659,7 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: Student Events & News -->
+        <!-- COLUMN 3: Student Events, News & Promo Punkto -->
         <div class="dash-column">
             <div id="screen-akcie" class="screen active">
                 <div class="dash-card">
@@ -690,6 +704,21 @@
                                 <a href="https://www.sportoviska.uniza.sk" target="_blank" class="news-link">sportoviska.uniza.sk ↗</a>
                             </div>
                         </div>
+
+                        <!-- Рекламный блок punkto.sk в пустом правом нижнем углу -->
+                        <div class="promo-punkto-card">
+                            <div class="promo-punkto-title">
+                                🚀 Reklama: punkto.sk
+                            </div>
+                            <div class="promo-punkto-desc">
+                                Objavte nový portál a mobilnú aplikáciu <b>punkto.sk</b> — efektívne nástroje pre študentov a projekty!
+                            </div>
+                            <div class="promo-punkto-footer">
+                                <span>Odporúčané pre vás</span>
+                                <a href="https://punkto.sk" target="_blank" class="news-link">punkto.sk ↗</a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
