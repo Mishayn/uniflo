@@ -433,11 +433,11 @@
         .note-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
         .note-preview { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Online Chat Styles */
+        /* Online Chat Styles (Оптимизировано по высоте до 185px) */
         .chat-box {
             display: flex;
             flex-direction: column;
-            height: 240px;
+            height: 185px;
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -474,8 +474,12 @@
         .chat-msg-author {
             font-weight: 700;
             color: var(--accent-orange);
-            cursor: pointer;
-            position: relative;
+            cursor: help;
+        }
+        .chat-msg-orig {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-weight: 400;
         }
         .chat-input-area {
             display: flex;
@@ -1064,7 +1068,7 @@
             authContainer.innerHTML = `
                 <div class="chat-user-profile">
                     <img src="${photoURL}" class="chat-avatar" alt="Avatar">
-                    <span style="font-weight:600; color:var::text-primary;" title="Google: ${currentUser.displayName}">${escapeHtml(displayName)}</span>
+                    <span style="font-weight:600; color:var(--text-primary);">${escapeHtml(displayName)}</span>
                     <button onclick="changeCustomNickname()" title="Zmeniť nick" style="background:none; border:none; cursor:pointer; font-size:0.75rem;">✏️</button>
                     <button onclick="logoutUser()" title="Odhlásiť sa" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; margin-left:2px;">✕</button>
                 </div>
@@ -1132,12 +1136,14 @@
             
             const avatarHtml = msg.photoURL ? `<img src="${msg.photoURL}" class="chat-msg-avatar" alt="">` : '';
             const origName = msg.originalName || msg.author;
-            const tooltipText = `Pôvodné meno: ${origName}\nAktuálny nick: ${msg.author}`;
+            const isDifferent = msg.originalName && msg.originalName !== msg.author;
+            const origSpan = isDifferent ? `<span class="chat-msg-orig">(${escapeHtml(msg.originalName)})</span>` : '';
 
             div.innerHTML = `
                 <div class="chat-msg-header">
                     ${avatarHtml}
-                    <span class="chat-msg-author" title="${escapeHtml(tooltipText)}">${escapeHtml(msg.author)}</span>
+                    <span class="chat-msg-author">${escapeHtml(msg.author)}</span>
+                    ${origSpan}
                 </div>
                 <div>${escapeHtml(msg.text)}</div>
             `;
