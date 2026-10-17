@@ -43,73 +43,16 @@
             background-color: var(--bg-main);
             color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
         }
 
+        /* Overall App Container */
         .app-container {
             width: 100%;
-            max-width: 680px; /* Квадратный аккуратный центр */
-            background-color: var(--bg-main);
+            max-width: 1400px;
+            margin: 0 auto;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.6);
-        }
-
-        /* Desktop side widgets styling for wide screens */
-        @media (min-width: 1100px) {
-            body::before {
-                content: "UNIZA FRI 2026\A📅 Skupina: Aktívna\A🚀 Rýchly prístup k mapám";
-                white-space: pre;
-                position: fixed;
-                left: 40px;
-                top: 100px;
-                width: 220px;
-                background: var(--bg-card);
-                border: 1px solid var(--border-color);
-                padding: 20px;
-                border-radius: 12px;
-                font-size: 0.85rem;
-                color: var(--text-secondary);
-                line-height: 1.5;
-            }
-
-            body::after {
-                content: "💡 Tip:\AKliknutím do mapy môžete pridávať vlastné body pre všetkých spolužiakov!";
-                white-space: pre;
-                position: fixed;
-                right: 40px;
-                top: 100px;
-                width: 240px;
-                background: var(--bg-card);
-                border: 1px solid var(--border-color);
-                padding: 20px;
-                border-radius: 12px;
-                font-size: 0.85rem;
-                color: var(--text-secondary);
-                line-height: 1.5;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .bottom-nav {
-                display: none !important;
-            }
-            .desktop-nav {
-                display: flex !important;
-                gap: 8px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding-bottom: 70px;
-            }
-            .desktop-nav {
-                display: none !important;
-            }
         }
 
         /* Top Header */
@@ -117,14 +60,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
+            padding: 14px 24px;
             background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
-            gap: 10px;
-            flex-wrap: wrap;
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .group-selector-container {
@@ -137,45 +87,27 @@
             background: var(--bg-input);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            padding: 6px 10px;
+            padding: 6px 12px;
             border-radius: 8px;
             font-size: 0.95rem;
             font-weight: 600;
-            width: 100px;
+            width: 110px;
             outline: none;
-        }
-
-        .desktop-nav-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-secondary);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.82rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .desktop-nav-btn:hover, .desktop-nav-btn.active {
-            color: var(--accent-orange);
-            background: var(--accent-orange-bg);
-            border-color: rgba(249, 115, 22, 0.3);
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
         .btn-header {
             background: var(--bg-input);
             color: var(--text-secondary);
             border: 1px solid var(--border-color);
-            padding: 6px 10px;
+            padding: 6px 14px;
             border-radius: 8px;
-            font-size: 0.78rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -191,15 +123,59 @@
             border-color: rgba(239, 68, 68, 0.3);
         }
 
-        /* Screen Sections */
-        .screen {
-            display: none;
-            padding: 16px;
+        /* Main Dashboard Grid for Desktop */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 20px;
             flex: 1;
         }
 
-        .screen.active {
-            display: block;
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+
+            .bottom-nav {
+                display: none !important;
+            }
+
+            .screen {
+                display: block !important;
+            }
+
+            .mobile-only {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            body {
+                padding-bottom: 70px;
+            }
+
+            .dashboard-grid {
+                display: block;
+                padding: 16px;
+            }
+
+            .screen {
+                display: none;
+            }
+
+            .screen.active {
+                display: block;
+            }
+        }
+
+        /* Dashboard Cards & Layout */
+        .dash-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
         }
 
         .section-header {
@@ -207,17 +183,16 @@
             justify-content: space-between;
             align-items: baseline;
             margin-bottom: 12px;
-            margin-top: 8px;
         }
 
         .section-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--text-primary);
         }
 
         .section-meta {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
         }
 
@@ -229,10 +204,10 @@
         }
 
         .card-item {
-            background: var(--bg-card);
+            background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 12px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -257,39 +232,37 @@
         .card-time {
             display: flex;
             flex-direction: column;
-            min-width: 95px;
+            min-width: 90px;
         }
 
         .time-range {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 700;
         }
 
         .time-block {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
-            margin-top: 2px;
         }
 
         .card-main {
             flex: 1;
-            padding: 0 12px;
+            padding: 0 10px;
         }
 
         .subject-title {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .badge {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: 500;
-            text-transform: lowercase;
         }
 
         .badge-prednaska { background: var(--badge-prednaska); color: var(--badge-prednaska-txt); }
@@ -297,58 +270,46 @@
         .badge-laboratorne { background: var(--badge-lab); color: var(--badge-lab-txt); }
 
         .teacher-name {
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .card-room {
-            text-align: right;
+            margin-top: 2px;
         }
 
         .room-code {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
-        }
-
-        .room-building {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 2px;
         }
 
         /* Weekly View Grid */
         .week-container {
             overflow-x: auto;
-            margin-top: 10px;
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
-            background: var(--bg-card);
+            background: var(--bg-main);
         }
 
         .week-grid {
             display: grid;
-            grid-template-columns: 50px repeat(5, minmax(110px, 1fr));
-            min-width: 600px;
+            grid-template-columns: 45px repeat(5, minmax(100px, 1fr));
             position: relative;
         }
 
         .week-header-cell {
-            padding: 10px 6px;
+            padding: 8px 4px;
             text-align: center;
             background: rgba(0, 0, 0, 0.2);
             border-bottom: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
         }
 
         .week-time-cell {
-            height: 40px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: var(--text-muted);
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             border-right: 1px solid var(--border-color);
@@ -357,17 +318,17 @@
         .week-day-column {
             border-right: 1px solid var(--border-color);
             position: relative;
-            height: 440px;
-            background-size: 100% 40px;
+            height: 418px;
+            background-size: 100% 38px;
             background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
 
         .week-card {
             background: rgba(249, 115, 22, 0.18);
             border: 1px solid var(--accent-orange);
-            border-radius: 6px;
-            padding: 4px 6px;
-            font-size: 0.72rem;
+            border-radius: 5px;
+            padding: 3px 5px;
+            font-size: 0.7rem;
             overflow: hidden;
             cursor: pointer;
             box-sizing: border-box;
@@ -389,47 +350,40 @@
             right: 2px;
             border: 1px dashed var(--border-color);
             background: rgba(255, 255, 255, 0.02);
-            border-radius: 6px;
+            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: var(--text-muted);
             pointer-events: none;
             box-sizing: border-box;
         }
 
-        .empty-schedule-msg {
-            text-align: center;
-            padding: 30px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* Map Screen */
+        /* Map Component */
         #map-container {
             width: 100%;
-            height: 480px;
-            border-radius: 12px;
+            height: 360px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .map-building-list {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             overflow-x: auto;
-            padding-bottom: 8px;
-            margin-bottom: 8px;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
         }
 
         .chip {
-            background: var(--bg-card);
+            background: var(--bg-main);
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 0.75rem;
             white-space: nowrap;
             cursor: pointer;
         }
@@ -441,56 +395,46 @@
             font-weight: 600;
         }
 
-        .chip:hover {
-            border-color: var(--accent-orange);
-            color: var(--accent-orange);
-        }
-
         /* Calendar */
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
+            gap: 4px;
             text-align: center;
         }
 
-        .cal-day-label { font-size: 0.75rem; color: var(--text-muted); padding-bottom: 6px; }
+        .cal-day-label { font-size: 0.72rem; color: var(--text-muted); padding-bottom: 4px; }
         .cal-day {
-            background: var(--bg-card);
+            background: var(--bg-main);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 6px;
             aspect-ratio: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
         }
         .cal-day.active { border-color: var(--accent-orange); background: var(--accent-orange-bg); font-weight: 700; }
-        .cal-day .dot { width: 4px; height: 4px; background: var(--accent-orange); border-radius: 50%; margin-top: 2px; }
 
-        /* Clock View */
-        .clock-hero {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 30px;
+        /* Clock Hero */
+        .clock-box {
             text-align: center;
-            margin-bottom: 16px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
-
-        .clock-time { font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-        .clock-date { font-size: 1rem; color: var(--text-secondary); margin-top: 6px; }
+        .clock-time { font-size: 1.8rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .clock-date { font-size: 0.82rem; color: var(--text-secondary); }
 
         /* Bottom Nav (Mobile) */
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
             width: 100%;
-            max-width: 680px;
             background: rgba(28, 30, 34, 0.95);
             backdrop-filter: blur(10px);
             border-top: 1px solid var(--border-color);
@@ -577,148 +521,169 @@
 <body>
 
 <div class="app-container">
-    <!-- Top Header -->
+    <!-- Header Bar -->
     <div class="top-header">
+        <div class="header-title">
+            <span>🏫 UNIZA Rozvrh</span>
+        </div>
         <div class="group-selector-container">
             <span style="font-size:0.85rem; color:var(--text-muted);">Skupina:</span>
             <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Skupina...">
         </div>
-
-        <!-- Desktop Navigation Bar -->
-        <div class="desktop-nav">
-            <button class="desktop-nav-btn active" onclick="switchTab('rozvrh', this)">Rozvrh</button>
-            <button class="desktop-nav-btn" onclick="switchTab('kalendar', this)">Kalendár</button>
-            <button class="desktop-nav-btn" onclick="switchTab('mapa', this)">Mapa</button>
-            <button class="desktop-nav-btn" onclick="switchTab('akcie', this)">Akcie</button>
-            <button class="desktop-nav-btn" onclick="switchTab('hodiny', this)">Hodiny</button>
-        </div>
-
         <div class="header-actions">
-            <button class="btn-header" onclick="openAddModal()">+ Pridať</button>
+            <button class="btn-header" onclick="openAddModal()">+ Pridať hodinu</button>
             <button class="btn-header btn-danger-confirm" onclick="resetScheduleWithConfirm()">Reset</button>
         </div>
     </div>
 
-    <!-- 1. ROZVRH SCREEN -->
-    <div id="screen-rozvrh" class="screen active">
-        <div class="section-header">
-            <div class="section-title">Najbližší deň</div>
-            <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026</div>
-        </div>
-        <div class="card-list" id="upcoming-list"></div>
-
-        <div class="section-header" style="margin-top:24px;">
-            <div class="section-title">Týždeň</div>
-            <div class="section-meta">19. 10. – 25. 10. 2026</div>
-        </div>
-
-        <div class="week-container">
-            <div class="week-grid">
-                <div class="week-header-cell"></div>
-                <div class="week-header-cell">Pondelok<br><span style="color:var(--text-muted);font-weight:400;">19. 10.</span></div>
-                <div class="week-header-cell">Utorok<br><span style="color:var(--text-muted);font-weight:400;">20. 10.</span></div>
-                <div class="week-header-cell">Streda<br><span style="color:var(--text-muted);font-weight:400;">21. 10.</span></div>
-                <div class="week-header-cell">Štvrtok<br><span style="color:var(--text-muted);font-weight:400;">22. 10.</span></div>
-                <div class="week-header-cell">Piatok<br><span style="color:var(--text-muted);font-weight:400;">23. 10.</span></div>
-
-                <div style="display:flex; flex-direction:column;">
-                    <div class="week-time-cell">7:00</div>
-                    <div class="week-time-cell">8:00</div>
-                    <div class="week-time-cell">9:00</div>
-                    <div class="week-time-cell">10:00</div>
-                    <div class="week-time-cell">11:00</div>
-                    <div class="week-time-cell">12:00</div>
-                    <div class="week-time-cell">13:00</div>
-                    <div class="week-time-cell">14:00</div>
-                    <div class="week-time-cell">15:00</div>
-                    <div class="week-time-cell">16:00</div>
-                    <div class="week-time-cell">17:00</div>
+    <!-- Main Grid (Single Screen for Desktop Dashboard, Tabbed on Mobile) -->
+    <div class="dashboard-grid">
+        
+        <!-- LEFT COLUMN: Rozvrh & Týždeň -->
+        <div class="dash-column">
+            <!-- Rozvrh Screen Section -->
+            <div id="screen-rozvrh" class="screen active">
+                <!-- Upcoming Lesson -->
+                <div class="dash-card">
+                    <div class="section-header">
+                        <div class="section-title">Najbližší deň</div>
+                        <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026</div>
+                    </div>
+                    <div class="card-list" id="upcoming-list"></div>
                 </div>
 
-                <div class="week-day-column" id="week-day-1"></div>
-                <div class="week-day-column" id="week-day-2"></div>
-                <div class="week-day-column" id="week-day-3"></div>
-                <div class="week-day-column" id="week-day-4"></div>
-                <div class="week-day-column" id="week-day-5"></div>
-            </div>
-        </div>
-    </div>
+                <!-- Weekly Grid -->
+                <div class="dash-card">
+                    <div class="section-header">
+                        <div class="section-title">Týždenný rozvrh</div>
+                        <div class="section-meta">19. 10. – 25. 10. 2026</div>
+                    </div>
+                    <div class="week-container">
+                        <div class="week-grid">
+                            <div class="week-header-cell"></div>
+                            <div class="week-header-cell">Pondelok<br><span style="color:var(--text-muted);font-weight:400;">19. 10.</span></div>
+                            <div class="week-header-cell">Utorok<br><span style="color:var(--text-muted);font-weight:400;">20. 10.</span></div>
+                            <div class="week-header-cell">Streda<br><span style="color:var(--text-muted);font-weight:400;">21. 10.</span></div>
+                            <div class="week-header-cell">Štvrtok<br><span style="color:var(--text-muted);font-weight:400;">22. 10.</span></div>
+                            <div class="week-header-cell">Piatok<br><span style="color:var(--text-muted);font-weight:400;">23. 10.</span></div>
 
-    <!-- 2. KALENDÁR SCREEN -->
-    <div id="screen-kalendar" class="screen">
-        <div class="section-title" style="margin-bottom:16px;">Október 2026</div>
-        <div class="cal-grid">
-            <div class="cal-day-label">Po</div><div class="cal-day-label">Ut</div><div class="cal-day-label">St</div><div class="cal-day-label">Št</div><div class="cal-day-label">Pi</div><div class="cal-day-label">So</div><div class="cal-day-label">Ne</div>
-            <div class="cal-day" style="opacity:0.3;">28</div><div class="cal-day" style="opacity:0.3;">29</div><div class="cal-day" style="opacity:0.3;">30</div>
-            <div class="cal-day">1 <div class="dot"></div></div><div class="cal-day">2 <div class="dot"></div></div><div class="cal-day">3</div><div class="cal-day">4</div>
-            <div class="cal-day">5 <div class="dot"></div></div><div class="cal-day">6 <div class="dot"></div></div><div class="cal-day">7 <div class="dot"></div></div><div class="cal-day">8 <div class="dot"></div></div><div class="cal-day">9 <div class="dot"></div></div><div class="cal-day">10</div><div class="cal-day">11</div>
-            <div class="cal-day">12 <div class="dot"></div></div><div class="cal-day">13 <div class="dot"></div></div><div class="cal-day">14 <div class="dot"></div></div><div class="cal-day">15 <div class="dot"></div></div><div class="cal-day">16 <div class="dot"></div></div><div class="cal-day">17</div><div class="cal-day">18</div>
-            <div class="cal-day active">19 <div class="dot"></div></div><div class="cal-day">20 <div class="dot"></div></div><div class="cal-day">21 <div class="dot"></div></div><div class="cal-day">22 <div class="dot"></div></div><div class="cal-day">23 <div class="dot"></div></div><div class="cal-day">24</div><div class="cal-day">25</div>
-        </div>
-    </div>
+                            <div style="display:flex; flex-direction:column;">
+                                <div class="week-time-cell">7:00</div>
+                                <div class="week-time-cell">8:00</div>
+                                <div class="week-time-cell">9:00</div>
+                                <div class="week-time-cell">10:00</div>
+                                <div class="week-time-cell">11:00</div>
+                                <div class="week-time-cell">12:00</div>
+                                <div class="week-time-cell">13:00</div>
+                                <div class="week-time-cell">14:00</div>
+                                <div class="week-time-cell">15:00</div>
+                                <div class="week-time-cell">16:00</div>
+                                <div class="week-time-cell">17:00</div>
+                            </div>
 
-    <!-- 3. MAPA SCREEN -->
-    <div id="screen-mapa" class="screen">
-        <div class="section-title" style="margin-bottom:8px;">Interaktívna Mapa Kampusu UNIZA</div>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">💡 Kliknite do mapy pre pridanie verejnej bodky pre všetkých!</p>
-        <div class="map-building-list">
-            <div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>
-            <div class="chip" onclick="focusBuilding(49.20160, 18.75620, 'FRI')">FRI</div>
-            <div class="chip" onclick="focusBuilding(49.20230, 18.76100, 'Aula AR')">Aula AR</div>
-            <div class="chip" onclick="focusBuilding(49.20300, 18.76020, 'Rektorát')">Rektorát</div>
-            <div class="chip" onclick="focusBuilding(49.20120, 18.76150, 'Knižnica')">Knižnica</div>
-            <div class="chip" onclick="focusBuilding(49.19850, 18.76100, 'Internáty')">Internáty</div>
-        </div>
-        <div id="map-container"></div>
-    </div>
-
-    <!-- 4. AKCIE SCREEN -->
-    <div id="screen-akcie" class="screen">
-        <div class="section-title" style="margin-bottom:12px;">Univerzitné Akcie & Správy</div>
-        <div class="card-list">
-            <div class="card-item">
-                <div class="card-main">
-                    <div class="subject-title">Študentská kvapka krvi <span class="badge badge-prednaska">akcia</span></div>
-                    <div class="teacher-name">Menza Veľký Diel • 22. Október 08:00</div>
+                            <div class="week-day-column" id="week-day-1"></div>
+                            <div class="week-day-column" id="week-day-2"></div>
+                            <div class="week-day-column" id="week-day-3"></div>
+                            <div class="week-day-column" id="week-day-4"></div>
+                            <div class="week-day-column" id="week-day-5"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- 5. HODINY SCREEN -->
-    <div id="screen-hodiny" class="screen">
-        <div class="clock-hero">
-            <div class="clock-time" id="live-clock">10:00:00</div>
-            <div class="clock-date" id="live-date">Pondelok, 19. Október 2026</div>
+        <!-- RIGHT COLUMN: Mapa, Kalendár & Akcie -->
+        <div class="dash-column">
+            
+            <!-- Mapa Section -->
+            <div id="screen-mapa" class="screen active">
+                <div class="dash-card">
+                    <div class="section-header">
+                        <div class="section-title">Mapa Kampusu UNIZA</div>
+                        <span class="section-meta">Veľký Diel</span>
+                    </div>
+                    <div class="map-building-list">
+                        <div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>
+                        <div class="chip" onclick="focusBuilding(49.20160, 18.75620)">FRI</div>
+                        <div class="chip" onclick="focusBuilding(49.20230, 18.76100)">Aula AR</div>
+                        <div class="chip" onclick="focusBuilding(49.20300, 18.76020)">Rektorát</div>
+                        <div class="chip" onclick="focusBuilding(49.19850, 18.76100)">Internáty</div>
+                    </div>
+                    <div id="map-container"></div>
+                </div>
+            </div>
+
+            <!-- Kalendár & Hodiny Section -->
+            <div id="screen-kalendar" class="screen active">
+                <div class="dash-card">
+                    <div class="clock-box">
+                        <div class="clock-time" id="live-clock">10:00:00</div>
+                        <div class="clock-date" id="live-date">Pondelok, 19. Október 2026</div>
+                    </div>
+                    <div class="section-header">
+                        <div class="section-title">Kalendár</div>
+                        <span class="section-meta">Október 2026</span>
+                    </div>
+                    <div class="cal-grid">
+                        <div class="cal-day-label">Po</div><div class="cal-day-label">Ut</div><div class="cal-day-label">St</div><div class="cal-day-label">Št</div><div class="cal-day-label">Pi</div><div class="cal-day-label">So</div><div class="cal-day-label">Ne</div>
+                        <div class="cal-day" style="opacity:0.3;">28</div><div class="cal-day" style="opacity:0.3;">29</div><div class="cal-day" style="opacity:0.3;">30</div>
+                        <div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day">4</div>
+                        <div class="cal-day">5</div><div class="cal-day">6</div><div class="cal-day">7</div><div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day">10</div><div class="cal-day">11</div>
+                        <div class="cal-day">12</div><div class="cal-day">13</div><div class="cal-day">14</div><div class="cal-day">15</div><div class="cal-day">16</div><div class="cal-day">17</div><div class="cal-day">18</div>
+                        <div class="cal-day active">19</div><div class="cal-day">20</div><div class="cal-day">21</div><div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Akcie Section -->
+            <div id="screen-akcie" class="screen active">
+                <div class="dash-card">
+                    <div class="section-header">
+                        <div class="section-title">Akcie & Správy</div>
+                    </div>
+                    <div class="card-list">
+                        <div class="card-item">
+                            <div class="card-main">
+                                <div class="subject-title">Študentská kvapka krvi <span class="badge badge-prednaska">akcia</span></div>
+                                <div class="teacher-name">Menza Veľký Diel • 22. Október 08:00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hodiny Section (Mobile Fallback) -->
+            <div id="screen-hodiny" class="screen"></div>
+
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar (Mobile Only) -->
+    <!-- Bottom Nav (Mobile Only) -->
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('rozvrh', this)">
+        <div class="nav-item active" onclick="switchMobileTab('rozvrh', this)">
             <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
             Rozvrh
         </div>
-        <div class="nav-item" onclick="switchTab('kalendar', this)">
+        <div class="nav-item" onclick="switchMobileTab('kalendar', this)">
             <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
             Kalendár
         </div>
-        <div class="nav-item" onclick="switchTab('mapa', this)">
+        <div class="nav-item" onclick="switchMobileTab('mapa', this)">
             <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
             Mapa
         </div>
-        <div class="nav-item" onclick="switchTab('akcie', this)">
+        <div class="nav-item" onclick="switchMobileTab('akcie', this)">
             <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
             Akcie
         </div>
-        <div class="nav-item" onclick="switchTab('hodiny', this)">
+        <div class="nav-item" onclick="switchMobileTab('hodiny', this)">
             <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
             Hodiny
         </div>
     </nav>
 </div>
 
-<!-- Modal for Lesson -->
+<!-- Modal for Adding / Editing Lesson -->
 <div class="modal-overlay" id="lesson-modal">
     <div class="modal">
         <div class="modal-header">
@@ -783,7 +748,7 @@
 <div class="modal-overlay" id="map-point-modal">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-title">Pridať verejný bod na mapu</div>
+            <div class="modal-title">Pridať bod na mapu</div>
             <button class="close-btn" onclick="closeModal('map-point-modal')">&times;</button>
         </div>
         <form id="map-point-form" onsubmit="saveMapPoint(event)">
@@ -791,7 +756,7 @@
             <input type="hidden" id="map-lng">
             <div class="form-group">
                 <label>Názov miesta</label>
-                <input type="text" id="map-point-title" class="form-control" placeholder="napr. Najlepšia káva" required>
+                <input type="text" id="map-point-title" class="form-control" placeholder="napr. Kaviareň, Zraz" required>
             </div>
             <div class="form-group">
                 <label>Kategória</label>
@@ -810,55 +775,6 @@
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Firebase Cloud Database Modules -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyC_Public_DemoKey_UNIZA",
-        authDomain: "uniza-schedule.firebaseapp.com",
-        projectId: "uniza-schedule-shared",
-        storageBucket: "uniza-schedule.appspot.com",
-        messagingSenderId: "123456789",
-        appId: "1:123456789:web:abcdef"
-    };
-
-    let db = null;
-    try {
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-    } catch(e) {}
-
-    window.saveMapPointToCloud = async function(title, cat, lat, lng) {
-        if (db) {
-            try {
-                await addDoc(collection(db, "shared_points"), { title, cat, lat, lng, time: Date.now() });
-            } catch(e) {}
-        }
-        const localPoints = JSON.parse(localStorage.getItem('uniza_shared_points') || '[]');
-        localPoints.push({ title, cat, lat, lng });
-        localStorage.setItem('uniza_shared_points', JSON.stringify(localPoints));
-        window.renderSingleMapPoint({ title, cat, lat, lng });
-    };
-
-    window.initCloudPointsListener = function() {
-        if (db) {
-            try {
-                onSnapshot(collection(db, "shared_points"), (snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added") {
-                            window.renderSingleMapPoint(change.doc.data());
-                        }
-                    });
-                });
-            } catch(e) {}
-        }
-        const localPoints = JSON.parse(localStorage.getItem('uniza_shared_points') || '[]');
-        localPoints.forEach(p => window.renderSingleMapPoint(p));
-    };
-</script>
-
 <script>
     let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR11';
     document.getElementById('group-input').value = currentGroup;
@@ -866,8 +782,6 @@
     let schedule = JSON.parse(localStorage.getItem(`uniza_sched_${currentGroup}`)) || [];
     let leafletMap = null;
     let mapMarkers = [];
-    let userLocationMarker = null;
-    let userLocationCircle = null;
 
     function changeGroup(groupName) {
         if (!groupName.trim()) return;
@@ -929,7 +843,6 @@
                 </div>
                 <div class="card-room">
                     <div class="room-code">${lesson.room || ''}</div>
-                    <div class="room-building">${lesson.building || ''}</div>
                 </div>
             `;
             upcomingList.appendChild(item);
@@ -945,9 +858,9 @@
             dayLessons.forEach((l, idx) => {
                 const [sh, sm] = l.start.split(':').map(Number);
                 const [eh, em] = l.end.split(':').map(Number);
-                const topPx = (sh - 7) * 40 + (sm / 60) * 40;
+                const topPx = (sh - 7) * 38 + (sm / 60) * 38;
                 const durationHrs = (eh * 60 + em - (sh * 60 + sm)) / 60;
-                const heightPx = durationHrs * 40;
+                const heightPx = durationHrs * 38;
 
                 const card = document.createElement('div');
                 const typeCls = l.type === 'cvičenie' ? 'cvicenie' : (l.type === 'laboratórne' ? 'laboratorne' : '');
@@ -960,9 +873,8 @@
                 card.onclick = () => openEditModal(l.id);
 
                 card.innerHTML = `
-                    <div style="font-weight:700;">${l.title} <span style="font-size:0.65rem;opacity:0.8;">${l.type}</span></div>
-                    <div style="font-size:0.65rem;">${l.start}–${l.end} | ${l.room}</div>
-                    <div style="font-size:0.65rem; color:var(--text-muted);">${l.teacher || ''}</div>
+                    <div style="font-weight:700;">${l.title} <span style="font-size:0.62rem;opacity:0.8;">${l.type}</span></div>
+                    <div style="font-size:0.62rem;">${l.start}–${l.end} | ${l.room}</div>
                 `;
                 col.appendChild(card);
 
@@ -972,7 +884,7 @@
                     if (gapText) {
                         const gapTopPx = topPx + heightPx;
                         const [nextSh, nextSm] = nextL.start.split(':').map(Number);
-                        const nextTopPx = (nextSh - 7) * 40 + (nextSm / 60) * 40;
+                        const nextTopPx = (nextSh - 7) * 38 + (nextSm / 60) * 38;
                         const gapHeightPx = nextTopPx - gapTopPx;
 
                         const gapBox = document.createElement('div');
@@ -987,44 +899,41 @@
         }
     }
 
-    function switchTab(tabId, el) {
+    function switchMobileTab(tabId, el) {
+        if (window.innerWidth >= 1024) return; // Desktop uses all-in-one view
+
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelectorAll('.desktop-nav-btn').forEach(b => b.classList.remove('active'));
 
         document.getElementById(`screen-${tabId}`).classList.add('active');
         if (el) el.classList.add('active');
 
-        if (tabId === 'mapa') {
-            if (!leafletMap) {
-                initMap();
-            } else {
-                setTimeout(() => { leafletMap.invalidateSize(); }, 200);
-            }
+        if (tabId === 'mapa' && leafletMap) {
+            setTimeout(() => { leafletMap.invalidateSize(); }, 200);
         }
     }
 
     function initMap() {
+        if (leafletMap) return;
+
         leafletMap = L.map('map-container').setView([49.2025, 18.7595], 16);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap & UNIZA Campus'
+            attribution: '© OpenStreetMap & UNIZA'
         }).addTo(leafletMap);
 
         const buildings = [
-            { name: "FRI UNIZA (RA, RB, RC)", lat: 49.20160, lng: 18.75620, desc: "Fakulta riadenia a informatiky" },
-            { name: "Aula AR", lat: 49.20230, lng: 18.76100, desc: "Hlavná prednášková aula AR" },
-            { name: "Rektorát & Dekanáty (AA – AF)", lat: 49.20300, lng: 18.76020, desc: "Hlavná administratívna os" },
-            { name: "Strojnícka & Elektrotechnika", lat: 49.20420, lng: 18.75900, desc: "Strojnícka fakulta a FEIT" },
-            { name: "Univerzitná knižnica (UK)", lat: 49.20120, lng: 18.76150, desc: "Hlavná knižnica UNIZA" },
-            { name: "Internáty Veľký Diel", lat: 49.19850, lng: 18.76100, desc: "Ubytovacie zariadenia" }
+            { name: "FRI UNIZA", lat: 49.20160, lng: 18.75620, desc: "RA, RB, RC" },
+            { name: "Aula AR", lat: 49.20230, lng: 18.76100, desc: "AR1A3" },
+            { name: "Rektorát", lat: 49.20300, lng: 18.76020, desc: "AA-AF" },
+            { name: "Internáty VD", lat: 49.19850, lng: 18.76100, desc: "DA-DH" }
         ];
 
         buildings.forEach(b => {
             const marker = L.marker([b.lat, b.lng]).addTo(leafletMap)
                 .bindPopup(`<b>${b.name}</b><br>${b.desc}`);
-            mapMarkers.push({ name: b.name.toLowerCase(), marker, lat: b.lat, lng: b.lng });
+            mapMarkers.push({ marker, lat: b.lat, lng: b.lng });
         });
 
         leafletMap.on('click', function(e) {
@@ -1034,17 +943,7 @@
         });
 
         setTimeout(() => { leafletMap.invalidateSize(); }, 300);
-
-        if (window.initCloudPointsListener) {
-            window.initCloudPointsListener();
-        }
     }
-
-    window.renderSingleMapPoint = function(p) {
-        if (!leafletMap) return;
-        L.marker([p.lat, p.lng]).addTo(leafletMap)
-            .bindPopup(`<b>${p.cat || '📍 Bod'}</b><br>${p.title}`);
-    };
 
     function saveMapPoint(e) {
         e.preventDefault();
@@ -1053,9 +952,11 @@
         const lat = parseFloat(document.getElementById('map-lat').value);
         const lng = parseFloat(document.getElementById('map-lng').value);
 
-        if (window.saveMapPointToCloud) {
-            window.saveMapPointToCloud(title, cat, lat, lng);
+        if (leafletMap) {
+            L.marker([lat, lng]).addTo(leafletMap)
+                .bindPopup(`<b>${cat}</b><br>${title}`).openPopup();
         }
+
         closeModal('map-point-modal');
         document.getElementById('map-point-form').reset();
     }
@@ -1140,6 +1041,7 @@
     function renderAll() {
         renderUpcomingDay();
         renderWeekGrid();
+        initMap();
     }
 
     setInterval(() => {
