@@ -19,7 +19,7 @@
             --text-secondary: #9aa0a6;
             --text-muted: #626873;
 
-            /* New Color Palette Requested */
+            /* Subject Types Colors */
             --color-prednaska: #22c55e; /* GREEN */
             --color-prednaska-bg: rgba(34, 197, 94, 0.18);
             
@@ -49,7 +49,7 @@
 
         .app-container {
             width: 100%;
-            max-width: 1400px;
+            max-width: 1550px;
             margin: 0 auto;
             min-height: 100vh;
             display: flex;
@@ -124,7 +124,7 @@
             border-color: rgba(239, 68, 68, 0.3);
         }
 
-        /* Main Dashboard Grid */
+        /* Desktop Grid Layout (3 Columns) */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -133,9 +133,9 @@
             flex: 1;
         }
 
-        @media (min-width: 1024px) {
+        @media (min-width: 1200px) {
             .dashboard-grid {
-                grid-template-columns: 1.15fr 0.85fr;
+                grid-template-columns: 1.1fr 0.9fr 0.65fr; /* Schedule | Map & Clock | Events */
             }
 
             .bottom-nav {
@@ -147,7 +147,7 @@
             }
         }
 
-        @media (max-width: 1023px) {
+        @media (max-width: 1199px) {
             body {
                 padding-bottom: 70px;
             }
@@ -192,7 +192,7 @@
             color: var(--text-muted);
         }
 
-        /* Cards and Colored Badges */
+        /* Cards & Badges */
         .card-list {
             display: flex;
             flex-direction: column;
@@ -212,7 +212,6 @@
             overflow: hidden;
         }
 
-        /* Left Color Indicator Lines */
         .card-item.type-prednaska::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--color-prednaska); }
         .card-item.type-cvicenie::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--color-cvicenie); }
         .card-item.type-laboratorne::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--color-lab); }
@@ -232,7 +231,7 @@
         .teacher-name { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
         .room-code { font-size: 0.92rem; font-weight: 700; }
 
-        /* Weekly View Grid */
+        /* Weekly View Grid Extended to 20:00 */
         .week-container {
             overflow-x: auto;
             border-radius: 8px;
@@ -267,15 +266,15 @@
             border-right: 1px solid var(--border-color);
         }
 
+        /* 13 hours (7:00 to 20:00) * 38px = 494px height */
         .week-day-column {
             border-right: 1px solid var(--border-color);
             position: relative;
-            height: 418px;
+            height: 494px;
             background-size: 100% 38px;
             background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
 
-        /* Weekly Card Colors */
         .week-card {
             border-radius: 5px;
             padding: 3px 5px;
@@ -308,7 +307,7 @@
         /* Map Container */
         #map-container {
             width: 100%;
-            height: 340px;
+            height: 320px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             overflow: hidden;
@@ -332,9 +331,16 @@
             cursor: pointer;
         }
 
+        .chip-admin {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #fca5a5;
+            font-weight: 600;
+        }
+
         .chip-gps { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; font-weight: 600; }
 
-        /* Compact Fixed Calendar */
+        /* Compact Calendar */
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -352,7 +358,7 @@
             cursor: pointer;
         }
 
-        .cal-day.active { border-color: var(--accent-orange); background: var(--accent-orange-bg); font-weight: 700; color: var(--accent-orange); }
+        .cal-day.active { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.15); font-weight: 700; color: var(--accent-orange); }
         .cal-day.other-month { opacity: 0.25; }
 
         /* Clock Box */
@@ -363,16 +369,16 @@
             padding: 8px;
             margin-bottom: 10px;
         }
-        .clock-time { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .clock-time { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 0.78rem; color: var(--text-secondary); }
 
-        /* News & Events Section */
+        /* Events & News Card */
         .news-item {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 10px 12px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         .news-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
         .news-desc { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.35; margin-bottom: 6px; }
@@ -468,11 +474,6 @@
             border: 1px solid rgba(239, 68, 68, 0.4);
             margin-top: 6px;
         }
-
-        /* Red Admin Marker Animation */
-        .admin-marker-icon {
-            filter: hue-rotate(140deg) saturate(300%) brightness(0.9);
-        }
     </style>
 </head>
 <body>
@@ -493,13 +494,12 @@
         </div>
     </div>
 
-    <!-- Main Grid -->
+    <!-- Main Grid Layout -->
     <div class="dashboard-grid">
         
-        <!-- LEFT COLUMN: Rozvrh & Týždeň -->
+        <!-- COLUMN 1: Schedule & Week View -->
         <div class="dash-column">
             <div id="screen-rozvrh" class="screen active">
-                <!-- Upcoming Lesson -->
                 <div class="dash-card">
                     <div class="section-header">
                         <div class="section-title">Najbližší deň</div>
@@ -508,11 +508,10 @@
                     <div class="card-list" id="upcoming-list"></div>
                 </div>
 
-                <!-- Weekly Grid -->
                 <div class="dash-card">
                     <div class="section-header">
                         <div class="section-title">Týždenný rozvrh</div>
-                        <div class="section-meta">19. 10. – 25. 10. 2026</div>
+                        <div class="section-meta">19. 10. – 25. 10. 2026 (07:00 – 20:00)</div>
                     </div>
                     <div class="week-container">
                         <div class="week-grid">
@@ -535,6 +534,8 @@
                                 <div class="week-time-cell">15:00</div>
                                 <div class="week-time-cell">16:00</div>
                                 <div class="week-time-cell">17:00</div>
+                                <div class="week-time-cell">18:00</div>
+                                <div class="week-time-cell">19:00</div>
                             </div>
 
                             <div class="week-day-column" id="week-day-1"></div>
@@ -548,29 +549,24 @@
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Mapa, Compact Kalendár & News -->
+        <!-- COLUMN 2: Map & Compact Calendar -->
         <div class="dash-column">
             
-            <!-- Mapa Section -->
+            <!-- Map Section -->
             <div id="screen-mapa" class="screen active">
                 <div class="dash-card">
                     <div class="section-header">
                         <div class="section-title">Mapa Kampusu UNIZA</div>
-                        <span class="section-meta">Pravý klik = pridať/zmazať bod</span>
+                        <span class="section-meta">Pravý klik = nová bodka</span>
                     </div>
-                    <div class="map-building-list">
+                    <div class="map-building-list" id="map-category-chips">
                         <div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>
-                        <div class="chip" onclick="openAdminModal()">🔴 Vytvoriť lokáciu (Admin)</div>
-                        <div class="chip" onclick="focusBuilding(49.20160, 18.75620)">FRI</div>
-                        <div class="chip" onclick="focusBuilding(49.20230, 18.76100)">Aula AR</div>
-                        <div class="chip" onclick="focusBuilding(49.20300, 18.76020)">Rektorát</div>
-                        <div class="chip" onclick="focusBuilding(49.19850, 18.76100)">Internáty</div>
                     </div>
                     <div id="map-container"></div>
                 </div>
             </div>
 
-            <!-- Kalendár Section (Compact) -->
+            <!-- Calendar Section -->
             <div id="screen-kalendar" class="screen active">
                 <div class="dash-card">
                     <div class="clock-box">
@@ -581,43 +577,54 @@
                         <div class="section-title">Kalendár</div>
                         <span class="section-meta">Október 2026</span>
                     </div>
-                    <!-- Compact Grid for 31 days of Oct 2026 -->
                     <div class="cal-grid" id="compact-calendar-grid"></div>
                 </div>
             </div>
+        </div>
 
-            <!-- Akcie & Správy Section -->
+        <!-- COLUMN 3: Student Events & News -->
+        <div class="dash-column">
             <div id="screen-akcie" class="screen active">
                 <div class="dash-card">
                     <div class="section-header">
-                        <div class="section-title">Akcie & Univerzitné Správy</div>
-                        <span class="section-meta">Oficiálne zdroje</span>
+                        <div class="section-title">🔥 Študentský Život & Akcie</div>
+                        <span class="section-meta">Žilina / UNIZA</span>
                     </div>
+                    
                     <div class="card-list">
                         <div class="news-item">
-                            <div class="news-title">Študentská kvapka krvi UNIZA 🩸</div>
-                            <div class="news-desc">Tradičná dobrovoľnícka akcia darovania krvi v priestoroch Študentského domova Veľký Diel / Novej Menzy. Príďte pomôcť správnej veci!</div>
+                            <div class="news-title">🍻 FRIčkovica 2026 (FRI Club)</div>
+                            <div class="news-desc">Tradičné neoficiálne otvorenie semestra pre študentov FRI UNIZA! Živá hudba, pivo, guláš a zoznamka prvohlavov pred budovou FRI.</div>
+                            <div class="news-meta">
+                                <span>Október 2026 • Chodba FRI</span>
+                                <a href="https://www.fri.uniza.sk/stranka/aktualne-informacie-novinky" target="_blank" class="news-link">fri.uniza.sk ↗</a>
+                            </div>
+                        </div>
+
+                        <div class="news-item">
+                            <div class="news-title">🎮 FRI LAN Party & Boardgames Night</div>
+                            <div class="news-desc">Celonočný turnaj v League of Legends, CS2 a spoločenských hrách. Pizza, energetické nápoje a hodnotné ceny pre víťazov!</div>
+                            <div class="news-meta">
+                                <span>21. Október 2026 • 18:00</span>
+                                <a href="https://www.fri.uniza.sk" target="_blank" class="news-link">fri.uniza.sk ↗</a>
+                            </div>
+                        </div>
+
+                        <div class="news-item">
+                            <div class="news-title">🩸 Študentská kvapka krvi UNIZA</div>
+                            <div class="news-desc">Príďte darovať krv v priestoroch Novej Menzy na Veľkom Diele. Získajte odpustenie absentérskych hodín a voľno z výučby!</div>
                             <div class="news-meta">
                                 <span>22. Október 2026 • 08:00</span>
-                                <a href="https://www.uniza.sk/index.php/studenti/vseobecne-informacie/oznamy" target="_blank" class="news-link">Zdroj: uniza.sk ↗</a>
+                                <a href="https://www.uniza.sk/index.php/studenti/vseobecne-informacie/oznamy" target="_blank" class="news-link">uniza.sk ↗</a>
                             </div>
                         </div>
 
                         <div class="news-item">
-                            <div class="news-title">Siemens Healthineers Cybersecurity Academy 🔒</div>
-                            <div class="news-desc">Exkluzívna príležitosť pre študentov FRI UNIZA získať praktické skúsenosti v oblasti kybernetickej bezpečnosti a zdravotníckych IT systémov.</div>
+                            <div class="news-title">🧗 Študentské lezenie & Bouldering</div>
+                            <div class="news-desc">Športové centrum UNIZA ponúka voľné vstupy pre študentov na novú lezeckú stenu T1 na Veľkom Diele.</div>
                             <div class="news-meta">
-                                <span>12. Október 2026</span>
-                                <a href="https://www.fri.uniza.sk/stranka/aktualne-informacie-novinky" target="_blank" class="news-link">Zdroj: fri.uniza.sk ↗</a>
-                            </div>
-                        </div>
-
-                        <div class="news-item">
-                            <div class="news-title">Slovenský pohár vo volejbale žien: VA UNIZA 🏐</div>
-                            <div class="news-desc">Zápas Slovenského pohára medzi VA UNIZA Žilina a ŠVK Pezinok v priestoroch Športového centra UNIZA na Veľkom Diele.</div>
-                            <div class="news-meta">
-                                <span>21. Október 2026 • 18:30</span>
-                                <a href="https://www.sportoviska.uniza.sk/udalosti/kategoria/sportove-centrum-uniza/" target="_blank" class="news-link">Zdroj: sportoviska.uniza.sk ↗</a>
+                                <span>Každý Utorok & Štvrtok</span>
+                                <a href="https://www.sportoviska.uniza.sk" target="_blank" class="news-link">sportoviska.uniza.sk ↗</a>
                             </div>
                         </div>
                     </div>
@@ -626,6 +633,7 @@
 
             <div id="screen-hodiny" class="screen"></div>
         </div>
+
     </div>
 
     <!-- Bottom Nav Mobile -->
@@ -653,7 +661,7 @@
     </nav>
 </div>
 
-<!-- Modal for Adding / Editing Lesson -->
+<!-- Modal for Lesson -->
 <div class="modal-overlay" id="lesson-modal">
     <div class="modal">
         <div class="modal-header">
@@ -686,12 +694,12 @@
             </div>
             <div style="display:flex; gap:10px;">
                 <div class="form-group" style="flex:1;">
-                    <label>Začiatok</label>
-                    <input type="time" id="form-start" class="form-control" value="10:00" required>
+                    <label>Začiatok (07:00 - 20:00)</label>
+                    <input type="time" id="form-start" class="form-control" value="10:00" min="07:00" max="20:00" required>
                 </div>
                 <div class="form-group" style="flex:1;">
-                    <label>Koniec</label>
-                    <input type="time" id="form-end" class="form-control" value="11:40" required>
+                    <label>Koniec (07:00 - 20:00)</label>
+                    <input type="time" id="form-end" class="form-control" value="11:40" min="07:00" max="20:00" required>
                 </div>
             </div>
             <div class="form-group">
@@ -710,20 +718,19 @@
     </div>
 </div>
 
-<!-- Modal for Map Point (Standard / Admin) -->
+<!-- Modal for Map Point -->
 <div class="modal-overlay" id="map-point-modal">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-title" id="map-modal-title">Pridať bod na mapu</div>
+            <div class="modal-title">Pridať bod na mapu</div>
             <button class="close-btn" onclick="closeModal('map-point-modal')">&times;</button>
         </div>
         <form id="map-point-form" onsubmit="saveMapPoint(event)">
             <input type="hidden" id="map-lat">
             <input type="hidden" id="map-lng">
-            <input type="hidden" id="map-is-admin" value="false">
             <div class="form-group">
                 <label>Názov miesta</label>
-                <input type="text" id="map-point-title" class="form-control" placeholder="napr. Kaviareň, Zraz" required>
+                <input type="text" id="map-point-title" class="form-control" placeholder="napr. Kaviareň, FRI, Zraz" required>
             </div>
             <div class="form-group">
                 <label>Kategória</label>
@@ -731,8 +738,13 @@
                     <option value="☕ Kaviareň / Jedlo">☕ Kaviareň / Jedlo</option>
                     <option value="📚 Štúdium / Ticho">📚 Štúdium / Ticho</option>
                     <option value="🎉 Zábava / Oddych">🎉 Zábava / Oddych</option>
-                    <option value="🔴 Dôležité miesto">🔴 Dôležité miesto</option>
+                    <option value="📍 Iné">📍 Iné</option>
                 </select>
+            </div>
+            <div class="form-group" style="margin-top:12px; background:rgba(239, 68, 68, 0.1); padding:8px; border-radius:6px;">
+                <label style="color:#fca5a5; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="checkbox" id="map-is-admin-check"> Vytvoriť ako АДМИН-БОД (официальный)
+                </label>
             </div>
             <button type="submit" class="btn-primary">Uložiť bod na mapu</button>
         </form>
@@ -827,6 +839,8 @@
             dayLessons.forEach((l, idx) => {
                 const [sh, sm] = l.start.split(':').map(Number);
                 const [eh, em] = l.end.split(':').map(Number);
+
+                // Start relative to 07:00
                 const topPx = (sh - 7) * 38 + (sm / 60) * 38;
                 const durationHrs = (eh * 60 + em - (sh * 60 + sm)) / 60;
                 const heightPx = durationHrs * 38;
@@ -852,7 +866,7 @@
                     if (gapText) {
                         const gapTopPx = topPx + heightPx;
                         const [nextSh, nextSm] = nextL.start.split(':').map(Number);
-                        const nextTopPx = (nextSh - 7) * 38 + (nextSm / 60) * 40;
+                        const nextTopPx = (nextSh - 7) * 38 + (nextSm / 60) * 38;
                         const gapHeightPx = nextTopPx - gapTopPx;
 
                         const gapBox = document.createElement('div');
@@ -867,7 +881,6 @@
         }
     }
 
-    // Render Compact Calendar for October 2026
     function renderCompactCalendar() {
         const calGrid = document.getElementById('compact-calendar-grid');
         calGrid.innerHTML = '';
@@ -880,8 +893,6 @@
             calGrid.appendChild(h);
         });
 
-        // Oct 1 2026 is Thursday (day index 3 starting Monday=0)
-        // Previous month filler (28, 29, 30)
         for (let p = 28; p <= 30; p++) {
             const cell = document.createElement('div');
             cell.className = 'cal-day other-month';
@@ -889,7 +900,6 @@
             calGrid.appendChild(cell);
         }
 
-        // Days 1 to 31
         for (let day = 1; day <= 31; day++) {
             const cell = document.createElement('div');
             cell.className = 'cal-day' + (day === 19 ? ' active' : '');
@@ -899,7 +909,7 @@
     }
 
     function switchMobileTab(tabId, el) {
-        if (window.innerWidth >= 1024) return;
+        if (window.innerWidth >= 1200) return;
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
@@ -921,47 +931,15 @@
             attribution: '© OpenStreetMap & UNIZA'
         }).addTo(leafletMap);
 
-        const buildings = [
-            { id: 'b1', name: "FRI UNIZA", lat: 49.20160, lng: 18.75620, desc: "RA, RB, RC" },
-            { id: 'b2', name: "Aula AR", lat: 49.20230, lng: 18.76100, desc: "AR1A3" },
-            { id: 'b3', name: "Rektorát", lat: 49.20300, lng: 18.76020, desc: "AA-AF" },
-            { id: 'b4', name: "Internáty VD", lat: 49.19850, lng: 18.76100, desc: "DA-DH" }
-        ];
-
-        buildings.forEach(b => {
-            const marker = L.marker([b.lat, b.lng]).addTo(leafletMap)
-                .bindPopup(`<b>${b.name}</b><br>${b.desc}`);
-            mapMarkers.push(marker);
-        });
-
-        // Right Click to Add Point Context Modal
         leafletMap.on('contextmenu', function(e) {
             document.getElementById('map-lat').value = e.latlng.lat;
             document.getElementById('map-lng').value = e.latlng.lng;
-            document.getElementById('map-is-admin').value = "false";
-            document.getElementById('map-modal-title').innerText = "Pridať bod na mapu (Pravý klik)";
+            document.getElementById('map-is-admin-check').checked = false;
             document.getElementById('map-point-modal').classList.add('active');
         });
 
-        // Load Saved Custom Map Points
         renderCustomMapPoints();
-
         setTimeout(() => { leafletMap.invalidateSize(); }, 300);
-    }
-
-    function openAdminModal() {
-        const pass = prompt("Zadajte admin heslo pre vytvorenie super-lokácie:");
-        if (pass === "454") {
-            const lat = 49.2020;
-            const lng = 18.7595;
-            document.getElementById('map-lat').value = lat;
-            document.getElementById('map-lng').value = lng;
-            document.getElementById('map-is-admin').value = "true";
-            document.getElementById('map-modal-title').innerText = "🔴 Vytvoriť SUPER-lokáciu (Admin)";
-            document.getElementById('map-point-modal').classList.add('active');
-        } else if (pass !== null) {
-            alert("Nesprávne heslo!");
-        }
     }
 
     function saveMapPoint(e) {
@@ -970,7 +948,17 @@
         const cat = document.getElementById('map-point-cat').value;
         const lat = parseFloat(document.getElementById('map-lat').value);
         const lng = parseFloat(document.getElementById('map-lng').value);
-        const isAdmin = document.getElementById('map-is-admin').value === "true";
+        const isAdminRequested = document.getElementById('map-is-admin-check').checked;
+
+        let isAdmin = false;
+        if (isAdminRequested) {
+            const pass = prompt("Zadajte heslo pre vytvorenie Admin bodu:");
+            if (pass === "454") {
+                isAdmin = true;
+            } else {
+                alert("Nesprávne heslo! Bod bude vytvorený ako obyčajný.");
+            }
+        }
 
         const newPoint = {
             id: Date.now().toString(),
@@ -985,6 +973,7 @@
         localStorage.setItem('uniza_saved_map_points', JSON.stringify(customMapPoints));
 
         renderSinglePointOnMap(newPoint);
+        updateAdminCategoryChips();
 
         closeModal('map-point-modal');
         document.getElementById('map-point-form').reset();
@@ -992,6 +981,21 @@
 
     function renderCustomMapPoints() {
         customMapPoints.forEach(p => renderSinglePointOnMap(p));
+        updateAdminCategoryChips();
+    }
+
+    function updateAdminCategoryChips() {
+        const chipsContainer = document.getElementById('map-category-chips');
+        chipsContainer.innerHTML = '<div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>';
+
+        const adminPoints = customMapPoints.filter(p => p.isAdmin);
+        adminPoints.forEach(p => {
+            const chip = document.createElement('div');
+            chip.className = 'chip chip-admin';
+            chip.innerText = `🔴 ${p.title}`;
+            chip.onclick = () => focusBuilding(p.lat, p.lng);
+            chipsContainer.appendChild(chip);
+        });
     }
 
     function renderSinglePointOnMap(p) {
@@ -999,7 +1003,6 @@
 
         let marker;
         if (p.isAdmin) {
-            // Red Marker for Admin
             const redIcon = L.icon({
                 iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
                 shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -1031,7 +1034,7 @@
         if (confirm("Naozaj chcete vymazať tento bod z mapy?")) {
             customMapPoints = customMapPoints.filter(p => p.id !== id);
             localStorage.setItem('uniza_saved_map_points', JSON.stringify(customMapPoints));
-            location.reload(); // Refresh to clean map markers
+            location.reload();
         }
     };
 
@@ -1077,14 +1080,23 @@
 
     function saveLesson(e) {
         e.preventDefault();
+        const startVal = document.getElementById('form-start').value;
+        const endVal = document.getElementById('form-end').value;
+
+        // Validation for Time Bounds (07:00 to 20:00)
+        if (startVal < "07:00" || endVal > "20:00" || startVal >= endVal) {
+            alert("Hodina musí byť v rozmedzí od 07:00 do 20:00 a čas začiatku musí byť skôr ako koniec!");
+            return;
+        }
+
         const id = document.getElementById('edit-id').value;
         const newLesson = {
             id: id || Date.now().toString(),
             day: parseInt(document.getElementById('form-day').value),
             title: document.getElementById('form-title').value,
             type: document.getElementById('form-type').value,
-            start: document.getElementById('form-start').value,
-            end: document.getElementById('form-end').value,
+            start: startVal,
+            end: endVal,
             teacher: document.getElementById('form-teacher').value,
             room: document.getElementById('form-room').value
         };
