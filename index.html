@@ -94,9 +94,10 @@
             font-weight: 600;
             width: 110px;
             outline: none;
+            text-transform: uppercase;
         }
 
-        /* e-vzd quick link button */
+        /* e-vzd quick dynamic link button */
         .btn-evzd {
             background: var(--bg-input);
             color: var(--accent-orange);
@@ -155,7 +156,7 @@
 
         .btn-square-reset:hover { background: rgba(239, 68, 68, 0.3); }
 
-        /* Desktop Grid Layout (3 Columns Aligned Perfectly) */
+        /* Desktop Grid Layout (3 Columns Strictly Equal Height) */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -190,6 +191,8 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            align-self: stretch;
+            height: 100%;
         }
 
         .dash-card {
@@ -197,6 +200,36 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 14px;
+        }
+
+        /* Force column 2 containers to fill height proportionally */
+        .dash-column > .screen {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+        }
+
+        #screen-mapa {
+            flex: 1.3;
+        }
+
+        #screen-kalendar {
+            flex: 1;
+        }
+
+        #screen-akcie {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .events-column-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
         }
 
         .section-header {
@@ -331,7 +364,7 @@
         /* Map Container */
         #map-container {
             width: 100%;
-            height: 300px;
+            height: 280px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             overflow: hidden;
@@ -395,14 +428,6 @@
         }
         .clock-time { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 0.78rem; color: var(--text-secondary); }
-
-        /* Column 3 wrapper to match total height perfectly */
-        .events-column-card {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
 
         .news-container {
             display: flex;
@@ -523,7 +548,7 @@
         <div class="group-selector-container">
             <span style="font-size:0.82rem; color:var(--text-muted);">Skupina:</span>
             <input type="text" id="group-input" class="group-input" value="5ZYR12" onchange="changeGroup(this.value)" placeholder="Skupina...">
-            <a href="https://vzdelavanie.uniza.sk/vzdelavanie/rozvrh2.php?list=2026Z" target="_blank" class="btn-evzd">e-vzd ↗</a>
+            <a href="#" id="evzd-link" target="_blank" class="btn-evzd">e-vzd ↗</a>
         </div>
     </div>
 
@@ -532,7 +557,7 @@
         
         <!-- COLUMN 1: Schedule & Actions Bar -->
         <div class="dash-column">
-            <div id="screen-rozvrh" class="screen active">
+            <div id="screen-rozvrh" class="screen active" style="display:flex; flex-direction:column; height:100%;">
                 
                 <div class="schedule-actions-bar">
                     <button class="btn-main-action" onclick="openAddModal()">+ Pridať hodinu</button>
@@ -547,12 +572,12 @@
                     <div class="card-list" id="upcoming-list"></div>
                 </div>
 
-                <div class="dash-card">
+                <div class="dash-card" style="flex:1; display:flex; flex-direction:column;">
                     <div class="section-header">
                         <div class="section-title">Týždenný rozvrh</div>
                         <div class="section-meta">19. 10. – 25. 10. 2026 (07:00 – 20:00)</div>
                     </div>
-                    <div class="week-container">
+                    <div class="week-container" style="flex:1;">
                         <div class="week-grid">
                             <div class="week-header-cell"></div>
                             <div class="week-header-cell">Pondelok<br><span style="color:var(--text-muted);font-weight:400;">19. 10.</span></div>
@@ -593,7 +618,7 @@
             
             <!-- Map Section -->
             <div id="screen-mapa" class="screen active">
-                <div class="dash-card">
+                <div class="dash-card" style="height:100%; display:flex; flex-direction:column;">
                     <div class="section-header">
                         <div class="section-title">Mapa Kampusu UNIZA</div>
                         <span class="section-meta">Pravý klik = nová bodka</span>
@@ -601,18 +626,18 @@
                     <div class="map-building-list" id="map-category-chips">
                         <div class="chip chip-gps" onclick="locateUser()">📍 Moja poloha</div>
                     </div>
-                    <div id="map-container"></div>
+                    <div id="map-container" style="flex:1;"></div>
                 </div>
             </div>
 
             <!-- Calendar Section -->
             <div id="screen-kalendar" class="screen active">
-                <div class="dash-card">
+                <div class="dash-card" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
                     <div class="clock-box">
                         <div class="clock-time" id="live-clock">10:00:00</div>
                         <div class="clock-date" id="live-date">Pondelok, 19. Október 2026</div>
                     </div>
-                    <div class="section-header">
+                    <div class="section-header" style="margin-bottom:6px;">
                         <div class="section-title">Kalendár</div>
                         <span class="section-meta">Október 2026</span>
                     </div>
@@ -621,7 +646,7 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: Student Events & News (Matched height) -->
+        <!-- COLUMN 3: Student Events & News (Strictly Matched Height) -->
         <div class="dash-column">
             <div id="screen-akcie" class="screen active">
                 <div class="dash-card events-column-card">
@@ -810,13 +835,20 @@
         ]
     };
 
+    function updateEvzdLink(groupName) {
+        const upperGroup = groupName.trim().toUpperCase();
+        const evzdBtn = document.getElementById('evzd-link');
+        evzdBtn.href = `https://vzdelavanie.uniza.sk/vzdelavanie/rozvrh2.php?sq=2&id=${upperGroup}`;
+    }
+
     function loadInitialSchedule(group) {
-        let sched = JSON.parse(localStorage.getItem(`uniza_sched_${group}`));
+        let upperGroup = group.trim().toUpperCase();
+        let sched = JSON.parse(localStorage.getItem(`uniza_sched_${upperGroup}`));
         if (!sched || sched.length === 0) {
-            sched = groupPresets[group] || [
+            sched = groupPresets[upperGroup] || [
                 { id: 'def1', day: 1, title: 'Predmet odboru', type: 'prednáška', start: '09:00', end: '10:30', teacher: 'Katedra FRI', room: 'AR1A3' }
             ];
-            localStorage.setItem(`uniza_sched_${group}`, JSON.stringify(sched));
+            localStorage.setItem(`uniza_sched_${upperGroup}`, JSON.stringify(sched));
         }
         return sched;
     }
@@ -832,6 +864,7 @@
         currentGroup = groupName.trim().toUpperCase();
         localStorage.setItem('uniza_active_group', currentGroup);
         document.getElementById('group-input').value = currentGroup;
+        updateEvzdLink(currentGroup);
         schedule = loadInitialSchedule(currentGroup);
         renderAll();
     }
@@ -1200,6 +1233,7 @@
         if (clockEl) clockEl.innerText = now.toTimeString().split(' ')[0];
     }, 1000);
 
+    updateEvzdLink(currentGroup);
     renderAll();
 </script>
 </body>
