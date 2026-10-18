@@ -1469,7 +1469,7 @@
             btn_subscribe: "Підтримати ↗",
             promo_punkto_desc: "Зручний пошук місць на карті: їжа, магазини, послуги, дозвілля та багато іншого.",
             youtube_creator: "YouTube творця",
-            promo_yt_desc: "Ютуб творця, підтримайте підпискою!",
+            promo_yt_desc: "YouTube творця, підтримайте підпискою!",
             send_review: "Надіслати",
             note_title_label: "Назва (необов'язково)",
             note_text_label: "Текст нотатки",
@@ -2043,8 +2043,8 @@
     function initMap() {
         if (leafletMap) return;
 
-        // Установлены точные координаты и масштаб для отображения кампуса целиком, как на твоем скриншоте (изображение_2.png)
-        leafletMap = L.map('map-container').setView([49.2065, 18.7555], 15);
+        // Координаты чуть правее для идеального совпадения с твоим скриншотом (изображение_2.png)
+        leafletMap = L.map('map-container').setView([49.2065, 18.7580], 15);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
