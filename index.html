@@ -6,17 +6,25 @@
     <title>UniFlo – UNIZA Dashboard</title>
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="https://img.magnific.com/free-vector/calendar-red-glyph-style_78370-7233.jpg?semt=ais_hybrid&w=740&q=80">
+    
+    <!-- Open Graph / Превью ссылки -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mishayn.github.io/uniflo/">
+    <meta property="og:title" content="UniFlo – UNIZA Dashboard">
+    <meta property="og:description" content="Удобное расписание, карта кампуса УНИЗА, заметки и онлайн-чат для студентов.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/mishayn/uniflo/main/preview.png">
+
     <!-- Leaflet CSS for Maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #121316;
-            --bg-card: #1c1e22;
-            --bg-card-hover: #25282e;
-            --bg-input: #292d34;
-            --border-color: #2e323b;
+            --bg-main: rgba(18, 19, 22, 0.82);
+            --bg-card: rgba(28, 30, 34, 0.88);
+            --bg-card-hover: rgba(37, 40, 46, 0.92);
+            --bg-input: rgba(41, 45, 52, 0.9);
+            --border-color: rgba(46, 50, 59, 0.8);
             --text-primary: #f0f2f5;
             --text-secondary: #9aa0a6;
             --text-muted: #626873;
@@ -44,9 +52,22 @@
         }
 
         body {
-            background-color: var(--bg-main);
+            background-image: url('https://raw.githubusercontent.com/mishayn/uniflo/main/preview.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-color: #121316;
             color: var(--text-primary);
             min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(12, 13, 15, 0.75);
+            backdrop-filter: blur(12px);
+            z-index: -1;
         }
 
         .app-container {
@@ -65,6 +86,7 @@
             align-items: center;
             padding: 12px 20px;
             background-color: var(--bg-card);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
@@ -126,6 +148,7 @@
             top: 44px;
             left: 0;
             background: var(--bg-card);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -273,6 +296,7 @@
 
         .dash-card {
             background: var(--bg-card);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 14px;
@@ -331,7 +355,7 @@
         }
 
         .card-item {
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 10px 14px;
@@ -366,7 +390,7 @@
         .week-wrapper {
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             overflow: hidden;
         }
 
@@ -465,7 +489,7 @@
         }
 
         .map-action-btn {
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
             padding: 6px 4px;
@@ -512,7 +536,7 @@
         }
 
         .chip-modal-btn {
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             border: 1px solid var(--border-color);
             padding: 6px 12px;
             border-radius: 16px;
@@ -563,7 +587,7 @@
 
         .cal-day-label { font-size: 0.7rem; color: var(--text-muted); padding-bottom: 3px; font-weight: 600; }
         .cal-day {
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             border: 1px solid var(--border-color);
             border-radius: 5px;
             padding: 6px 0;
@@ -593,7 +617,7 @@
         }
 
         .note-item {
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 10px 12px;
@@ -608,7 +632,7 @@
             display: flex;
             flex-direction: column;
             height: 255px;
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
@@ -682,7 +706,7 @@
             margin-bottom: 12px;
         }
         .review-item {
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 8px 10px;
@@ -744,7 +768,7 @@
             color: inherit;
         }
         .promo-card {
-            background: var(--bg-main);
+            background: rgba(18, 19, 22, 0.75);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 10px 12px;
@@ -760,12 +784,12 @@
         
         .promo-card.punkto-highlight {
             border-color: rgba(34, 197, 94, 0.4);
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), var(--bg-main));
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(18, 19, 22, 0.75));
         }
 
         .promo-card.highlighted {
             border-color: rgba(239, 68, 68, 0.4);
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), var(--bg-main));
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(18, 19, 22, 0.75));
         }
         .promo-logo {
             width: 36px;
@@ -799,7 +823,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: rgba(28, 30, 34, 0.98);
+            background: rgba(28, 30, 34, 0.92);
             backdrop-filter: blur(12px);
             border-top: 1px solid var(--border-color);
             display: flex;
@@ -824,6 +848,7 @@
 
         .modal {
             background: var(--bg-card);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
             border-radius: 14px;
             width: 100%;
@@ -1718,7 +1743,7 @@
             authContainer.innerHTML = `
                 <div class="chat-user-profile">
                     <img src="${photoURL}" class="chat-avatar" alt="Avatar">
-                    <span style="font-weight:600; color:var::text-primary);">${escapeHtml(displayName)}</span>
+                    <span style="font-weight:600; color:var(--text-primary);">${escapeHtml(displayName)}</span>
                     <button onclick="changeCustomNickname()" title="Zmeniť nick" style="background:none; border:none; cursor:pointer; font-size:0.75rem;">✏️</button>
                     <button onclick="logoutUser()" title="Odhlásiť sa" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; margin-left:2px;">✕</button>
                 </div>
