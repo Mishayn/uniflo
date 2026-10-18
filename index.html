@@ -1120,16 +1120,14 @@
     </nav>
 </div>
 
-<!-- Modal for Points Selection (Кнопки-чипы) -->
+<!-- Modal for Points Selection -->
 <div class="modal-overlay" id="map-points-select-modal">
     <div class="modal">
         <div class="modal-header">
             <div class="modal-title" id="points-modal-title">Vyberte miesto</div>
             <button class="close-btn" onclick="closeModal('map-points-select-modal')">&times;</button>
         </div>
-        <div class="points-chips-grid" id="points-select-container">
-            <!-- Динамические маленькие скругленные кнопки -->
-        </div>
+        <div class="points-chips-grid" id="points-select-container"></div>
     </div>
 </div>
 
@@ -1239,14 +1237,15 @@
     </div>
 </div>
 
-<!-- Modal for Map Point -->
+<!-- Modal for Map Point (Create / Edit) -->
 <div class="modal-overlay" id="map-point-modal">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-title" data-i18n="modal_map_title">Pridať bod na mapu</div>
+            <div class="modal-title" id="map-point-modal-title" data-i18n="modal_map_title">Pridať bod na mapu</div>
             <button class="close-btn" onclick="closeModal('map-point-modal')">&times;</button>
         </div>
         <form id="map-point-form" onsubmit="saveMapPoint(event)">
+            <input type="hidden" id="map-point-id">
             <input type="hidden" id="map-lat">
             <input type="hidden" id="map-lng">
             <div class="form-group">
@@ -1262,7 +1261,7 @@
                     <option value="📍 Iné">📍 Iné</option>
                 </select>
             </div>
-            <div class="form-group" style="margin-top:12px; background:rgba(239, 68, 68, 0.1); padding:8px; border-radius:6px;">
+            <div class="form-group" style="margin-top:12px; background:rgba(239, 68, 68, 0.1); padding:8px; border-radius:6px;" id="admin-checkbox-wrapper">
                 <label style="color:#fca5a5; display:flex; align-items:center; gap:6px; cursor:pointer;">
                     <input type="checkbox" id="map-is-admin-check"> <span data-i18n="admin_point">Vytvoriť ako АДМИН-БОД (официальный)</span>
                 </label>
@@ -2039,9 +2038,13 @@
         }).addTo(leafletMap);
 
         leafletMap.on('contextmenu', function(e) {
+            document.getElementById('map-point-id').value = '';
             document.getElementById('map-lat').value = e.latlng.lat;
             document.getElementById('map-lng').value = e.latlng.lng;
+            document.getElementById('map-point-title').value = '';
             document.getElementById('map-is-admin-check').checked = false;
+            document.getElementById('admin-checkbox-wrapper').style.display = 'block';
+            document.getElementById('map-point-modal-title').innerText = 'Pridať bod na mapu';
             document.getElementById('map-point-modal').classList.add('active');
         });
 
@@ -2051,6 +2054,7 @@
 
     function saveMapPoint(e) {
         e.preventDefault();
+        const id = document.getElementById('map-point-id').value;
         const title = document.getElementById('map-point-title').value;
         const cat = document.getElementById('map-point-cat').value;
         const lat = parseFloat(document.getElementById('map-lat').value);
@@ -2058,16 +2062,31 @@
         const isAdminRequested = document.getElementById('map-is-admin-check').checked;
 
         let isAdmin = false;
-        if (isAdminRequested) {
-            const pass = prompt("Zadajte heslo pre vytvorenie Admin bodu:");
-            if (pass === "454") {
-                isAdmin = true;
-            } else {
-                alert("Nesprávne heslo!");
+        if (id) {
+            // Редактирование существующего
+            const existing = customMapPoints.find(p => p.id === id);
+            isAdmin = existing ? existing.isAdmin : false;
+            if (isAdmin) {
+                const pass = prompt("Zadajte heslo pre úpravu Admin bodu:");
+                if (pass !== "454") {
+                    alert("Nesprávne heslo!");
+                    return;
+                }
+            }
+        } else {
+            // Создание нового
+            if (isAdminRequested) {
+                const pass = prompt("Zadajte heslo pre vytvorenie Admin bodu:");
+                if (pass === "454") {
+                    isAdmin = true;
+                } else {
+                    alert("Nesprávne heslo!");
+                    return;
+                }
             }
         }
 
-        const newPoint = {
+        const pointData = {
             title,
             cat,
             lat,
@@ -2076,9 +2095,15 @@
             timestamp: Date.now()
         };
 
-        db.ref('mapPoints').push(newPoint).catch((error) => {
-            alert("Chyba pri ukladaní bodu: " + error.message);
-        });
+        if (id) {
+            db.ref('mapPoints/' + id).set(pointData).catch((error) => {
+                alert("Chyba pri aktualizácii bodu: " + error.message);
+            });
+        } else {
+            db.ref('mapPoints').push(pointData).catch((error) => {
+                alert("Chyba pri ukladaní bodu: " + error.message);
+            });
+        }
 
         closeModal('map-point-modal');
         document.getElementById('map-point-form').reset();
@@ -2089,7 +2114,6 @@
         customMapPoints.forEach(p => renderSinglePointOnMap(p));
     }
 
-    // ОТКРЫТИЕ МОДАЛКИ С СЕТКОЙ МАЛЕНЬКИХ КНОПОК-ЧИПОВ
     function openPointsModal(type) {
         const container = document.getElementById('points-select-container');
         const titleEl = document.getElementById('points-modal-title');
@@ -2108,7 +2132,6 @@
                 const btn = document.createElement('button');
                 btn.className = 'chip-modal-btn';
                 
-                // Достаем иконку категории
                 let icon = '📍';
                 if (p.cat && p.cat.includes('Kaviareň')) icon = '☕';
                 else if (p.cat && p.cat.includes('Štúdium')) icon = '📚';
@@ -2131,6 +2154,11 @@
         if (!leafletMap) return;
 
         let marker;
+        let catIconSymbol = '📍';
+        if (p.cat && p.cat.includes('Kaviareň')) catIconSymbol = '☕';
+        else if (p.cat && p.cat.includes('Štúdium')) catIconSymbol = '📚';
+        else if (p.cat && p.cat.includes('Zábava')) catIconSymbol = '🎉';
+
         if (p.isAdmin) {
             const redIcon = L.icon({
                 iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -2145,11 +2173,39 @@
             marker = L.marker([p.lat, p.lng]).addTo(leafletMap);
         }
 
-        const deleteBtnHtml = `<br><button onclick="deleteCustomPoint('${p.id}')" style="margin-top:6px; background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">🗑 Odstrániť</button>`;
+        // Кнопки управления в попапе: Слева Изменить, Справа Удалить
+        const popupButtonsHtml = `
+            <div style="margin-top:8px; display:flex; gap:6px;">
+                <button onclick="editCustomPoint('${p.id}')" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer; font-weight:600;">✏️ Upraviť</button>
+                <button onclick="deleteCustomPoint('${p.id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer; font-weight:600;">🗑 Odstrániť</button>
+            </div>
+        `;
 
-        marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br>${escapeHtml(p.title)} ${deleteBtnHtml}`);
+        marker.bindPopup(`<b>${catIconSymbol} ${escapeHtml(p.cat)}</b><br><span style="font-size:0.9rem; font-weight:700;">${escapeHtml(p.title)}</span> ${popupButtonsHtml}`);
         mapMarkers.push(marker);
     }
+
+    window.editCustomPoint = function(id) {
+        const point = customMapPoints.find(p => p.id === id);
+        if (!point) return;
+
+        if (point.isAdmin) {
+            const pass = prompt("Zadajte heslo pre úpravu Admin bodu:");
+            if (pass !== "454") {
+                alert("Nesprávne heslo!");
+                return;
+            }
+        }
+
+        document.getElementById('map-point-id').value = point.id;
+        document.getElementById('map-lat').value = point.lat;
+        document.getElementById('map-lng').value = point.lng;
+        document.getElementById('map-point-title').value = point.title;
+        document.getElementById('map-point-cat').value = point.cat;
+        document.getElementById('admin-checkbox-wrapper').style.display = 'none'; // Скрываем галочку при редактировании
+        document.getElementById('map-point-modal-title').innerText = 'Upraviť bod na mape';
+        document.getElementById('map-point-modal').classList.add('active');
+    };
 
     window.deleteCustomPoint = function(id) {
         const point = customMapPoints.find(p => p.id === id);
