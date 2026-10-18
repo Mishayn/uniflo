@@ -1120,11 +1120,11 @@
     </nav>
 </div>
 
-<!-- Modal for Points Selection -->
+<!-- Modal for Points Selection (Двухуровневый выбор категорий и точек) -->
 <div class="modal-overlay" id="map-points-select-modal">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-title" id="points-modal-title">Vyberte miesto</div>
+            <div class="modal-title" id="points-modal-title">Vyberte kategóriu</div>
             <button class="close-btn" onclick="closeModal('map-points-select-modal')">&times;</button>
         </div>
         <div class="points-chips-grid" id="points-select-container"></div>
@@ -1255,10 +1255,17 @@
             <div class="form-group">
                 <label data-i18n="map_point_cat">Kategória</label>
                 <select id="map-point-cat" class="form-control">
+                    <option value="🏛️ Fakulty / Univerzita">🏛️ Fakulty / Univerzita</option>
                     <option value="☕ Kaviareň / Jedlo">☕ Kaviareň / Jedlo</option>
+                    <option value="🍽️ Menza / Jedáleň">🍽️ Menza / Jedáleň</option>
                     <option value="📚 Štúdium / Ticho">📚 Štúdium / Ticho</option>
+                    <option value="💻 PC / Knižnica">💻 PC / Knižnica</option>
+                    <option value="🖨️ Tlač / Služby">🖨️ Tlač / Služby</option>
                     <option value="🎉 Zábava / Oddych">🎉 Zábava / Oddych</option>
-                    <option value="📍 Iné">📍 Iné</option>
+                    <option value="🍻 Bar / Pub / Party">🍻 Bar / Pub / Party</option>
+                    <option value="🏋️‍♂️ Šport / Fitness">🏋️‍♂️ Šport / Fitness</option>
+                    <option value="🛏️ Internáty / Ubytovanie">🛏️ Internáty / Ubytovanie</option>
+                    <option value="🅿️ Parkovanie / MHD">🅿️ Parkovanie / MHD</option>
                 </select>
             </div>
             <div class="form-group" style="margin-top:12px; background:rgba(239, 68, 68, 0.1); padding:8px; border-radius:6px;" id="admin-checkbox-wrapper">
@@ -2063,7 +2070,6 @@
 
         let isAdmin = false;
         if (id) {
-            // Редактирование существующего
             const existing = customMapPoints.find(p => p.id === id);
             isAdmin = existing ? existing.isAdmin : false;
             if (isAdmin) {
@@ -2074,7 +2080,6 @@
                 }
             }
         } else {
-            // Создание нового
             if (isAdminRequested) {
                 const pass = prompt("Zadajte heslo pre vytvorenie Admin bodu:");
                 if (pass === "454") {
@@ -2114,15 +2119,55 @@
         customMapPoints.forEach(p => renderSinglePointOnMap(p));
     }
 
+    // ДВУХУРОВНЕВОЕ ОКНО КАТЕГОРИЙ И ТОЧЕК
+    const allowedCategories = [
+        "🏛️ Fakulty / Univerzita",
+        "☕ Kaviareň / Jedlo",
+        "🍽️ Menza / Jedáleň",
+        "📚 Štúdium / Ticho",
+        "💻 PC / Knižnica",
+        "🖨️ Tlač / Služby",
+        "🎉 Zábava / Oddych",
+        "🍻 Bar / Pub / Party",
+        "🏋️‍♂️ Šport / Fitness",
+        "🛏️ Internáty / Ubytovanie",
+        "🅿️ Parkovanie / MHD"
+    ];
+
+    let currentModalType = 'admin';
+
     function openPointsModal(type) {
+        currentModalType = type;
+        renderCategoriesView();
+        document.getElementById('map-points-select-modal').classList.add('active');
+    }
+
+    function renderCategoriesView() {
         const container = document.getElementById('points-select-container');
         const titleEl = document.getElementById('points-modal-title');
         container.innerHTML = '';
 
-        const isAdminMode = (type === 'admin');
+        const isAdminMode = (currentModalType === 'admin');
         titleEl.innerText = isAdminMode ? '🔴 Budovy a oficiálne miesta' : '📍 Študentské body';
 
-        const filteredPoints = customMapPoints.filter(p => !!p.isAdmin === isAdminMode);
+        allowedCategories.forEach(catName => {
+            const btn = document.createElement('button');
+            btn.className = 'chip-modal-btn';
+            btn.innerHTML = `<span>${catName}</span>`;
+            btn.onclick = () => renderPointsViewForCategory(catName);
+            container.appendChild(btn);
+        });
+    }
+
+    function renderPointsViewForCategory(catName) {
+        const container = document.getElementById('points-select-container');
+        const titleEl = document.getElementById('points-modal-title');
+        container.innerHTML = '';
+
+        const isAdminMode = (currentModalType === 'admin');
+        titleEl.innerHTML = `<button onclick="renderCategoriesView()" style="background:none; border:none; color:var(--accent-orange); cursor:pointer; font-weight:700; margin-right:8px;">← Späť</button> ${escapeHtml(catName)}`;
+
+        const filteredPoints = customMapPoints.filter(p => !!p.isAdmin === isAdminMode && p.cat === catName);
         filteredPoints.sort((a, b) => a.title.localeCompare(b.title, currentLang));
 
         if (filteredPoints.length === 0) {
@@ -2131,14 +2176,7 @@
             filteredPoints.forEach(p => {
                 const btn = document.createElement('button');
                 btn.className = 'chip-modal-btn';
-                
-                let icon = '📍';
-                if (p.cat && p.cat.includes('Kaviareň')) icon = '☕';
-                else if (p.cat && p.cat.includes('Štúdium')) icon = '📚';
-                else if (p.cat && p.cat.includes('Zábava')) icon = '🎉';
-                else if (isAdminMode) icon = '🔴';
-
-                btn.innerHTML = `<span>${icon}</span> <span>${escapeHtml(p.title)}</span>`;
+                btn.innerHTML = `<span>📍 ${escapeHtml(p.title)}</span>`;
                 btn.onclick = () => {
                     focusBuilding(p.lat, p.lng);
                     closeModal('map-points-select-modal');
@@ -2146,8 +2184,6 @@
                 container.appendChild(btn);
             });
         }
-
-        document.getElementById('map-points-select-modal').classList.add('active');
     }
 
     function renderSinglePointOnMap(p) {
@@ -2158,6 +2194,14 @@
         if (p.cat && p.cat.includes('Kaviareň')) catIconSymbol = '☕';
         else if (p.cat && p.cat.includes('Štúdium')) catIconSymbol = '📚';
         else if (p.cat && p.cat.includes('Zábava')) catIconSymbol = '🎉';
+        else if (p.cat && p.cat.includes('Fakulty')) catIconSymbol = '🏛️';
+        else if (p.cat && p.cat.includes('Menza')) catIconSymbol = '🍽️';
+        else if (p.cat && p.cat.includes('PC')) catIconSymbol = '💻';
+        else if (p.cat && p.cat.includes('Tlač')) catIconSymbol = '🖨️';
+        else if (p.cat && p.cat.includes('Bar')) catIconSymbol = '🍻';
+        else if (p.cat && p.cat.includes('Šport')) catIconSymbol = '🏋️‍♂️';
+        else if (p.cat && p.cat.includes('Internáty')) catIconSymbol = '🛏️';
+        else if (p.cat && p.cat.includes('Parkovanie')) catIconSymbol = '🅿️';
 
         if (p.isAdmin) {
             const redIcon = L.icon({
@@ -2173,7 +2217,6 @@
             marker = L.marker([p.lat, p.lng]).addTo(leafletMap);
         }
 
-        // Кнопки управления в попапе: Слева Изменить, Справа Удалить
         const popupButtonsHtml = `
             <div style="margin-top:8px; display:flex; gap:6px;">
                 <button onclick="editCustomPoint('${p.id}')" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer; font-weight:600;">✏️ Upraviť</button>
@@ -2202,7 +2245,7 @@
         document.getElementById('map-lng').value = point.lng;
         document.getElementById('map-point-title').value = point.title;
         document.getElementById('map-point-cat').value = point.cat;
-        document.getElementById('admin-checkbox-wrapper').style.display = 'none'; // Скрываем галочку при редактировании
+        document.getElementById('admin-checkbox-wrapper').style.display = 'none';
         document.getElementById('map-point-modal-title').innerText = 'Upraviť bod na mape';
         document.getElementById('map-point-modal').classList.add('active');
     };
