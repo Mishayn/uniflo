@@ -267,6 +267,31 @@
             padding: 14px;
         }
 
+        /* Выделенная карточка для Ближайшего дня */
+        .dash-card.upcoming-highlight {
+            border-color: rgba(249, 115, 22, 0.4);
+            background: linear-gradient(180deg, rgba(249, 115, 22, 0.08) 0%, var(--bg-card) 100%);
+        }
+
+        .upcoming-title-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .upcoming-date-badge {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--accent-orange);
+            border: 1px solid rgba(249, 115, 22, 0.35);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
         .dash-column-3 {
             display: flex;
             flex-direction: column;
@@ -330,7 +355,7 @@
         .teacher-name { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
         .room-code { font-size: 0.92rem; font-weight: 700; }
 
-        /* ИСПРАВЛЕННАЯ СЕТКА РАСПИСАНИЯ */
+        /* ИСПРАВЛЕННАЯ СЕТКА РАСПИСАНИЯ И ВЫРАВНИВАНИЕ ВРЕМЕНИ */
         .week-wrapper {
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -358,11 +383,11 @@
             display: grid;
             grid-template-columns: 45px repeat(5, 1fr);
             position: relative;
-            height: 494px; /* Ровно 13 слотов по 38px, без лишнего пространства */
+            height: 494px; /* Ровно 13 слотов по 38px */
             overflow: hidden;
         }
 
-        /* ВРЕМЯ ПОДТЯНУТО К ВЕРХНЕЙ ЛИНИИ ЧАСА */
+        /* ТОЧНОЕ ВЫРАВНИВАНИЕ ВРЕМЕНИ ПО ВЕРХНЕЙ ЛИНИИ СЛОТА */
         .week-time-cell {
             height: 38px;
             display: flex;
@@ -374,7 +399,6 @@
             border-right: 1px solid var(--border-color);
             box-sizing: border-box;
             padding-top: 2px;
-            transform: translateY(-50%);
         }
 
         .week-day-column {
@@ -613,7 +637,6 @@
         .review-stars { color: #facc15; font-size: 0.8rem; }
         .review-text { color: var(--text-secondary); line-height: 1.35; }
 
-        /* ИСПРАВЛЕННЫЙ ВЫБОР ЗВЕЗД (СЛЕВА НАПРАВО) */
         .star-rating-input {
             display: flex;
             gap: 6px;
@@ -815,7 +838,7 @@
                 </div>
             </div>
 
-            <!-- Кнопка Отзывы 💬 (квадратная, теперь работает и на ПК, и на телефонах) -->
+            <!-- Кнопка Отзывы 💬 (квадратная, для ПК и мобилок) -->
             <button class="btn-header-square" onclick="openReviewModal()" title="Recenzie / Отзывы">
                 💬
             </button>
@@ -848,10 +871,13 @@
                     <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
                 </div>
 
-                <!-- Najbližší deň -->
-                <div class="dash-card">
+                <!-- Najbližší deň (ВЫДЕЛЕННЫЙ БЛОК) -->
+                <div class="dash-card upcoming-highlight">
                     <div class="section-header" style="cursor: pointer;" onclick="toggleUpcomingExpand()">
-                        <div class="section-title" id="upcoming-day-title">Najbližší deň – Pondelok 19. 10. 2026</div>
+                        <div class="upcoming-title-box" id="upcoming-day-title">
+                            <span>📌 Najbližší deň –</span>
+                            <span class="upcoming-date-badge">Pondelok 19. 10. 2026</span>
+                        </div>
                         <div class="section-meta" style="display:flex; align-items:center; gap:8px;">
                             <span id="upcoming-arrow">▼</span>
                         </div>
@@ -859,7 +885,7 @@
                     <div class="card-list" id="upcoming-list"></div>
                 </div>
 
-                <!-- РASPISANIE NA NEDELU -->
+                <!-- RASPRISANIE NA NEDELU -->
                 <div class="dash-card">
                     <div class="section-header">
                         <div class="section-title" data-i18n="weekly_schedule">Týždenný rozvrh</div>
@@ -1550,7 +1576,6 @@
         document.getElementById('review-modal').classList.add('active');
     }
 
-    // ИСПРАВЛЕННЫЙ РАСЧЕТ ЗВЕЗД СЛЕВА НАПРАВО
     function setReviewRating(rating) {
         selectedRating = rating;
         const stars = document.querySelectorAll('#star-rating-selector span');
@@ -1591,10 +1616,8 @@
         }
 
         const reviewsArr = Object.values(data);
-        let totalStars = 0;
 
         reviewsArr.reverse().forEach(r => {
-            totalStars += r.rating;
             const item = document.createElement('div');
             item.className = 'review-item';
             
@@ -1802,7 +1825,10 @@
 
         const dayTitleEl = document.getElementById('upcoming-day-title');
         if (dayTitleEl) {
-            dayTitleEl.innerText = "Najbližší deň – Pondelok 19. 10. 2026";
+            dayTitleEl.innerHTML = `
+                <span>📌 Najbližší deň –</span>
+                <span class="upcoming-date-badge">Pondelok 19. 10. 2026</span>
+            `;
         }
 
         if (dayLessons.length === 0) {
