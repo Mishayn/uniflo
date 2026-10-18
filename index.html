@@ -501,7 +501,7 @@
             color: #fca5a5;
         }
 
-        /* СЕТКА С МАЛЕНЬКИМИ КНОПКАМИ-ЧИПАМИ В МОДАЛЬНОМ ОКНЕ */
+        /* СЕТКА С КАТЕГОРИЯМИ И ТОЧКАМИ */
         .points-chips-grid {
             display: flex;
             flex-wrap: wrap;
@@ -529,6 +529,13 @@
         .chip-modal-btn:hover {
             border-color: var(--accent-orange);
             background: var(--bg-card-hover);
+            color: var(--accent-orange);
+        }
+
+        /* Стиль для категорий, в которых есть элементы */
+        .chip-modal-btn.has-items {
+            border-color: rgba(249, 115, 22, 0.5);
+            background: rgba(249, 115, 22, 0.1);
             color: var(--accent-orange);
         }
 
@@ -2073,7 +2080,6 @@
         if (id) {
             const existing = customMapPoints.find(p => p.id === id);
             isAdmin = existing ? existing.isAdmin : false;
-            // Пароль при изменении уже запрашивался один раз при клике на «Upraviť»
         } else {
             if (isAdminRequested) {
                 const pass = prompt("Zadajte heslo pre vytvorenie Admin bodu:");
@@ -2147,7 +2153,11 @@
 
         allowedCategories.forEach(catName => {
             const btn = document.createElement('button');
-            btn.className = 'chip-modal-btn';
+            
+            // Проверяем, есть ли хотя бы одна точка в этой категории
+            const hasItems = customMapPoints.some(p => !!p.isAdmin === isAdminMode && p.cat === catName);
+            
+            btn.className = 'chip-modal-btn' + (hasItems ? ' has-items' : '');
             btn.innerHTML = `<span>${catName}</span>`;
             btn.onclick = () => renderPointsViewForCategory(catName);
             container.appendChild(btn);
@@ -2200,19 +2210,6 @@
         if (!leafletMap) return;
 
         let marker;
-        let catIconSymbol = '📍';
-        if (p.cat && p.cat.includes('Kaviareň')) catIconSymbol = '☕';
-        else if (p.cat && p.cat.includes('Štúdium')) catIconSymbol = '📚';
-        else if (p.cat && p.cat.includes('Zábava')) catIconSymbol = '🎉';
-        else if (p.cat && p.cat.includes('Fakulty')) catIconSymbol = '🏛️';
-        else if (p.cat && p.cat.includes('Menza')) catIconSymbol = '🍽️';
-        else if (p.cat && p.cat.includes('PC')) catIconSymbol = '💻';
-        else if (p.cat && p.cat.includes('Tlač')) catIconSymbol = '🖨️';
-        else if (p.cat && p.cat.includes('Bar')) catIconSymbol = '🍻';
-        else if (p.cat && p.cat.includes('Šport')) catIconSymbol = '🏋️‍♂️';
-        else if (p.cat && p.cat.includes('Internáty')) catIconSymbol = '🛏️';
-        else if (p.cat && p.cat.includes('Potraviny')) catIconSymbol = '🛒';
-        else if (p.cat && p.cat.includes('Parkovanie')) catIconSymbol = '🅿️';
 
         if (p.isAdmin) {
             const redIcon = L.icon({
@@ -2235,8 +2232,8 @@
             </div>
         `;
 
-        // Исправлено: убрано дублирование иконки в названии категории
-        marker.bindPopup(`<b>${catIconSymbol} ${escapeHtml(p.cat)}</b><br><span style="font-size:0.9rem; font-weight:700;">${escapeHtml(p.title)}</span> ${popupButtonsHtml}`);
+        // Исправлено: выводим категорию ровно один раз без дублирования эмодзи в строке
+        marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br><span style="font-size:0.9rem; font-weight:700;">${escapeHtml(p.title)}</span> ${popupButtonsHtml}`);
         mapMarkers.push(marker);
     }
 
