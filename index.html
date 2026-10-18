@@ -58,7 +58,7 @@
             flex-direction: column;
         }
 
-        /* Top Header - Точно по центру UniFlo */
+        /* Top Header */
         .top-header {
             display: flex;
             justify-content: space-between;
@@ -78,7 +78,6 @@
             z-index: 2;
         }
 
-        /* Абсолютное центрирование заголовка */
         .header-title {
             position: absolute;
             left: 50%;
@@ -236,7 +235,6 @@
             flex: 1;
         }
 
-        /* Адаптация ПК / Мобильный */
         @media (min-width: 1200px) {
             .dashboard-grid {
                 grid-template-columns: 1.15fr 0.85fr 0.7fr; 
@@ -255,6 +253,14 @@
             .top-header {
                 display: flex;
                 justify-content: space-between;
+                align-items: center;
+            }
+            #btn-review-header {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 5;
             }
         }
 
@@ -262,6 +268,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            min-width: 0;
         }
 
         .dash-card {
@@ -269,6 +276,8 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 14px;
+            width: 100%;
+            overflow: hidden;
         }
 
         .upcoming-title-box {
@@ -280,7 +289,6 @@
             color: var(--text-primary);
         }
 
-        /* Оранжевый акцент только на плашке с датой */
         .upcoming-date-badge {
             background: rgba(249, 115, 22, 0.2);
             color: var(--accent-orange);
@@ -354,7 +362,7 @@
         .teacher-name { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
         .room-code { font-size: 0.92rem; font-weight: 700; }
 
-        /* СЕТКА РАСПИСАНИЯ: ВЫСОТА ЯЧЕЙКИ 40px */
+        /* СЕТКА РАСПИСАНИЯ: 39px */
         .week-wrapper {
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -382,13 +390,12 @@
             display: grid;
             grid-template-columns: 45px repeat(5, 1fr);
             position: relative;
-            height: 520px; /* 13 слотов по 40px = 520px */
+            height: 507px;
             overflow: hidden;
         }
 
-        /* Выравнивание времени строго по верхнему краю */
         .week-time-cell {
-            height: 40px;
+            height: 39px;
             display: flex;
             align-items: flex-start;
             justify-content: center;
@@ -403,8 +410,8 @@
         .week-day-column {
             border-right: 1px solid var(--border-color);
             position: relative;
-            height: 520px;
-            background-size: 100% 40px;
+            height: 507px;
+            background-size: 100% 39px;
             background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
         .week-day-column:last-child { border-right: none; }
@@ -449,31 +456,74 @@
             margin-top: 6px;
         }
 
-        .map-building-list {
-            display: flex;
+        /* НОВАЯ ТРЕХКНОПОЧНАЯ СИСТЕМА УПРАВЛЕНИЯ КАРТОЙ */
+        .map-actions-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 4px;
+            margin-bottom: 8px;
+            width: 100%;
         }
 
-        .chip {
+        .map-action-btn {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
-            padding: 4px 8px;
-            border-radius: 14px;
+            color: var(--text-primary);
+            padding: 6px 4px;
+            border-radius: 8px;
             font-size: 0.72rem;
-            white-space: nowrap;
-            cursor: pointer;
-        }
-
-        .chip-admin {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: #ef4444;
-            color: #fca5a5;
             font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            text-align: center;
+            transition: all 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .chip-gps { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; font-weight: 600; }
+        .map-action-btn:hover {
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+        }
+
+        .btn-gps-action {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+
+        .btn-admin-action {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .points-select-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .point-select-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s;
+        }
+        .point-select-item:hover {
+            border-color: var(--accent-orange);
+        }
 
         .user-pulse-marker {
             background: rgba(59, 130, 246, 0.3);
@@ -610,7 +660,6 @@
             font-size: 0.8rem;
         }
 
-        /* ОТЗЫВЫ В МОДАЛЬНОМ ОКНЕ */
         .reviews-container {
             display: flex;
             flex-direction: column;
@@ -645,9 +694,7 @@
             margin-bottom: 8px;
             justify-content: center;
         }
-        .star-rating-input span {
-            transition: color 0.15s ease;
-        }
+        .star-rating-input span { transition: color 0.15s ease; }
         .star-rating-input span.active { color: #facc15; }
 
         .btn-google-login {
@@ -678,7 +725,6 @@
             object-fit: cover;
         }
 
-        /* Promo Cards Style */
         .promo-card-link {
             text-decoration: none;
             display: block;
@@ -735,7 +781,6 @@
             line-height: 1.3;
         }
 
-        /* ЗАКРЕПЛЕННАЯ НИЖНЯЯ ПАНЕЛЬ С ГРУППОЙ И E-VZD ДЛЯ ТЕЛЕФОНОВ */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -824,7 +869,6 @@
     <!-- Header Bar -->
     <div class="top-header">
         <div class="header-left">
-            <!-- Выбор языка: белая планета -->
             <div class="lang-dropdown-container">
                 <button class="btn-header-square" onclick="toggleLangMenu()" title="Zvoliť jazyk / Language">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -841,18 +885,15 @@
                 </div>
             </div>
 
-            <!-- Кнопка Отзывы 💬 (квадратная, белая) -->
-            <button class="btn-header-square" onclick="openReviewModal()" title="Recenzie / Отзывы">
+            <button class="btn-header-square" id="btn-review-header" onclick="openReviewModal()" title="Recenzie / Отзывы">
                 💬
             </button>
         </div>
 
-        <!-- Название UniFlo строго по центру страницы -->
         <div class="header-title">
             <span>📅 UniFlo</span>
         </div>
 
-        <!-- Поле группы и e-vzd для ПК -->
         <div class="header-right mobile-header-group">
             <div class="group-selector-container">
                 <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
@@ -865,7 +906,7 @@
     <!-- Main Grid Layout -->
     <div class="dashboard-grid">
         
-        <!-- COLUMN 1: Schedule & Actions Bar -->
+        <!-- COLUMN 1: Schedule -->
         <div class="dash-column">
             <div id="screen-rozvrh" class="screen active">
                 
@@ -874,7 +915,7 @@
                     <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
                 </div>
 
-                <!-- Najbližší deň (Без оранжевой подсветки карточки) -->
+                <!-- Najbližší deň -->
                 <div class="dash-card">
                     <div class="section-header" style="cursor: pointer;" onclick="toggleUpcomingExpand()">
                         <div class="upcoming-title-box" id="upcoming-day-title">
@@ -888,7 +929,7 @@
                     <div class="card-list" id="upcoming-list"></div>
                 </div>
 
-                <!-- RASPRISANIE NA NEDELU (Со эмодзи календаря) -->
+                <!-- RASPRISANIE NA NEDELU -->
                 <div class="dash-card">
                     <div class="section-header">
                         <div class="section-title" data-i18n="weekly_schedule">📅 Týždenný rozvrh</div>
@@ -942,9 +983,20 @@
                             <div class="section-title" data-i18n="campus_map">Mapa Kampusu UNIZA</div>
                             <span class="section-meta" data-i18n="map_hint">Pravý klik = nová bodka</span>
                         </div>
-                        <div class="map-building-list" id="map-category-chips">
-                            <div class="chip chip-gps" onclick="locateUser()" data-i18n="my_location">📍 Moja poloha</div>
+                        
+                        <!-- 3 фиксированные кнопки управления картой -->
+                        <div class="map-actions-row">
+                            <button class="map-action-btn btn-gps-action" onclick="locateUser()">
+                                <span>📍 Moja poloha</span>
+                            </button>
+                            <button class="map-action-btn btn-admin-action" onclick="openPointsModal('admin')">
+                                <span>🔴 Budovy / Miesta</span>
+                            </button>
+                            <button class="map-action-btn" onclick="openPointsModal('user')">
+                                <span>📍 Študentské body</span>
+                            </button>
                         </div>
+
                         <div id="map-container"></div>
                     </div>
                 </div>
@@ -1051,7 +1103,7 @@
 
     </div>
 
-    <!-- Bottom Nav Mobile: Закреплены группа и e-vzd -->
+    <!-- Bottom Nav Mobile -->
     <nav class="bottom-nav">
         <div class="group-selector-container" style="justify-content: center; width: 100%;">
             <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
@@ -1059,6 +1111,19 @@
             <a href="#" id="evzd-link-mobile" target="_blank" class="btn-evzd">e-vzd ↗</a>
         </div>
     </nav>
+</div>
+
+<!-- Modal for Points Selection -->
+<div class="modal-overlay" id="map-points-select-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="points-modal-title">Vyberte miesto</div>
+            <button class="close-btn" onclick="closeModal('map-points-select-modal')">&times;</button>
+        </div>
+        <div class="points-select-list" id="points-select-container">
+            <!-- Динамический список точек -->
+        </div>
+    </div>
 </div>
 
 <!-- Modal for Reviews -->
@@ -1069,9 +1134,7 @@
             <button class="close-btn" onclick="closeModal('review-modal')">&times;</button>
         </div>
         
-        <div class="reviews-container" id="reviews-list">
-            <!-- Отзывы из Firebase -->
-        </div>
+        <div class="reviews-container" id="reviews-list"></div>
 
         <div style="border-top:1px solid var(--border-color); padding-top:10px;">
             <div class="star-rating-input" id="star-rating-selector">
@@ -1878,10 +1941,9 @@
                 const [sh, sm] = l.start.split(':').map(Number);
                 const [eh, em] = l.end.split(':').map(Number);
 
-                /* Расчет карточек под высоту 40px */
-                const topPx = (sh - 7) * 40 + (sm / 60) * 40;
+                const topPx = (sh - 7) * 39 + (sm / 60) * 39;
                 const durationHrs = (eh * 60 + em - (sh * 60 + sm)) / 60;
-                const heightPx = durationHrs * 40;
+                const heightPx = durationHrs * 39;
 
                 const card = document.createElement('div');
                 card.className = `week-card ${l.type}`;
@@ -1904,7 +1966,7 @@
                     if (gapText) {
                         const gapTopPx = topPx + heightPx;
                         const [nextSh, nextSm] = nextL.start.split(':').map(Number);
-                        const nextTopPx = (nextSh - 7) * 40 + (nextSm / 60) * 40;
+                        const nextTopPx = (nextSh - 7) * 39 + (nextSm / 60) * 39;
                         const gapHeightPx = nextTopPx - gapTopPx;
 
                         const gapBox = document.createElement('div');
@@ -2018,22 +2080,43 @@
     function renderCustomMapPoints() {
         if (!leafletMap) return;
         customMapPoints.forEach(p => renderSinglePointOnMap(p));
-        updateAdminCategoryChips();
     }
 
-    function updateAdminCategoryChips() {
-        const chipsContainer = document.getElementById('map-category-chips');
-        chipsContainer.innerHTML = `<div class="chip chip-gps" onclick="locateUser()">${translations[currentLang].my_location}</div>`;
+    // ЛОГИКА ОТКРЫТИЯ МОДАЛЬНЫХ ОКН С ТОЧКАМИ
+    function openPointsModal(type) {
+        const container = document.getElementById('points-select-container');
+        const titleEl = document.getElementById('points-modal-title');
+        container.innerHTML = '';
 
-        const sortedPoints = [...customMapPoints].sort((a, b) => a.title.localeCompare(b.title, currentLang));
+        const isAdminMode = (type === 'admin');
+        titleEl.innerText = isAdminMode ? '🔴 Budovy a oficiálne miesta' : '📍 Študentské body';
 
-        sortedPoints.forEach(p => {
-            const chip = document.createElement('div');
-            chip.className = p.isAdmin ? 'chip chip-admin' : 'chip';
-            chip.innerText = `${p.isAdmin ? '🔴 ' : '📍 '}${p.title}`;
-            chip.onclick = () => focusBuilding(p.lat, p.lng);
-            chipsContainer.appendChild(chip);
-        });
+        const filteredPoints = customMapPoints.filter(p => !!p.isAdmin === isAdminMode);
+        filteredPoints.sort((a, b) => a.title.localeCompare(b.title, currentLang));
+
+        if (filteredPoints.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem;">Žiadne miesta v tejto kategórii.</div>';
+        } else {
+            filteredPoints.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'point-select-item';
+                item.onclick = () => {
+                    focusBuilding(p.lat, p.lng);
+                    closeModal('map-points-select-modal');
+                };
+
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight:700; color:var(--text-primary); font-size:0.9rem;">${isAdminMode ? '🔴' : '📍'} ${escapeHtml(p.title)}</div>
+                        <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">${escapeHtml(p.cat || '')}</div>
+                    </div>
+                    <span style="font-size:0.75rem; color:var(--accent-orange); font-weight:600;">Ukázať ↗</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        document.getElementById('map-points-select-modal').classList.add('active');
     }
 
     function renderSinglePointOnMap(p) {
