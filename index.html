@@ -253,7 +253,6 @@
             .screen { display: block !important; }
             .mobile-header-group { display: flex !important; }
             
-            /* На ПК порядок кнопок в шапке: Язык, Отзывы, Колокольчик */
             #btn-notif-header { order: 3; }
             #btn-review-header { order: 2; }
         }
@@ -268,7 +267,6 @@
                 justify-content: space-between;
                 align-items: center;
             }
-            /* На мобилке порядок в header-left: Язык, Колокольчик, Отзывы */
             .header-left { display: flex; align-items: center; gap: 8px; }
             #btn-notif-header { order: 2; }
             #btn-review-header { order: 3; }
@@ -2466,7 +2464,20 @@
             </div>
         `;
 
-        marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br><span style="font-size:0.9rem; font-weight:700;">${escapeHtml(p.title)}</span> ${popupButtonsHtml}`);
+        let icon = '📍';
+        if (p.cat.includes('Kaviareň') || p.cat.includes('Cafe') || p.cat.includes('Кафе')) icon = '☕';
+        else if (p.cat.includes('Štúdium') || p.cat.includes('Study') || p.cat.includes('Учеба') || p.cat.includes('Навчання')) icon = '📚';
+        else if (p.cat.includes('Zábava') || p.cat.includes('Fun') || p.cat.includes('Развлечения') || p.cat.includes('Розваги')) icon = '🎉';
+        else if (p.cat.includes('Fakulty') || p.cat.includes('Faculties') || p.cat.includes('Факультеты') || p.cat.includes('Факультети')) icon = '🏛️';
+        else if (p.cat.includes('Menza') || p.cat.includes('Canteen') || p.cat.includes('Столовая') || p.cat.includes('Їдальня')) icon = '🍽️';
+        else if (p.cat.includes('Tlač') || p.cat.includes('Print') || p.cat.includes('Печать') || p.cat.includes('Друк')) icon = '🖨️';
+        else if (p.cat.includes('Bar')) icon = '🍻';
+        else if (p.cat.includes('Šport') || p.cat.includes('Sport') || p.cat.includes('Спорт')) icon = '🏋️‍♂️';
+        else if (p.cat.includes('Internáty') || p.cat.includes('Dorm') || p.cat.includes('Общежития') || p.cat.includes('Гуртожитки')) icon = '🛏️';
+        else if (p.cat.includes('Potraviny') || p.cat.includes('Groceries') || p.cat.includes('Продукты') || p.cat.includes('Продукти')) icon = '🛒';
+        else if (p.cat.includes('Parkovanie') || p.cat.includes('Parking') || p.cat.includes('Парковка')) icon = '🅿️';
+
+        marker.bindPopup(`<b>${icon} ${escapeHtml(p.cat)}</b><br><span style="font-size:0.9rem; font-weight:700;">${escapeHtml(p.title)}</span> ${popupButtonsHtml}`);
         mapMarkers.push(marker);
     }
 
