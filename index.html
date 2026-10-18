@@ -1618,6 +1618,7 @@
         document.getElementById('lang-menu').classList.remove('active');
         applyTranslations();
         renderCategoriesView();
+        renderUpcomingDay(); // Обновляем названия дней недели на бэйдже
     }
 
     function applyTranslations() {
@@ -2019,8 +2020,64 @@
 
     function renderUpcomingDay() {
         const upcomingList = document.getElementById('upcoming-list');
+        const badgeTextEl = document.getElementById('upcoming-date-badge-text');
+        if (!upcomingList || !badgeTextEl) return;
         upcomingList.innerHTML = '';
-        const dayLessons = schedule.filter(l => l.day === 1).sort((a,b) => a.start.localeCompare(b.start));
+
+        // Определяем ближайший день с парами (от текущего дня недели или с понедельника, если сегодня выходной)
+        const now = new Date();
+        let jsDay = now.getDay(); // 0 - ВС, 1 - ПН, ..., 6 - СБ
+        let targetDay = 1; // по умолчанию ПН (1)
+
+        if (jsDay >= 1 && jsDay <= 5) {
+            // Проверяем, есть ли пары сегодня или в последующие дни этой недели
+            let found = false;
+            for (let d = jsDay; d <= 5; d++) {
+                if (schedule.some(l => l.day === d)) {
+                    targetDay = d;
+                    found = true;
+                    break;
+                }
+            }
+            // Если на оставшиеся дни недели пар нет, берем первый день недели, где они есть
+            if (!found) {
+                for (let d = 1; d <= 5; d++) {
+                    if (schedule.some(l => l.day === d)) {
+                        targetDay = d;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        } else {
+            // Выходные — ищем первый день с парами на неделе
+            for (let d = 1; d <= 5; d++) {
+                if (schedule.some(l => l.day === d)) {
+                    targetDay = d;
+                    break;
+                }
+            }
+        }
+
+        // Вычисляем конкретную дату для targetDay (исходя из текущей недели 19.10.2026 - 25.10.2026)
+        const baseMonday = new Date(2026, 9, 19); // 19 октября 2026
+        const targetDate = new Date(baseMonday);
+        targetDate.setDate(baseMonday.getDate() + (targetDay - 1));
+
+        const dayNamesMap = {
+            1: { sk: 'Pondelok', en: 'Monday', ru: 'Понедельник', uk: 'Понеділок' },
+            2: { sk: 'Utorok', en: 'Tuesday', ru: 'Вторник', uk: 'Вівторок' },
+            3: { sk: 'Streda', en: 'Wednesday', ru: 'Среда', uk: 'Середа' },
+            4: { sk: 'Štvrtok', en: 'Thursday', ru: 'Четверг', uk: 'Четвер' },
+            5: { sk: 'Piatok', en: 'Friday', ru: 'Пятница', uk: "П'ятниця" }
+        };
+
+        const langDict = dayNamesMap[targetDay] || dayNamesMap[1];
+        const dayNameStr = langDict[currentLang] || langDict['sk'];
+        const dateStr = `${targetDate.getDate()}. ${targetDate.getMonth() + 1}. ${targetDate.getFullYear()}`;
+        badgeTextEl.innerText = `${dayNameStr} ${dateStr}`;
+
+        const dayLessons = schedule.filter(l => l.day === targetDay).sort((a,b) => a.start.localeCompare(b.start));
 
         if (dayLessons.length === 0) {
             upcomingList.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem;">Žiadne hodiny.</div>`;
