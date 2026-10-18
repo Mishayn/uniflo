@@ -252,6 +252,10 @@
             .bottom-nav { display: none !important; }
             .screen { display: block !important; }
             .mobile-header-group { display: flex !important; }
+            
+            /* На ПК порядок кнопок в шапке: Язык, Отзывы, Колокольчик */
+            #btn-notif-header { order: 3; }
+            #btn-review-header { order: 2; }
         }
 
         @media (max-width: 1199px) {
@@ -264,13 +268,10 @@
                 justify-content: space-between;
                 align-items: center;
             }
-            #btn-review-header {
-                position: absolute;
-                right: 16px;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: 5;
-            }
+            /* На мобилке порядок в header-left: Язык, Колокольчик, Отзывы */
+            .header-left { display: flex; align-items: center; gap: 8px; }
+            #btn-notif-header { order: 2; }
+            #btn-review-header { order: 3; }
         }
 
         .dash-column {
@@ -907,8 +908,13 @@
                 </div>
             </div>
 
+            <!-- Кнопка уведомлений с колокольчиком -->
+            <button class="btn-header-square" id="btn-notif-header" onclick="requestNotificationPermission()" title="Upozornenia / Уведомления">
+                🔔
+            </button>
+
             <button class="btn-header-square" id="btn-review-header" onclick="openReviewModal()" title="Recenzie / Отзывы">
-                💬
+                ⭐
             </button>
         </div>
 
@@ -937,7 +943,7 @@
                     <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
                 </div>
 
-                <!-- Najbližší deň -->
+                <!-- Najbližший deň -->
                 <div class="dash-card">
                     <div class="section-header" style="cursor: pointer;" onclick="toggleUpcomingExpand()">
                         <div class="upcoming-title-box">
@@ -1150,7 +1156,7 @@
 <div class="modal-overlay" id="review-modal">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-title" data-i18n="reviews_modal_title">💬 Recenzie / Hodnotenie</div>
+            <div class="modal-title" data-i18n="reviews_modal_title">⭐ Recenzie / Hodnotenie</div>
             <button class="close-btn" onclick="closeModal('review-modal')">&times;</button>
         </div>
         
@@ -1331,7 +1337,7 @@
             promo_punkto_desc: "Pohodlné vyhľadávanie miest na mape: jedlo, obchody, služby, voľný čas a veľa ďalšieho.",
             youtube_creator: "YouTube tvorcu",
             promo_yt_desc: "YouTube kanál tvorcu, podporte odberom!",
-            reviews_modal_title: "💬 Recenzie / Hodnotenie",
+            reviews_modal_title: "⭐ Recenzie / Hodnotenie",
             review_input_placeholder: "Napíšte vašu recenziu...",
             send_review: "Odoslať",
             note_modal_new: "Nová poznámka",
@@ -1341,7 +1347,7 @@
             note_text_label: "Text poznámky",
             note_text_placeholder: "Napíšte svoju poznámku...",
             save_note: "Uložiť poznámku",
-            delete_note: "Odstrániť poznámku",
+            delete_note: "Odstránić poznámku",
             modal_lesson_title: "Pridať hodinu",
             form_day: "Deň v týždni",
             form_subject: "Názov predmetu",
@@ -1411,7 +1417,7 @@
             promo_punkto_desc: "Convenient place search on map: food, shops, services, leisure and more.",
             youtube_creator: "Creator's YouTube",
             promo_yt_desc: "Creator's YouTube channel, support with a subscription!",
-            reviews_modal_title: "💬 Reviews / Rating",
+            reviews_modal_title: "⭐ Reviews / Rating",
             review_input_placeholder: "Write your review...",
             send_review: "Send",
             note_modal_new: "New Note",
@@ -1491,7 +1497,7 @@
             promo_punkto_desc: "Удобный поиск мест на карте: еда, магазины, услуги, досуг и многое другое.",
             youtube_creator: "YouTube создателя",
             promo_yt_desc: "Ютуб создателя, поддержите подпиской!",
-            reviews_modal_title: "💬 Отзывы / Оценка",
+            reviews_modal_title: "⭐ Отзывы / Оценка",
             review_input_placeholder: "Напишите ваш отзыв...",
             send_review: "Отправить",
             note_modal_new: "Новая заметка",
@@ -1571,7 +1577,7 @@
             promo_punkto_desc: "Зручний пошук місць на карті: їжа, магазини, послуги, дозвілля та багато іншого.",
             youtube_creator: "YouTube творця",
             promo_yt_desc: "Ютуб творця, підтримайте підпискою!",
-            reviews_modal_title: "💬 Відгуки / Оцінка",
+            reviews_modal_title: "⭐ Відгуки / Оцінка",
             review_input_placeholder: "Напишіть ваш відгук...",
             send_review: "Надіслати",
             note_modal_new: "Нова нотатка",
@@ -1664,6 +1670,51 @@
             if (menu) menu.classList.remove('active');
         }
     });
+
+    // ФУНКЦИЯ БРАУЗЕРНЫХ УВЕДОМЛЕНИЙ ЗА 10 МИНУТ
+    function requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            alert("Ваш браузер не поддерживает уведомления.");
+            return;
+        }
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                alert("Успешно! Уведомления включены. Вы получите оповещение за 10 минут до пары.");
+            } else {
+                alert("Разрешение на уведомления отклонено.");
+            }
+        });
+    }
+
+    function checkLessonReminders() {
+        if (Notification.permission !== "granted") return;
+
+        const now = new Date();
+        const currentDay = now.getDay();
+        const currentHours = now.getHours();
+        const currentMinutes = now.getMinutes();
+        const currentTotalMins = currentHours * 60 + currentMinutes;
+
+        const todayLessons = schedule.filter(l => l.day === currentDay);
+
+        todayLessons.forEach(lesson => {
+            const [startH, startM] = lesson.start.split(':').map(Number);
+            const lessonTotalMins = startH * 60 + startM;
+            const diffMins = lessonTotalMins - currentTotalMins;
+
+            if (diffMins === 10) {
+                const title = `⏰ Напоминание о паре`;
+                const body = `Через 10 минут пара по ${lesson.title} (${lesson.type})\nАудитория: ${lesson.room || 'Не указана'}`;
+                
+                new Notification(title, {
+                    body: body,
+                    icon: 'https://img.magnific.com/free-vector/calendar-red-glyph-style_78370-7233.jpg?semt=ais_hybrid&w=740&q=80'
+                });
+            }
+        });
+    }
+
+    setInterval(checkLessonReminders, 60000);
 
     // FIREBASE CONFIGURATION
     const firebaseConfig = {
