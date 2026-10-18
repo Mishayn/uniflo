@@ -89,6 +89,7 @@
         .header-right {
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         .lang-dropdown-container { position: relative; }
@@ -106,6 +107,7 @@
             transition: all 0.2s;
             color: var(--text-primary);
             font-size: 1rem;
+            flex-shrink: 0;
         }
         .btn-header-square:hover {
             border-color: var(--accent-orange);
@@ -235,14 +237,12 @@
             }
             .bottom-nav { display: none !important; }
             .screen { display: block !important; }
-            .desktop-review-btn { display: flex !important; }
             .mobile-header-group { display: flex !important; }
         }
 
         @media (max-width: 1199px) {
             body { padding-bottom: 70px; }
             .dashboard-grid { display: block; padding: 12px; }
-            .desktop-review-btn { display: none !important; }
             .mobile-header-group { display: none !important; }
             
             .top-header {
@@ -330,53 +330,61 @@
         .teacher-name { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
         .room-code { font-size: 0.92rem; font-weight: 700; }
 
-        /* ВОССТАНОВЛЕННАЯ СЕТКА РАСПИСАНИЯ ДЛЯ ПК */
-        .week-container {
-            overflow-x: auto;
-            overflow-y: auto;
-            border-radius: 8px;
+        /* ИСПРАВЛЕННАЯ СЕТКА РАСПИСАНИЯ */
+        .week-wrapper {
             border: 1px solid var(--border-color);
+            border-radius: 8px;
             background: var(--bg-main);
-            max-height: 535px;
+            overflow: hidden;
         }
 
-        .week-grid {
+        .week-headers-row {
             display: grid;
-            grid-template-columns: 45px repeat(5, minmax(95px, 1fr));
-            position: relative;
+            grid-template-columns: 45px repeat(5, 1fr);
+            background: rgba(0, 0, 0, 0.25);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .week-header-cell {
             padding: 8px 4px;
             text-align: center;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
             font-size: 0.78rem;
             font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        }
+        .week-header-cell:last-child { border-right: none; }
+
+        .week-body-grid {
+            display: grid;
+            grid-template-columns: 45px repeat(5, 1fr);
+            position: relative;
+            height: 494px; /* Ровно 13 слотов по 38px, без лишнего пространства */
+            overflow: hidden;
         }
 
+        /* ВРЕМЯ ПОДТЯНУТО К ВЕРХНЕЙ ЛИНИИ ЧАСА */
         .week-time-cell {
             height: 38px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             font-size: 0.68rem;
             color: var(--text-muted);
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             border-right: 1px solid var(--border-color);
+            box-sizing: border-box;
+            padding-top: 2px;
+            transform: translateY(-50%);
         }
 
         .week-day-column {
             border-right: 1px solid var(--border-color);
             position: relative;
-            height: 533px;
+            height: 494px;
             background-size: 100% 38px;
             background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
+        .week-day-column:last-child { border-right: none; }
 
         .week-card {
             border-radius: 5px;
@@ -385,6 +393,7 @@
             overflow: hidden;
             cursor: pointer;
             box-sizing: border-box;
+            z-index: 2;
         }
 
         .week-card.prednáška { background: var(--color-prednaska-bg); border: 1px solid var(--color-prednaska); color: #86efac; }
@@ -405,6 +414,7 @@
             color: var(--text-muted);
             pointer-events: none;
             box-sizing: border-box;
+            z-index: 1;
         }
 
         #map-container {
@@ -488,7 +498,6 @@
         .clock-time { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 0.78rem; color: var(--text-secondary); }
 
-        /* ВОССТАНОВЛЕННЫЕ ИСХОДНЫЕ РАЗМЕРЫ ЗАМЕТОК И ЧАТА */
         .notes-container {
             display: flex;
             flex-direction: column;
@@ -604,6 +613,7 @@
         .review-stars { color: #facc15; font-size: 0.8rem; }
         .review-text { color: var(--text-secondary); line-height: 1.35; }
 
+        /* ИСПРАВЛЕННЫЙ ВЫБОР ЗВЕЗД (СЛЕВА НАПРАВО) */
         .star-rating-input {
             display: flex;
             gap: 6px;
@@ -612,6 +622,9 @@
             cursor: pointer;
             margin-bottom: 8px;
             justify-content: center;
+        }
+        .star-rating-input span {
+            transition: color 0.15s ease;
         }
         .star-rating-input span.active { color: #facc15; }
 
@@ -716,23 +729,6 @@
             z-index: 1000;
         }
 
-        .mobile-review-card-btn {
-            width: 100%;
-            background: rgba(249, 115, 22, 0.12);
-            color: var(--accent-orange);
-            border: 1px solid rgba(249, 115, 22, 0.3);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
         .modal-overlay {
             display: none;
             position: fixed;
@@ -819,8 +815,8 @@
                 </div>
             </div>
 
-            <!-- Кнопка Отзывы 💬 только для ПК -->
-            <button class="btn-header-square desktop-review-btn" onclick="openReviewModal()" title="Recenzie / Отзывы">
+            <!-- Кнопка Отзывы 💬 (квадратная, теперь работает и на ПК, и на телефонах) -->
+            <button class="btn-header-square" onclick="openReviewModal()" title="Recenzie / Отзывы">
                 💬
             </button>
         </div>
@@ -863,22 +859,24 @@
                     <div class="card-list" id="upcoming-list"></div>
                 </div>
 
-                <!-- ИСХОДНОЕ РАСПИСАНИЕ НА НЕДЕЛЮ -->
+                <!-- РASPISANIE NA NEDELU -->
                 <div class="dash-card">
                     <div class="section-header">
                         <div class="section-title" data-i18n="weekly_schedule">Týždenný rozvrh</div>
                         <div class="section-meta">19. 10. – 25. 10. 2026 (07:00 – 20:00)</div>
                     </div>
                     
-                    <div class="week-container">
-                        <div class="week-grid">
+                    <div class="week-wrapper">
+                        <div class="week-headers-row">
                             <div class="week-header-cell"></div>
-                            <div class="week-header-cell" data-i18n="day_mon">Pondelok<br><span style="color:var(--text-muted);font-weight:400;">19. 10.</span></div>
-                            <div class="week-header-cell" data-i18n="day_tue">Utorok<br><span style="color:var(--text-muted);font-weight:400;">20. 10.</span></div>
-                            <div class="week-header-cell" data-i18n="day_wed">Streda<br><span style="color:var(--text-muted);font-weight:400;">21. 10.</span></div>
-                            <div class="week-header-cell" data-i18n="day_thu">Štvrtok<br><span style="color:var(--text-muted);font-weight:400;">22. 10.</span></div>
-                            <div class="week-header-cell" data-i18n="day_fri">Piatok<br><span style="color:var(--text-muted);font-weight:400;">23. 10.</span></div>
+                            <div class="week-header-cell" data-i18n="day_mon">Pondelok</div>
+                            <div class="week-header-cell" data-i18n="day_tue">Utorok</div>
+                            <div class="week-header-cell" data-i18n="day_wed">Streda</div>
+                            <div class="week-header-cell" data-i18n="day_thu">Štvrtok</div>
+                            <div class="week-header-cell" data-i18n="day_fri">Piatok</div>
+                        </div>
 
+                        <div class="week-body-grid">
                             <div style="display:flex; flex-direction:column;">
                                 <div class="week-time-cell">7:00</div>
                                 <div class="week-time-cell">8:00</div>
@@ -938,7 +936,7 @@
             </div>
         </div>
 
-        <!-- COLUMN 3: Notes, Chat, Promo & Reviews (Не закрепленная кнопка снизу на телефоне) -->
+        <!-- COLUMN 3: Notes, Chat & Promo -->
         <div class="dash-column">
             <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
@@ -1015,11 +1013,6 @@
                             </div>
                         </a>
                     </div>
-
-                    <!-- Кнопка отзывов внизу страницы (под ютубом) -->
-                    <button class="mobile-review-card-btn" onclick="openReviewModal()">
-                        💬 Recenzie a hodnotenie <span id="mobile-rating-badge" style="font-size:0.75rem; opacity:0.8;">★ 5.0</span>
-                    </button>
 
                 </div>
             </div>
@@ -1557,12 +1550,16 @@
         document.getElementById('review-modal').classList.add('active');
     }
 
+    // ИСПРАВЛЕННЫЙ РАСЧЕТ ЗВЕЗД СЛЕВА НАПРАВО
     function setReviewRating(rating) {
         selectedRating = rating;
         const stars = document.querySelectorAll('#star-rating-selector span');
         stars.forEach((s, idx) => {
-            if (idx < rating) s.classList.add('active');
-            else s.classList.remove('active');
+            if (idx < rating) {
+                s.classList.add('active');
+            } else {
+                s.classList.remove('active');
+            }
         });
     }
 
@@ -1612,10 +1609,6 @@
             `;
             list.appendChild(item);
         });
-
-        const avg = (totalStars / reviewsArr.length).toFixed(1);
-        const mobileBadge = document.getElementById('mobile-rating-badge');
-        if (mobileBadge) mobileBadge.innerText = `★ ${avg}`;
     });
 
     function escapeHtml(text) {
@@ -1705,7 +1698,7 @@
         renderNotes();
     }
 
-    // SCHEDULE LOGIC & SYNC BETWEEN DESKTOP AND MOBILE INPUTS
+    // SCHEDULE LOGIC
     let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR11';
     
     function syncGroupInputs(val) {
