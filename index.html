@@ -58,7 +58,7 @@
             flex-direction: column;
         }
 
-        /* Top Header */
+        /* Top Header - Точно по центру UniFlo */
         .top-header {
             display: flex;
             justify-content: space-between;
@@ -75,21 +75,28 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            z-index: 2;
         }
 
+        /* Абсолютное центрирование заголовка */
         .header-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 1.15rem;
             font-weight: 700;
             color: var(--accent-orange);
             display: flex;
             align-items: center;
             gap: 8px;
+            pointer-events: none;
         }
 
         .header-right {
             display: flex;
             align-items: center;
             gap: 8px;
+            z-index: 2;
         }
 
         .lang-dropdown-container { position: relative; }
@@ -105,7 +112,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
-            color: var(--text-primary);
+            color: #ffffff;
             font-size: 1rem;
             flex-shrink: 0;
         }
@@ -246,11 +253,8 @@
             .mobile-header-group { display: none !important; }
             
             .top-header {
-                display: grid;
-                grid-template-columns: auto 1fr auto;
-            }
-            .header-title {
-                justify-content: center;
+                display: flex;
+                justify-content: space-between;
             }
         }
 
@@ -267,12 +271,6 @@
             padding: 14px;
         }
 
-        /* Выделенная карточка для Ближайшего дня */
-        .dash-card.upcoming-highlight {
-            border-color: rgba(249, 115, 22, 0.4);
-            background: linear-gradient(180deg, rgba(249, 115, 22, 0.08) 0%, var(--bg-card) 100%);
-        }
-
         .upcoming-title-box {
             display: flex;
             align-items: center;
@@ -282,6 +280,7 @@
             color: var(--text-primary);
         }
 
+        /* Оранжевый акцент только на плашке с датой */
         .upcoming-date-badge {
             background: rgba(249, 115, 22, 0.2);
             color: var(--accent-orange);
@@ -355,7 +354,7 @@
         .teacher-name { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
         .room-code { font-size: 0.92rem; font-weight: 700; }
 
-        /* ИСПРАВЛЕННАЯ СЕТКА РАСПИСАНИЯ И ВЫРАВНИВАНИЕ ВРЕМЕНИ */
+        /* СЕТКА РАСПИСАНИЯ: ВЫСОТА ЯЧЕЙКИ 40px */
         .week-wrapper {
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -383,13 +382,13 @@
             display: grid;
             grid-template-columns: 45px repeat(5, 1fr);
             position: relative;
-            height: 494px; /* Ровно 13 слотов по 38px */
+            height: 520px; /* 13 слотов по 40px = 520px */
             overflow: hidden;
         }
 
-        /* ТОЧНОЕ ВЫРАВНИВАНИЕ ВРЕМЕНИ ПО ВЕРХНЕЙ ЛИНИИ СЛОТА */
+        /* Выравнивание времени строго по верхнему краю */
         .week-time-cell {
-            height: 38px;
+            height: 40px;
             display: flex;
             align-items: flex-start;
             justify-content: center;
@@ -404,8 +403,8 @@
         .week-day-column {
             border-right: 1px solid var(--border-color);
             position: relative;
-            height: 494px;
-            background-size: 100% 38px;
+            height: 520px;
+            background-size: 100% 40px;
             background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
         .week-day-column:last-child { border-right: none; }
@@ -825,10 +824,14 @@
     <!-- Header Bar -->
     <div class="top-header">
         <div class="header-left">
-            <!-- Выбор языка -->
+            <!-- Выбор языка: белая планета -->
             <div class="lang-dropdown-container">
                 <button class="btn-header-square" onclick="toggleLangMenu()" title="Zvoliť jazyk / Language">
-                    🌐
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
                 </button>
                 <div class="lang-menu" id="lang-menu">
                     <div class="lang-item" onclick="setLanguage('sk')">🇸🇰 Slovenčina</div>
@@ -838,13 +841,13 @@
                 </div>
             </div>
 
-            <!-- Кнопка Отзывы 💬 (квадратная, для ПК и мобилок) -->
+            <!-- Кнопка Отзывы 💬 (квадратная, белая) -->
             <button class="btn-header-square" onclick="openReviewModal()" title="Recenzie / Отзывы">
                 💬
             </button>
         </div>
 
-        <!-- Название UniFlo по центру -->
+        <!-- Название UniFlo строго по центру страницы -->
         <div class="header-title">
             <span>📅 UniFlo</span>
         </div>
@@ -871,8 +874,8 @@
                     <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
                 </div>
 
-                <!-- Najbližší deň (ВЫДЕЛЕННЫЙ БЛОК) -->
-                <div class="dash-card upcoming-highlight">
+                <!-- Najbližší deň (Без оранжевой подсветки карточки) -->
+                <div class="dash-card">
                     <div class="section-header" style="cursor: pointer;" onclick="toggleUpcomingExpand()">
                         <div class="upcoming-title-box" id="upcoming-day-title">
                             <span>📌 Najbližší deň –</span>
@@ -885,10 +888,10 @@
                     <div class="card-list" id="upcoming-list"></div>
                 </div>
 
-                <!-- RASPRISANIE NA NEDELU -->
+                <!-- RASPRISANIE NA NEDELU (Со эмодзи календаря) -->
                 <div class="dash-card">
                     <div class="section-header">
-                        <div class="section-title" data-i18n="weekly_schedule">Týždenný rozvrh</div>
+                        <div class="section-title" data-i18n="weekly_schedule">📅 Týždenný rozvrh</div>
                         <div class="section-meta">19. 10. – 25. 10. 2026 (07:00 – 20:00)</div>
                     </div>
                     
@@ -1213,7 +1216,7 @@
             group_label: "Skupina:",
             add_lesson: "+ Pridať hodinu",
             reset_title: "Reset rozvrhu",
-            weekly_schedule: "Týždenný rozvrh",
+            weekly_schedule: "📅 Týždenný rozvrh",
             day_mon: "Pondelok",
             day_tue: "Utorok",
             day_wed: "Streda",
@@ -1263,7 +1266,7 @@
             group_label: "Group:",
             add_lesson: "+ Add Lesson",
             reset_title: "Reset schedule",
-            weekly_schedule: "Weekly Schedule",
+            weekly_schedule: "📅 Weekly Schedule",
             day_mon: "Monday",
             day_tue: "Tuesday",
             day_wed: "Wednesday",
@@ -1313,7 +1316,7 @@
             group_label: "Группа:",
             add_lesson: "+ Добавить пару",
             reset_title: "Сбросить расписание",
-            weekly_schedule: "Расписание на неделю",
+            weekly_schedule: "📅 Расписание на неделю",
             day_mon: "Понедельник",
             day_tue: "Вторник",
             day_wed: "Среда",
@@ -1363,7 +1366,7 @@
             group_label: "Група:",
             add_lesson: "+ Додати пару",
             reset_title: "Скинути розклад",
-            weekly_schedule: "Тижневий розклад",
+            weekly_schedule: "📅 Тижневий розклад",
             day_mon: "Понеділок",
             day_tue: "Вівторок",
             day_wed: "Середа",
@@ -1875,9 +1878,10 @@
                 const [sh, sm] = l.start.split(':').map(Number);
                 const [eh, em] = l.end.split(':').map(Number);
 
-                const topPx = (sh - 7) * 38 + (sm / 60) * 38;
+                /* Расчет карточек под высоту 40px */
+                const topPx = (sh - 7) * 40 + (sm / 60) * 40;
                 const durationHrs = (eh * 60 + em - (sh * 60 + sm)) / 60;
-                const heightPx = durationHrs * 38;
+                const heightPx = durationHrs * 40;
 
                 const card = document.createElement('div');
                 card.className = `week-card ${l.type}`;
@@ -1900,7 +1904,7 @@
                     if (gapText) {
                         const gapTopPx = topPx + heightPx;
                         const [nextSh, nextSm] = nextL.start.split(':').map(Number);
-                        const nextTopPx = (nextSh - 7) * 38 + (nextSm / 60) * 38;
+                        const nextTopPx = (nextSh - 7) * 40 + (nextSm / 60) * 40;
                         const gapHeightPx = nextTopPx - gapTopPx;
 
                         const gapBox = document.createElement('div');
