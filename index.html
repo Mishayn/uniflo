@@ -1369,7 +1369,10 @@
             back_btn: "← Späť",
             no_places: "Žiadne miesta v tejto kategórii.",
             edit_btn: "✏️ Upraviť",
-            delete_btn: "🗑 Odstrániť"
+            delete_btn: "🗑 Odstrániť",
+            months: ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"],
+            weekdays_clock: ["Nedeľa", "Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota"],
+            weekdays_cal: ["Po", "Ut", "St", "Št", "Pi", "So", "Ne"]
         },
         en: {
             group_label: "Group:",
@@ -1446,7 +1449,10 @@
             back_btn: "← Back",
             no_places: "No places in this category.",
             edit_btn: "✏️ Edit",
-            delete_btn: "🗑 Delete"
+            delete_btn: "🗑 Delete",
+            months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            weekdays_clock: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            weekdays_cal: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
         },
         ru: {
             group_label: "Группа:",
@@ -1523,7 +1529,10 @@
             back_btn: "← Назад",
             no_places: "В этой категории нет мест.",
             edit_btn: "✏️ Изменить",
-            delete_btn: "🗑 Удалить"
+            delete_btn: "🗑 Удалить",
+            months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+            weekdays_clock: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+            weekdays_cal: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         },
         uk: {
             group_label: "Група:",
@@ -1600,7 +1609,10 @@
             back_btn: "← Назад",
             no_places: "У цій категорії немає місць.",
             edit_btn: "✏️ Редагувати",
-            delete_btn: "🗑 Видалити"
+            delete_btn: "🗑 Видалити",
+            months: ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"],
+            weekdays_clock: ["Неділя", "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота"],
+            weekdays_cal: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"]
         }
     };
 
@@ -1618,7 +1630,8 @@
         document.getElementById('lang-menu').classList.remove('active');
         applyTranslations();
         renderCategoriesView();
-        renderUpcomingDay(); // Обновляем названия дней недели на бэйдже
+        renderUpcomingDay();
+        renderCompactCalendar();
     }
 
     function applyTranslations() {
@@ -1705,7 +1718,7 @@
             authContainer.innerHTML = `
                 <div class="chat-user-profile">
                     <img src="${photoURL}" class="chat-avatar" alt="Avatar">
-                    <span style="font-weight:600; color:var(--text-primary);">${escapeHtml(displayName)}</span>
+                    <span style="font-weight:600; color:var::text-primary);">${escapeHtml(displayName)}</span>
                     <button onclick="changeCustomNickname()" title="Zmeniť nick" style="background:none; border:none; cursor:pointer; font-size:0.75rem;">✏️</button>
                     <button onclick="logoutUser()" title="Odhlásiť sa" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; margin-left:2px;">✕</button>
                 </div>
@@ -2024,13 +2037,11 @@
         if (!upcomingList || !badgeTextEl) return;
         upcomingList.innerHTML = '';
 
-        // Определяем ближайший день с парами (от текущего дня недели или с понедельника, если сегодня выходной)
         const now = new Date();
-        let jsDay = now.getDay(); // 0 - ВС, 1 - ПН, ..., 6 - СБ
-        let targetDay = 1; // по умолчанию ПН (1)
+        let jsDay = now.getDay();
+        let targetDay = 1;
 
         if (jsDay >= 1 && jsDay <= 5) {
-            // Проверяем, есть ли пары сегодня или в последующие дни этой недели
             let found = false;
             for (let d = jsDay; d <= 5; d++) {
                 if (schedule.some(l => l.day === d)) {
@@ -2039,7 +2050,6 @@
                     break;
                 }
             }
-            // Если на оставшиеся дни недели пар нет, берем первый день недели, где они есть
             if (!found) {
                 for (let d = 1; d <= 5; d++) {
                     if (schedule.some(l => l.day === d)) {
@@ -2050,7 +2060,6 @@
                 }
             }
         } else {
-            // Выходные — ищем первый день с парами на неделе
             for (let d = 1; d <= 5; d++) {
                 if (schedule.some(l => l.day === d)) {
                     targetDay = d;
@@ -2059,8 +2068,7 @@
             }
         }
 
-        // Вычисляем конкретную дату для targetDay (исходя из текущей недели 19.10.2026 - 25.10.2026)
-        const baseMonday = new Date(2026, 9, 19); // 19 октября 2026
+        const baseMonday = new Date(2026, 9, 19);
         const targetDate = new Date(baseMonday);
         targetDate.setDate(baseMonday.getDate() + (targetDay - 1));
 
@@ -2167,7 +2175,9 @@
         const calGrid = document.getElementById('compact-calendar-grid');
         calGrid.innerHTML = '';
 
-        const daysHeader = ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
+        const t = translations[currentLang];
+        const daysHeader = t.weekdays_cal || ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
+        
         daysHeader.forEach(d => {
             const h = document.createElement('div');
             h.className = 'cal-day-label';
@@ -2180,7 +2190,7 @@
         const currentMonth = now.getMonth();
         const currentDayNum = now.getDate();
 
-        const monthNames = ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"];
+        const monthNames = t.months;
         document.getElementById('cal-month-title').innerText = `${monthNames[currentMonth]} ${currentYear}`;
 
         const firstDayIndex = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
@@ -2594,9 +2604,10 @@
         }
         
         if (dateEl) {
-            const daysSk = ["Nedeľa", "Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota"];
-            const monthsSk = ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"];
-            dateEl.innerText = `${daysSk[now.getDay()]}, ${now.getDate()}. ${monthsSk[now.getMonth()]} ${now.getFullYear()}`;
+            const t = translations[currentLang];
+            const daysArr = t.weekdays_clock;
+            const monthsArr = t.months;
+            dateEl.innerText = `${daysArr[now.getDay()]}, ${now.getDate()}. ${monthsArr[now.getMonth()]} ${now.getFullYear()}`;
         }
     }, 1000);
 
