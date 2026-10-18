@@ -323,13 +323,14 @@
         .teacher-name { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
         .room-code { font-size: 0.92rem; font-weight: 700; }
 
+        /* Увеличенная высота сетки расписания для предотвращения скролла */
         .week-container {
             overflow-x: auto;
             overflow-y: auto;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--bg-main);
-            max-height: 505px;
+            max-height: 535px;
         }
 
         .week-grid {
@@ -365,7 +366,7 @@
         .week-day-column {
             border-right: 1px solid var(--border-color);
             position: relative;
-            height: 494px;
+            height: 533px;
             background-size: 100% 38px;
             background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
@@ -755,12 +756,13 @@
             margin-top: 6px;
         }
 
-        /* Анимация стрелочки разворачивания */
+        /* Анимация стрелочки разворачивания справа */
         #upcoming-arrow {
             display: inline-block;
             transition: transform 0.2s ease;
             font-size: 0.75rem;
             color: var(--accent-orange);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -807,12 +809,13 @@
                     <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
                 </div>
 
+                <!-- Карточка Najbližší deň с правой стрелочкой -->
                 <div class="dash-card">
-                    <div class="section-header">
-                        <div class="section-title" style="cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="toggleUpcomingExpand()">
-                            <span id="upcoming-arrow">▼</span> <span data-i18n="upcoming_day">Najbližší deň</span>
+                    <div class="section-header" style="cursor: pointer;" onclick="toggleUpcomingExpand()">
+                        <div class="section-title" id="upcoming-day-title">Pondelok 19. 10. 2026</div>
+                        <div class="section-meta" style="display:flex; align-items:center; gap:8px;">
+                            <span id="upcoming-arrow">▼</span>
                         </div>
-                        <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026</div>
                     </div>
                     <div class="card-list" id="upcoming-list"></div>
                 </div>
@@ -1131,7 +1134,6 @@
             group_label: "Skupina:",
             add_lesson: "+ Pridať hodinu",
             reset_title: "Reset rozvrhu",
-            upcoming_day: "Najbližší deň",
             weekly_schedule: "Týždenný rozvrh",
             day_mon: "Pondelok",
             day_tue: "Utorok",
@@ -1188,7 +1190,6 @@
             group_label: "Group:",
             add_lesson: "+ Add Lesson",
             reset_title: "Reset schedule",
-            upcoming_day: "Upcoming Day",
             weekly_schedule: "Weekly Schedule",
             day_mon: "Monday",
             day_tue: "Tuesday",
@@ -1245,7 +1246,6 @@
             group_label: "Группа:",
             add_lesson: "+ Добавить пару",
             reset_title: "Сбросить расписание",
-            upcoming_day: "Ближайший день",
             weekly_schedule: "Расписание на неделю",
             day_mon: "Понедельник",
             day_tue: "Вторник",
@@ -1302,7 +1302,6 @@
             group_label: "Група:",
             add_lesson: "+ Додати пару",
             reset_title: "Скинути розклад",
-            upcoming_day: "Найближчий день",
             weekly_schedule: "Тижневий розклад",
             day_mon: "Понеділок",
             day_tue: "Вівторок",
@@ -1323,7 +1322,7 @@
             chat_placeholder_active: "Введіть повідомлення...",
             chat_send: "Надіслати",
             btn_open: "Відкрити ↗",
-            btn_subscribe: "Підписатись ↗",
+            btn_subscribe: "Підтримайте ↗",
             promo_punkto_desc: "Зручний пошук місць на карті: їжа, магазини, послуги, дозвілля та багато іншого.",
             youtube_creator: "YouTube творця",
             promo_yt_desc: "Ютуб творця, підтримайте підпискою!",
@@ -1358,7 +1357,7 @@
     };
 
     let currentLang = localStorage.getItem('uniza_lang') || 'sk';
-    let upcomingExpanded = false; // Состояние развернутости ближайшего дня
+    let upcomingExpanded = false;
 
     function toggleLangMenu() {
         document.getElementById('lang-menu').classList.toggle('active');
@@ -1721,12 +1720,18 @@
         upcomingList.innerHTML = '';
         const dayLessons = schedule.filter(l => l.day === 1).sort((a,b) => a.start.localeCompare(b.start));
 
+        // Обновляем динамический заголовок слева (с датой/днем)
+        const dayTitleEl = document.getElementById('upcoming-day-title');
+        if (dayTitleEl) {
+            dayTitleEl.innerText = "Pondelok (19. 10. 2026)";
+        }
+
         if (dayLessons.length === 0) {
             upcomingList.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem;">${currentLang==='sk'?'Žiadne hodiny.':(currentLang==='en'?'No lessons.':'Нет пар.')}</div>`;
             return;
         }
 
-        // Если не развернуто, показываем только самую первую пару
+        // Если не развернуто, показываем только 1 самую ближайшую пару
         const lessonsToRender = upcomingExpanded ? dayLessons : [dayLessons[0]];
 
         lessonsToRender.forEach((lesson) => {
@@ -2059,20 +2064,36 @@
         document.getElementById(id).classList.remove('active');
     }
 
+    // Сохранение занятия с ПРОВЕРКОЙ НА НАЛОЖЕНИЕ ВРЕМЕНИ
     function saveLesson(e) {
         e.preventDefault();
         const startVal = document.getElementById('form-start').value;
         const endVal = document.getElementById('form-end').value;
+        const dayVal = parseInt(document.getElementById('form-day').value);
+        const id = document.getElementById('edit-id').value;
 
         if (startVal < "07:00" || endVal > "20:00" || startVal >= endVal) {
-            alert("Error time range 07:00 - 20:00");
+            alert("Čas musí byť v rozmedzí 07:00 - 20:00 a začiatok musí byť skôr ako koniec!");
             return;
         }
 
-        const id = document.getElementById('edit-id').value;
+        // Проверка пересечения по времени с существующими парами в этот день
+        const hasOverlap = schedule.some(l => {
+            if (id && l.id === id) return false; // Игнорируем редактируемую пару
+            if (l.day !== dayVal) return false;  // Разные дни
+            
+            // Наложение времени (start1 < end2 && start2 < end1)
+            return (startVal < l.end && l.start < endVal);
+        });
+
+        if (hasOverlap) {
+            alert("V tomto čase už máte inú hodinu! Vyberte iný čas.");
+            return;
+        }
+
         const newLesson = {
             id: id || Date.now().toString(),
-            day: parseInt(document.getElementById('form-day').value),
+            day: dayVal,
             title: document.getElementById('form-title').value,
             type: document.getElementById('form-type').value,
             start: startVal,
