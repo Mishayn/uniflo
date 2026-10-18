@@ -532,7 +532,6 @@
             color: var(--accent-orange);
         }
 
-        /* Стиль для категорий, в которых есть элементы */
         .chip-modal-btn.has-items {
             border-color: rgba(249, 115, 22, 0.5);
             background: rgba(249, 115, 22, 0.1);
@@ -1266,7 +1265,6 @@
                     <option value="☕ Kaviareň / Jedlo">☕ Kaviareň / Jedlo</option>
                     <option value="🍽️ Menza / Jedáleň">🍽️ Menza / Jedáleň</option>
                     <option value="📚 Štúdium / Ticho">📚 Štúdium / Ticho</option>
-                    <option value="💻 PC / Knižnica">💻 PC / Knižnica</option>
                     <option value="🖨️ Tlač / Služby">🖨️ Tlač / Služby</option>
                     <option value="🎉 Zábava / Oddych">🎉 Zábava / Oddych</option>
                     <option value="🍻 Bar / Pub / Party">🍻 Bar / Pub / Party</option>
@@ -2045,7 +2043,8 @@
     function initMap() {
         if (leafletMap) return;
 
-        leafletMap = L.map('map-container').setView([49.2025, 18.7595], 16);
+        // Обновленные координаты и зум для отображения всего кампуса целиком (как на второй картинке)
+        leafletMap = L.map('map-container').setView([49.2065, 18.7555], 15);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -2125,7 +2124,6 @@
         "☕ Kaviareň / Jedlo",
         "🍽️ Menza / Jedáleň",
         "📚 Štúdium / Ticho",
-        "💻 PC / Knižnica",
         "🖨️ Tlač / Služby",
         "🎉 Zábava / Oddych",
         "🍻 Bar / Pub / Party",
@@ -2153,8 +2151,6 @@
 
         allowedCategories.forEach(catName => {
             const btn = document.createElement('button');
-            
-            // Проверяем, есть ли хотя бы одна точка в этой категории
             const hasItems = customMapPoints.some(p => !!p.isAdmin === isAdminMode && p.cat === catName);
             
             btn.className = 'chip-modal-btn' + (hasItems ? ' has-items' : '');
@@ -2188,7 +2184,6 @@
                 else if (p.cat && p.cat.includes('Zábava')) icon = '🎉';
                 else if (p.cat && p.cat.includes('Fakulty')) icon = '🏛️';
                 else if (p.cat && p.cat.includes('Menza')) icon = '🍽️';
-                else if (p.cat && p.cat.includes('PC')) icon = '💻';
                 else if (p.cat && p.cat.includes('Tlač')) icon = '🖨️';
                 else if (p.cat && p.cat.includes('Bar')) icon = '🍻';
                 else if (p.cat && p.cat.includes('Šport')) icon = '🏋️‍♂️';
@@ -2232,7 +2227,6 @@
             </div>
         `;
 
-        // Исправлено: выводим категорию ровно один раз без дублирования эмодзи в строке
         marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br><span style="font-size:0.9rem; font-weight:700;">${escapeHtml(p.title)}</span> ${popupButtonsHtml}`);
         mapMarkers.push(marker);
     }
