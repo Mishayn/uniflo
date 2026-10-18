@@ -754,6 +754,14 @@
             border: 1px solid rgba(239, 68, 68, 0.4);
             margin-top: 6px;
         }
+
+        /* Анимация стрелочки разворачивания */
+        #upcoming-arrow {
+            display: inline-block;
+            transition: transform 0.2s ease;
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+        }
     </style>
 </head>
 <body>
@@ -762,7 +770,7 @@
     <!-- Header Bar -->
     <div class="top-header">
         <div class="header-left">
-            <!-- Кнопка выбора языка с планетой -->
+            <!-- Кнопка выбора языка с планеткой -->
             <div class="lang-dropdown-container">
                 <button class="btn-lang-toggle" onclick="toggleLangMenu()" title="Zvoliť jazyk / Language">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
@@ -801,7 +809,9 @@
 
                 <div class="dash-card">
                     <div class="section-header">
-                        <div class="section-title" data-i18n="upcoming_day">Najbližší deň</div>
+                        <div class="section-title" style="cursor: pointer; display: flex; align-items: center; gap: 6px;" onclick="toggleUpcomingExpand()">
+                            <span id="upcoming-arrow">▼</span> <span data-i18n="upcoming_day">Najbližší deň</span>
+                        </div>
                         <div class="section-meta" id="upcoming-meta">Pondelok 19. 10. 2026</div>
                     </div>
                     <div class="card-list" id="upcoming-list"></div>
@@ -1348,6 +1358,7 @@
     };
 
     let currentLang = localStorage.getItem('uniza_lang') || 'sk';
+    let upcomingExpanded = false; // Состояние развернутости ближайшего дня
 
     function toggleLangMenu() {
         document.getElementById('lang-menu').classList.toggle('active');
@@ -1637,12 +1648,32 @@
     }
 
     let schedule = loadInitialSchedule(currentGroup);
-    let customMapPoints = JSON.parse(localStorage.getItem('uniza_saved_map_points')) || [];
+    let customMapPoints = [];
     
     let leafletMap = null;
     let mapMarkers = [];
     let userLocationMarker = null;
     let userPulseMarker = null;
+
+    // Синхронизация меток через Firebase
+    db.ref('mapPoints').on('value', (snapshot) => {
+        customMapPoints = [];
+        const data = snapshot.val();
+        if (data) {
+            Object.keys(data).forEach(key => {
+                customMapPoints.push({ id: key, ...data[key] });
+            });
+        }
+        if (leafletMap) {
+            clearMapMarkers();
+            renderCustomMapPoints();
+        }
+    });
+
+    function clearMapMarkers() {
+        mapMarkers.forEach(m => leafletMap.removeLayer(m));
+        mapMarkers = [];
+    }
 
     function changeGroup(groupName) {
         if (!groupName.trim()) return;
@@ -1675,6 +1706,16 @@
         return str.trim();
     }
 
+    // Переключение развернутого вида ближайшего дня
+    function toggleUpcomingExpand() {
+        upcomingExpanded = !upcomingExpanded;
+        const arrow = document.getElementById('upcoming-arrow');
+        if (arrow) {
+            arrow.style.transform = upcomingExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+        renderUpcomingDay();
+    }
+
     function renderUpcomingDay() {
         const upcomingList = document.getElementById('upcoming-list');
         upcomingList.innerHTML = '';
@@ -1685,7 +1726,10 @@
             return;
         }
 
-        dayLessons.forEach((lesson) => {
+        // Если не развернуто, показываем только самую первую пару
+        const lessonsToRender = upcomingExpanded ? dayLessons : [dayLessons[0]];
+
+        lessonsToRender.forEach((lesson) => {
             const badgeClass = lesson.type === 'prednáška' ? 'badge-prednaska' : (lesson.type === 'cvičenie' ? 'badge-cvicenie' : 'badge-laboratorne');
             const typeClass = lesson.type === 'prednáška' ? 'type-prednaska' : (lesson.type === 'cvičenie' ? 'type-cvicenie' : 'type-laboratorne');
 
@@ -1855,25 +1899,24 @@
         }
 
         const newPoint = {
-            id: Date.now().toString(),
             title,
             cat,
             lat,
             lng,
-            isAdmin
+            isAdmin,
+            timestamp: Date.now()
         };
 
-        customMapPoints.push(newPoint);
-        localStorage.setItem('uniza_saved_map_points', JSON.stringify(customMapPoints));
-
-        renderSinglePointOnMap(newPoint);
-        updateAdminCategoryChips();
+        db.ref('mapPoints').push(newPoint).catch((error) => {
+            alert("Chyba pri ukladaní bodu: " + error.message);
+        });
 
         closeModal('map-point-modal');
         document.getElementById('map-point-form').reset();
     }
 
     function renderCustomMapPoints() {
+        if (!leafletMap) return;
         customMapPoints.forEach(p => renderSinglePointOnMap(p));
         updateAdminCategoryChips();
     }
@@ -1930,12 +1973,11 @@
             if (!confirm("Vymazať bod?")) return;
         }
 
-        customMapPoints = customMapPoints.filter(p => p.id !== id);
-        localStorage.setItem('uniza_saved_map_points', JSON.stringify(customMapPoints));
-        location.reload();
+        db.ref('mapPoints/' + id).remove().catch((error) => {
+            alert("Chyba pri mazaní: " + error.message);
+        });
     };
 
-    // Ускоренное определение геолокации без долгих зависаний
     function locateUser() {
         if (!leafletMap) initMap();
         
@@ -1975,9 +2017,9 @@
                 alert("GPS error / Nepodarilo sa zistiť polohu.");
             },
             { 
-                enableHighAccuracy: false, // Отключено для скорости (чтобы не ждать холодный GPS-модуль)
-                timeout: 7000,             // Максимум 7 секунд ожидания
-                maximumAge: 10000          // Использовать кэшированные данные до 10 секунд
+                enableHighAccuracy: false,
+                timeout: 7000,
+                maximumAge: 10000
             }
         );
     }
