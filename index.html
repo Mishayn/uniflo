@@ -7,7 +7,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="https://img.magnific.com/free-vector/calendar-red-glyph-style_78370-7233.jpg?semt=ais_hybrid&w=740&q=80">
     
-    <!-- Open Graph / Превью ссылки -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mishayn.github.io/uniflo/">
     <meta property="og:title" content="UniFlo – UNIZA Dashboard">
@@ -121,7 +121,7 @@
             cursor: pointer;
             transition: all 0.2s;
             color: #ffffff;
-            font-size: 1rem;
+            font-size: 1.1rem;
             flex-shrink: 0;
         }
         .btn-header-square:hover {
@@ -518,51 +518,136 @@
             color: #fca5a5;
         }
 
-        /* КНОПКИ РАСПИСАНИЯ РАБОТЫ ОБЪЕКТОВ ДЛЯ КАЛЕНДАРЯ */
-        .cal-schedule-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .btn-cal-sched {
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 6px 4px;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .btn-cal-sched:hover {
-            border-color: var(--accent-orange);
-            color: var(--accent-orange);
-            background: var(--bg-card-hover);
-        }
-
-        .opening-hours-card {
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px 12px;
+        /* ИНТЕРАКТИВНЫЙ КАЛЕНДАРЬ С СОБЫТИЯМИ GOOGLE STYLE */
+        .cal-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 8px;
         }
 
-        .opening-hours-title {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--accent-orange);
-            margin-bottom: 4px;
+        .cal-nav-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .cal-nav-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
         }
 
-        .opening-hours-detail {
-            font-size: 0.76rem;
+        .cal-day-label { font-size: 0.7rem; color: var(--text-muted); padding-bottom: 3px; font-weight: 600; }
+        
+        .cal-day {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-height: 52px;
+            padding: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            transition: all 0.15s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cal-day:hover {
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+        }
+
+        .cal-day-num {
+            font-weight: 600;
+            margin-bottom: 2px;
+            font-size: 0.72rem;
             color: var(--text-secondary);
-            line-height: 1.4;
+        }
+
+        .cal-day.active .cal-day-num {
+            background: var(--accent-orange);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cal-day.other-month { opacity: 0.25; }
+
+        .cal-events-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .cal-event-chip {
+            font-size: 0.6rem;
+            padding: 1px 3px;
+            border-radius: 3px;
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-align: left;
+        }
+
+        /* КАСТОМНЫЙ TABS В МОДАЛКЕ СОБЫТИЯ */
+        .type-tab-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .type-tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+        .type-tab-btn.active {
+            background: var(--accent-orange);
+            color: white;
+            border-color: var(--accent-orange);
+        }
+
+        .color-selector {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .color-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .color-dot.selected {
+            border-color: #ffffff;
+            transform: scale(1.1);
         }
 
         /* СЕТКА С КАТЕГОРИЯМИ И ТОЧКАМИ */
@@ -617,26 +702,6 @@
             border-radius: 50%;
             box-shadow: 0 0 6px rgba(0,0,0,0.5);
         }
-
-        .cal-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            text-align: center;
-        }
-
-        .cal-day-label { font-size: 0.7rem; color: var(--text-muted); padding-bottom: 3px; font-weight: 600; }
-        .cal-day {
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            padding: 6px 0;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-
-        .cal-day.active { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.15); font-weight: 700; color: var(--accent-orange); }
-        .cal-day.other-month { opacity: 0.25; }
 
         .clock-box {
             text-align: center;
@@ -947,12 +1012,9 @@
     <div class="top-header">
         <div class="header-left">
             <div class="lang-dropdown-container">
+                <!-- Исправленная понятная иконка переключения языков -->
                 <button class="btn-header-square" onclick="toggleLangMenu()" title="Zvoliť jazyk / Language">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
-                    </svg>
+                    🌐
                 </button>
                 <div class="lang-menu" id="lang-menu">
                     <div class="lang-item" onclick="setLanguage('sk')">🇸🇰 Slovenčina</div>
@@ -1067,7 +1129,7 @@
             </div>
         </div>
 
-        <!-- COLUMN 2: Map & Calendar -->
+        <!-- COLUMN 2: Map & Interactive Calendar -->
         <div class="dash-column">
             <div class="dash-column-2">
                 <div id="screen-mapa" class="screen active">
@@ -1093,7 +1155,7 @@
                     </div>
                 </div>
 
-                <!-- KALENDAR SA ZOBRAZENIM OTVARACICH HODIN -->
+                <!-- ГООГЛ-ПОДОБНЫЙ КАЛЕНДАРЬ -->
                 <div id="screen-kalendar" class="screen active" style="margin-top: 15px;">
                     <div class="dash-card">
                         <div class="clock-box">
@@ -1101,16 +1163,10 @@
                             <div class="clock-date" id="live-date">Piatok, 17. Október 2026</div>
                         </div>
 
-                        <!-- Новые кнопки графиков работы объектов -->
-                        <div class="cal-schedule-row">
-                            <button class="btn-cal-sched" onclick="openOpeningHoursModal('faculties')" data-i18n="btn_hours_faculties">🏛️ Budovy</button>
-                            <button class="btn-cal-sched" onclick="openOpeningHoursModal('canteen')" data-i18n="btn_hours_canteen">🍽️ Menzy</button>
-                            <button class="btn-cal-sched" onclick="openOpeningHoursModal('bars')" data-i18n="btn_hours_bars">🍻 Bary</button>
-                        </div>
-
-                        <div class="section-header" style="margin-bottom:6px;">
-                            <div class="section-title" data-i18n="calendar">Kalendár</div>
-                            <span class="section-meta" id="cal-month-title">Október 2026</span>
+                        <div class="cal-nav-bar">
+                            <button class="cal-nav-btn" onclick="prevCalMonth()">‹</button>
+                            <span class="section-title" id="cal-month-title">Október 2026</span>
+                            <button class="cal-nav-btn" onclick="nextCalMonth()">›</button>
                         </div>
                         <div class="cal-grid" id="compact-calendar-grid"></div>
                     </div>
@@ -1214,14 +1270,58 @@
     </nav>
 </div>
 
-<!-- Modal for Opening Hours (График работы объектов) -->
-<div class="modal-overlay" id="opening-hours-modal">
+<!-- Modal for GOOGLE CALENDAR EVENT (Создание/редактирование событий в стиле Google) -->
+<div class="modal-overlay" id="cal-event-modal">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-title" id="opening-hours-modal-title">⏰ Otváracie hodiny</div>
-            <button class="close-btn" onclick="closeModal('opening-hours-modal')">&times;</button>
+            <div class="modal-title" id="cal-event-modal-title">Pridať udalosť</div>
+            <button class="close-btn" onclick="closeModal('cal-event-modal')">&times;</button>
         </div>
-        <div id="opening-hours-content-list" style="max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
+        <form id="cal-event-form" onsubmit="saveCalEvent(event)">
+            <input type="hidden" id="cal-event-id">
+            <input type="hidden" id="cal-event-date">
+            <input type="hidden" id="cal-event-type" value="event">
+            <input type="hidden" id="cal-event-color" value="#3b82f6">
+
+            <div class="type-tab-group">
+                <button type="button" class="type-tab-btn active" id="tab-btn-event" onclick="setCalEventType('event')">Udalosť / Мероприятие</button>
+                <button type="button" class="type-tab-btn" id="tab-btn-task" onclick="setCalEventType('task')">Úloha / Задача</button>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="cal-event-title" class="form-control" style="font-size:1.05rem; font-weight:600;" placeholder="Pridať názov..." required>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Začiatok</label>
+                    <input type="time" id="cal-event-start" class="form-control" value="09:00">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Koniec</label>
+                    <input type="time" id="cal-event-end" class="form-control" value="10:00">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Farba oznamu</label>
+                <div class="color-selector">
+                    <div class="color-dot selected" style="background:#3b82f6;" onclick="selectCalColor(this, '#3b82f6')"></div>
+                    <div class="color-dot" style="background:#22c55e;" onclick="selectCalColor(this, '#22c55e')"></div>
+                    <div class="color-dot" style="background:#f97316;" onclick="selectCalColor(this, '#f97316')"></div>
+                    <div class="color-dot" style="background:#ef4444;" onclick="selectCalColor(this, '#ef4444')"></div>
+                    <div class="color-dot" style="background:#a855f7;" onclick="selectCalColor(this, '#a855f7')"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Popis / Poznámka</label>
+                <textarea id="cal-event-desc" class="form-control" rows="3" placeholder="Pridať popis..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">Uložiť / Сохранить</button>
+            <button type="button" class="btn-primary btn-delete" id="btn-delete-cal-event" onclick="deleteCalEvent()" style="display:none;">Vymazať</button>
+        </form>
     </div>
 </div>
 
@@ -1409,9 +1509,6 @@
             map_btn_buildings: "🔴 Budovy / Miesta",
             map_btn_student_points: "📍 Študentské body",
             calendar: "Kalendár",
-            btn_hours_faculties: "🏛️ Budovy",
-            btn_hours_canteen: "🍽️ Menzy",
-            btn_hours_bars: "🍻 Bary",
             my_notes: "📝 Moje Poznámky",
             create_note: "+ Vytvoriť poznámku",
             online_chat: "💬 Online Chat",
@@ -1492,9 +1589,6 @@
             map_btn_buildings: "🔴 Buildings / Places",
             map_btn_student_points: "📍 Student Points",
             calendar: "Calendar",
-            btn_hours_faculties: "🏛️ Buildings",
-            btn_hours_canteen: "🍽️ Canteens",
-            btn_hours_bars: "🍻 Bars",
             my_notes: "📝 My Notes",
             create_note: "+ Create Note",
             online_chat: "💬 Online Chat",
@@ -1575,9 +1669,6 @@
             map_btn_buildings: "🔴 Здания / Места",
             map_btn_student_points: "📍 Студ. точки",
             calendar: "Календарь",
-            btn_hours_faculties: "🏛️ Корпуса",
-            btn_hours_canteen: "🍽️ Столовые",
-            btn_hours_bars: "🍻 Бары",
             my_notes: "📝 Мои Заметки",
             create_note: "+ Создать заметку",
             online_chat: "💬 Онлайн Чат",
@@ -1658,9 +1749,6 @@
             map_btn_buildings: "🔴 Будівлі / Місця",
             map_btn_student_points: "📍 Студ. точки",
             calendar: "Календар",
-            btn_hours_faculties: "🏛️ Корпуси",
-            btn_hours_canteen: "🍽️ Їдальні",
-            btn_hours_bars: "🍻 Бари",
             my_notes: "📝 Мої Нотатки",
             create_note: "+ Створити нотатку",
             online_chat: "💬 Онлайн Чат",
@@ -1731,48 +1819,170 @@
     let upcomingExpanded = false;
     let selectedRating = 5;
 
-    // ДАННЫЕ О ВРЕМЕНИ РАБОТЫ ОБЪЕКТОВ UNIZA
-    const openingHoursData = {
-        faculties: [
-            { name: "FRI UNIZA (Fakulta riadenia a informatiky)", hours: "Po–Pi: 06:00 – 21:00\nSo–Ne: Zavreté / Na kartu" },
-            { name: "Hlavná budova AA / AB / AC", hours: "Po–Pi: 06:30 – 20:00\nSo: 07:00 – 15:00" },
-            { name: "Univerzitná knižnica (UK UNIZA)", hours: "Po–Št: 08:00 – 16:00\nPi: 08:00 – 14:00\nSo–Ne: Zavreté" }
-        ],
-        canteen: [
-            { name: "Nová Menza (Hliny)", hours: "Obedy (Po–Pá): 11:00 – 14:30\nVečere (Po–Št): 16:30 – 19:00" },
-            { name: "Menza Veľký Diel (Mensa)", hours: "Obedy (Po–Pá): 11:00 – 14:00" },
-            { name: "Buffet FRI", hours: "Po–Št: 07:30 – 15:00\nPi: 07:30 – 13:30" }
-        ],
-        bars: [
-            { name: "Klub Smer77", hours: "Po–Št: 16:00 – 23:30\nPi–So: 16:00 – 02:00\nNe: 16:00 – 22:00" },
-            { name: "Bar / Pub Hliny (K2)", hours: "Po–Ne: 15:00 – 24:00" },
-            { name: "Mlynčok / VD Bar", hours: "Po–Št: 17:00 – 23:00\nPi–Ne: Podľa akcií" }
-        ]
-    };
+    // ИНТЕРАКТИВНЫЙ КАЛЕНДАРЬ ГООГЛ СТИЛЯ
+    let calendarDate = new Date();
+    let calendarEvents = JSON.parse(localStorage.getItem('uniza_cal_events')) || [];
 
-    function openOpeningHoursModal(type) {
-        const titleEl = document.getElementById('opening-hours-modal-title');
-        const listEl = document.getElementById('opening-hours-content-list');
-        listEl.innerHTML = '';
+    function prevCalMonth() {
+        calendarDate.setMonth(calendarDate.getMonth() - 1);
+        renderCompactCalendar();
+    }
+
+    function nextCalMonth() {
+        calendarDate.setMonth(calendarDate.getMonth() + 1);
+        renderCompactCalendar();
+    }
+
+    function renderCompactCalendar() {
+        const calGrid = document.getElementById('compact-calendar-grid');
+        if (!calGrid) return;
+        calGrid.innerHTML = '';
 
         const t = translations[currentLang];
+        const daysHeader = t.weekdays_cal || ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
         
-        if (type === 'faculties') titleEl.innerText = t.btn_hours_faculties + " – Rozvrh budov";
-        else if (type === 'canteen') titleEl.innerText = t.btn_hours_canteen + " – Rozvrh menz";
-        else if (type === 'bars') titleEl.innerText = t.btn_hours_bars + " – Otváracie hodiny barov";
-
-        const items = openingHoursData[type] || [];
-        items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'opening-hours-card';
-            card.innerHTML = `
-                <div class="opening-hours-title">${escapeHtml(item.name)}</div>
-                <div class="opening-hours-detail">${escapeHtml(item.hours).replace(/\n/g, '<br>')}</div>
-            `;
-            listEl.appendChild(card);
+        daysHeader.forEach(d => {
+            const h = document.createElement('div');
+            h.className = 'cal-day-label';
+            h.innerText = d;
+            calGrid.appendChild(h);
         });
 
-        document.getElementById('opening-hours-modal').classList.add('active');
+        const currentYear = calendarDate.getFullYear();
+        const currentMonth = calendarDate.getMonth();
+        const now = new Date();
+
+        const monthNames = t.months;
+        document.getElementById('cal-month-title').innerText = `${monthNames[currentMonth]} ${currentYear}`;
+
+        const firstDayIndex = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
+        const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+
+        // Предыдущие дни месяца
+        for (let i = firstDayIndex - 1; i >= 0; i--) {
+            const cell = document.createElement('div');
+            cell.className = 'cal-day other-month';
+            cell.innerHTML = `<span class="cal-day-num">${prevMonthDays - i}</span>`;
+            calGrid.appendChild(cell);
+        }
+
+        // Дни текущего месяца
+        for (let day = 1; day <= totalDays; day++) {
+            const cell = document.createElement('div');
+            const isToday = (day === now.getDate() && currentMonth === now.getMonth() && currentYear === now.getFullYear());
+            cell.className = 'cal-day' + (isToday ? ' active' : '');
+            
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            cell.onclick = () => openCalEventModal(dateStr);
+
+            let eventsHtml = '';
+            const dayEvents = calendarEvents.filter(e => e.date === dateStr);
+
+            if (dayEvents.length > 0) {
+                eventsHtml = '<div class="cal-events-container">';
+                dayEvents.forEach(ev => {
+                    eventsHtml += `<div class="cal-event-chip" style="background:${ev.color || '#3b82f6'};" onclick="event.stopPropagation(); editCalEvent('${ev.id}')">${escapeHtml(ev.title)}</div>`;
+                });
+                eventsHtml += '</div>';
+            }
+
+            cell.innerHTML = `<span class="cal-day-num">${day}</span>` + eventsHtml;
+            calGrid.appendChild(cell);
+        }
+    }
+
+    function openCalEventModal(dateStr) {
+        document.getElementById('cal-event-id').value = '';
+        document.getElementById('cal-event-date').value = dateStr;
+        document.getElementById('cal-event-title').value = '';
+        document.getElementById('cal-event-desc').value = '';
+        document.getElementById('btn-delete-cal-event').style.display = 'none';
+        document.getElementById('cal-event-modal-title').innerText = `Pridať udalosť (${dateStr})`;
+        setCalEventType('event');
+        document.getElementById('cal-event-modal').classList.add('active');
+    }
+
+    function editCalEvent(id) {
+        const ev = calendarEvents.find(e => e.id === id);
+        if (!ev) return;
+
+        document.getElementById('cal-event-id').value = ev.id;
+        document.getElementById('cal-event-date').value = ev.date;
+        document.getElementById('cal-event-title').value = ev.title;
+        document.getElementById('cal-event-start').value = ev.start || '09:00';
+        document.getElementById('cal-event-end').value = ev.end || '10:00';
+        document.getElementById('cal-event-desc').value = ev.desc || '';
+        document.getElementById('btn-delete-cal-event').style.display = 'block';
+        document.getElementById('cal-event-modal-title').innerText = `Upraviť udalosť`;
+
+        setCalEventType(ev.type || 'event');
+        
+        // Цвет
+        const dots = document.querySelectorAll('.color-dot');
+        dots.forEach(d => {
+            if (d.style.backgroundColor === ev.color || d.getAttribute('onclick').includes(ev.color)) {
+                selectCalColor(d, ev.color);
+            }
+        });
+
+        document.getElementById('cal-event-modal').classList.add('active');
+    }
+
+    function setCalEventType(type) {
+        document.getElementById('cal-event-type').value = type;
+        const btnEvent = document.getElementById('tab-btn-event');
+        const btnTask = document.getElementById('tab-btn-task');
+        if (type === 'event') {
+            btnEvent.classList.add('active');
+            btnTask.classList.remove('active');
+        } else {
+            btnTask.classList.add('active');
+            btnEvent.classList.remove('active');
+        }
+    }
+
+    function selectCalColor(el, color) {
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('cal-event-color').value = color;
+    }
+
+    function saveCalEvent(e) {
+        e.preventDefault();
+        const id = document.getElementById('cal-event-id').value;
+        const date = document.getElementById('cal-event-date').value;
+        const title = document.getElementById('cal-event-title').value;
+        const start = document.getElementById('cal-event-start').value;
+        const end = document.getElementById('cal-event-end').value;
+        const type = document.getElementById('cal-event-type').value;
+        const color = document.getElementById('cal-event-color').value;
+        const desc = document.getElementById('cal-event-desc').value;
+
+        if (id) {
+            const idx = calendarEvents.findIndex(ev => ev.id === id);
+            if (idx !== -1) {
+                calendarEvents[idx] = { id, date, title, start, end, type, color, desc };
+            }
+        } else {
+            calendarEvents.push({
+                id: Date.now().toString(),
+                date, title, start, end, type, color, desc
+            });
+        }
+
+        localStorage.setItem('uniza_cal_events', JSON.stringify(calendarEvents));
+        closeModal('cal-event-modal');
+        renderCompactCalendar();
+    }
+
+    function deleteCalEvent() {
+        const id = document.getElementById('cal-event-id').value;
+        if (!id) return;
+        calendarEvents = calendarEvents.filter(e => e.id !== id);
+        localStorage.setItem('uniza_cal_events', JSON.stringify(calendarEvents));
+        closeModal('cal-event-modal');
+        renderCompactCalendar();
     }
 
     function toggleLangMenu() {
@@ -2368,48 +2578,6 @@
                     }
                 }
             });
-        }
-    }
-
-    function renderCompactCalendar() {
-        const calGrid = document.getElementById('compact-calendar-grid');
-        calGrid.innerHTML = '';
-
-        const t = translations[currentLang];
-        const daysHeader = t.weekdays_cal || ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
-        
-        daysHeader.forEach(d => {
-            const h = document.createElement('div');
-            h.className = 'cal-day-label';
-            h.innerText = d;
-            calGrid.appendChild(h);
-        });
-
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth();
-        const currentDayNum = now.getDate();
-
-        const monthNames = t.months;
-        document.getElementById('cal-month-title').innerText = `${monthNames[currentMonth]} ${currentYear}`;
-
-        const firstDayIndex = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
-        const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
-
-        for (let i = firstDayIndex - 1; i >= 0; i--) {
-            const cell = document.createElement('div');
-            cell.className = 'cal-day other-month';
-            cell.innerText = prevMonthDays - i;
-            calGrid.appendChild(cell);
-        }
-
-        for (let day = 1; day <= totalDays; day++) {
-            const cell = document.createElement('div');
-            const isToday = (day === currentDayNum);
-            cell.className = 'cal-day' + (isToday ? ' active' : '');
-            cell.innerText = day;
-            calGrid.appendChild(cell);
         }
     }
 
