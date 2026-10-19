@@ -267,9 +267,11 @@
                 justify-content: space-between;
                 align-items: center;
             }
+            /* На мобилке слева только язык, а колокольчик и звёздочка уходят вправе */
             .header-left { display: flex; align-items: center; gap: 8px; }
-            #btn-notif-header { order: 2; }
-            #btn-review-header { order: 3; }
+            #btn-notif-header { order: 10; }
+            #btn-review-header { order: 11; }
+            .header-right { display: flex; align-items: center; gap: 8px; }
         }
 
         .dash-column {
@@ -905,7 +907,13 @@
                     <div class="lang-item" onclick="setLanguage('uk')">🇺🇦 Українська</div>
                 </div>
             </div>
+        </div>
 
+        <div class="header-title">
+            <span>📅 UniFlo</span>
+        </div>
+
+        <div class="header-right">
             <!-- Кнопка уведомлений с колокольчиком -->
             <button class="btn-header-square" id="btn-notif-header" onclick="requestNotificationPermission()" title="Upozornenia / Уведомления">
                 🔔
@@ -914,18 +922,6 @@
             <button class="btn-header-square" id="btn-review-header" onclick="openReviewModal()" title="Recenzie / Отзывы">
                 ⭐
             </button>
-        </div>
-
-        <div class="header-title">
-            <span>📅 UniFlo</span>
-        </div>
-
-        <div class="header-right mobile-header-group">
-            <div class="group-selector-container">
-                <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
-                <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Skupina...">
-                <a href="#" id="evzd-link" target="_blank" class="btn-evzd">e-vzd ↗</a>
-            </div>
         </div>
     </div>
 
