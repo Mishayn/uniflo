@@ -253,7 +253,6 @@
             .screen { display: block !important; }
             .mobile-header-group { display: flex !important; }
             
-            /* На компе кнопки возвращаются влево обратно */
             #btn-notif-header, #btn-review-header {
                 display: flex !important;
             }
@@ -272,7 +271,6 @@
                 justify-content: space-between;
                 align-items: center;
             }
-            /* На телефоне прячем кнопки слева и показываем их справа */
             .desktop-only-btn {
                 display: none !important;
             }
@@ -573,6 +571,36 @@
             box-shadow: 0 0 6px rgba(0,0,0,0.5);
         }
 
+        /* СТИЛИ ИНТЕРАКТИВНОГО КАЛЕНДАРЯ */
+        .cal-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .cal-nav-btns {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cal-nav-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cal-nav-btn:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -581,17 +609,57 @@
         }
 
         .cal-day-label { font-size: 0.7rem; color: var(--text-muted); padding-bottom: 3px; font-weight: 600; }
+        
         .cal-day {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
-            border-radius: 5px;
-            padding: 6px 0;
+            border-radius: 6px;
+            padding: 4px 2px;
+            min-height: 52px;
             font-size: 0.75rem;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            transition: border-color 0.15s;
         }
 
-        .cal-day.active { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.15); font-weight: 700; color: var(--accent-orange); }
+        .cal-day:hover {
+            border-color: rgba(249, 115, 22, 0.5);
+        }
+
+        .cal-day.active { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.1); font-weight: 700; color: var(--accent-orange); }
         .cal-day.other-month { opacity: 0.25; }
+
+        .cal-events-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 3px;
+            overflow: hidden;
+        }
+
+        .cal-event-chip {
+            font-size: 0.62rem;
+            font-weight: 600;
+            padding: 1px 3px;
+            border-radius: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-align: left;
+            box-sizing: border-box;
+            color: #ffffff;
+        }
+
+        .cal-event-chip.type-study { background: #3b82f6; }
+        .cal-event-chip.type-important { background: #ef4444; }
+        .cal-event-chip.type-personal { background: #22c55e; }
+        .cal-event-chip.type-exam { background: #f97316; }
 
         .clock-box {
             text-align: center;
@@ -906,7 +974,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
                     </svg>
                 </button>
                 <div class="lang-menu" id="lang-menu">
@@ -931,7 +999,7 @@
             <span>📅 UniFlo</span>
         </div>
 
-        <!-- Для ПК правая часть c группой, а для телефонов - здесь дублируем кнопки -->
+        <!-- Для ПК правая часть c группой -->
         <div class="header-right mobile-header-group">
             <div class="group-selector-container">
                 <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
@@ -963,7 +1031,7 @@
                     <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
                 </div>
 
-                <!-- Najbližший deň -->
+                <!-- Najbližší deň -->
                 <div class="dash-card">
                     <div class="section-header" style="cursor: pointer;" onclick="toggleUpcomingExpand()">
                         <div class="upcoming-title-box">
@@ -1032,7 +1100,6 @@
                             <span class="section-meta" data-i18n="map_hint">Pravý klik = nová bodka</span>
                         </div>
                         
-                        <!-- 3 кнопки управления картой -->
                         <div class="map-actions-row">
                             <button class="map-action-btn btn-gps-action" onclick="locateUser()">
                                 <span data-i18n="map_btn_my_location">📍 Moja poloha</span>
@@ -1055,10 +1122,18 @@
                             <div class="clock-time" id="live-clock">10:00:00</div>
                             <div class="clock-date" id="live-date">Piatok, 17. Október 2026</div>
                         </div>
-                        <div class="section-header" style="margin-bottom:6px;">
+                        
+                        <!-- Шапка календаря с переключением месяцев -->
+                        <div class="cal-nav-bar">
                             <div class="section-title" data-i18n="calendar">Kalendár</div>
-                            <span class="section-meta" id="cal-month-title">Október 2026</span>
+                            <div class="cal-nav-btns">
+                                <button class="cal-nav-btn" onclick="prevCalMonth()">&lt;</button>
+                                <button class="cal-nav-btn" onclick="resetCalToToday()" data-i18n="cal_today">Dnes</button>
+                                <button class="cal-nav-btn" onclick="nextCalMonth()">&gt;</button>
+                                <span class="section-meta" id="cal-month-title" style="margin-left:6px; font-weight:700;">Október 2026</span>
+                            </div>
                         </div>
+                        
                         <div class="cal-grid" id="compact-calendar-grid"></div>
                     </div>
                 </div>
@@ -1159,6 +1234,49 @@
             <a href="#" id="evzd-link-mobile" target="_blank" class="btn-evzd">e-vzd ↗</a>
         </div>
     </nav>
+</div>
+
+<!-- Modal for Calendar Event (Google Calendar Style) -->
+<div class="modal-overlay" id="cal-event-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="cal-event-modal-title" data-i18n="event_modal_new">Pridať udalosť</div>
+            <button class="close-btn" onclick="closeModal('cal-event-modal')">&times;</button>
+        </div>
+        <form id="cal-event-form" onsubmit="saveCalEvent(event)">
+            <input type="hidden" id="event-edit-id">
+            <input type="hidden" id="event-date-str">
+            <div class="form-group">
+                <label data-i18n="event_title_label">Názov udalosti</label>
+                <input type="text" id="event-title-input" class="form-control" data-i18n-placeholder="event_title_placeholder" placeholder="napr. Skúška, Projekt..." required>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1;">
+                    <label data-i18n="event_time_start">Čas začiatku</label>
+                    <input type="time" id="event-time-start" class="form-control" value="09:00">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label data-i18n="event_time_end">Čas konca</label>
+                    <input type="time" id="event-time-end" class="form-control" value="10:00">
+                </div>
+            </div>
+            <div class="form-group">
+                <label data-i18n="event_category_label">Typ / Farba</label>
+                <select id="event-type-select" class="form-control">
+                    <option value="study" data-i18n="type_study">📚 Štúdium (Modrá)</option>
+                    <option value="important" data-i18n="type_important">🔴 Dôležité (Červená)</option>
+                    <option value="personal" data-i18n="type_personal">🟢 Osobné (Zelená)</option>
+                    <option value="exam" data-i18n="type_exam">📙 Skúška / Zápočet (Oranžová)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label data-i18n="event_desc_label">Popis / Poznámka</label>
+                <textarea id="event-desc-input" class="form-control" rows="3" data-i18n-placeholder="event_desc_placeholder" placeholder="Detaily udalosti..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary" data-i18n="save_event">Uložiť udalosť</button>
+            <button type="button" class="btn-primary btn-delete" id="btn-delete-event" onclick="deleteCalEvent()" style="display:none;" data-i18n="delete_event">Odstrániť udalosť</button>
+        </form>
+    </div>
 </div>
 
 <!-- Modal for Points Selection -->
@@ -1345,6 +1463,22 @@
             map_btn_buildings: "🔴 Budovy / Miesta",
             map_btn_student_points: "📍 Študentské body",
             calendar: "Kalendár",
+            cal_today: "Dnes",
+            event_modal_new: "Pridať udalosť",
+            event_modal_edit: "Upraviť udalosť",
+            event_title_label: "Názov udalosti",
+            event_title_placeholder: "napr. Skúška, Projekt...",
+            event_time_start: "Čas začiatku",
+            event_time_end: "Čas konca",
+            event_category_label: "Typ / Farba",
+            event_desc_label: "Popis / Poznámka",
+            event_desc_placeholder: "Detaily udalosti...",
+            save_event: "Uložiť udalosť",
+            delete_event: "Odstrániť udalosť",
+            type_study: "📚 Štúdium (Modrá)",
+            type_important: "🔴 Dôležité (Červená)",
+            type_personal: "🟢 Osobné (Zelená)",
+            type_exam: "📙 Skúška / Zápočet (Oranžová)",
             my_notes: "📝 Moje Poznámky",
             create_note: "+ Vytvoriť poznámku",
             online_chat: "💬 Online Chat",
@@ -1367,7 +1501,7 @@
             note_text_label: "Text poznámky",
             note_text_placeholder: "Napíšte svoju poznámku...",
             save_note: "Uložiť poznámku",
-            delete_note: "Odstránić poznámku",
+            delete_note: "Odstrániť poznámku",
             modal_lesson_title: "Pridať hodinu",
             form_day: "Deň v týždni",
             form_subject: "Názov predmetu",
@@ -1405,7 +1539,7 @@
             no_places: "Žiadne miesta v tejto kategórii.",
             edit_btn: "✏️ Upraviť",
             delete_btn: "🗑 Odstrániť",
-            months: ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Októbka", "November", "December"],
+            months: ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"],
             weekdays_clock: ["Nedeľa", "Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota"],
             weekdays_cal: ["Po", "Ut", "St", "Št", "Pi", "So", "Ne"]
         },
@@ -1425,6 +1559,22 @@
             map_btn_buildings: "🔴 Buildings / Places",
             map_btn_student_points: "📍 Student Points",
             calendar: "Calendar",
+            cal_today: "Today",
+            event_modal_new: "Add Event",
+            event_modal_edit: "Edit Event",
+            event_title_label: "Event Title",
+            event_title_placeholder: "e.g. Exam, Project...",
+            event_time_start: "Start Time",
+            event_time_end: "End Time",
+            event_category_label: "Type / Color",
+            event_desc_label: "Description / Note",
+            event_desc_placeholder: "Event details...",
+            save_event: "Save Event",
+            delete_event: "Delete Event",
+            type_study: "📚 Study (Blue)",
+            type_important: "🔴 Important (Red)",
+            type_personal: "🟢 Personal (Green)",
+            type_exam: "📙 Exam / Test (Orange)",
             my_notes: "📝 My Notes",
             create_note: "+ Create Note",
             online_chat: "💬 Online Chat",
@@ -1505,6 +1655,22 @@
             map_btn_buildings: "🔴 Здания / Места",
             map_btn_student_points: "📍 Студ. точки",
             calendar: "Календарь",
+            cal_today: "Сегодня",
+            event_modal_new: "Добавить событие",
+            event_modal_edit: "Редактировать событие",
+            event_title_label: "Название события",
+            event_title_placeholder: "напр. Экзамен, Проект...",
+            event_time_start: "Время начала",
+            event_time_end: "Время конца",
+            event_category_label: "Тип / Цвет",
+            event_desc_label: "Описание / Заметка",
+            event_desc_placeholder: "Детали события...",
+            save_event: "Сохранить событие",
+            delete_event: "Удалить событие",
+            type_study: "📚 Учеба (Синий)",
+            type_important: "🔴 Важное (Красный)",
+            type_personal: "🟢 Личное (Зеленый)",
+            type_exam: "📙 Экзамен / Зачет (Оранжевый)",
             my_notes: "📝 Мои Заметки",
             create_note: "+ Создать заметку",
             online_chat: "💬 Онлайн Чат",
@@ -1585,6 +1751,22 @@
             map_btn_buildings: "🔴 Будівлі / Місця",
             map_btn_student_points: "📍 Студ. точки",
             calendar: "Календар",
+            cal_today: "Сьогодні",
+            event_modal_new: "Додати подію",
+            event_modal_edit: "Редагувати подію",
+            event_title_label: "Назва події",
+            event_title_placeholder: "напр. Іспит, Проект...",
+            event_time_start: "Час початку",
+            event_time_end: "Час кінця",
+            event_category_label: "Тип / Колір",
+            event_desc_label: "Опис / Нотатка",
+            event_desc_placeholder: "Деталі події...",
+            save_event: "Зберегти подію",
+            delete_event: "Видалити подію",
+            type_study: "📚 Навчання (Синій)",
+            type_important: "🔴 Важливо (Червоний)",
+            type_personal: "🟢 Особисте (Зелений)",
+            type_exam: "📙 Іспит / Залік (Помаранчевий)",
             my_notes: "📝 Мої Нотатки",
             create_note: "+ Створити нотатку",
             online_chat: "💬 Онлайн Чат",
@@ -1655,6 +1837,10 @@
     let upcomingExpanded = false;
     let selectedRating = 5;
 
+    // Данные для интерактивного календаря событий
+    let calendarEvents = JSON.parse(localStorage.getItem('uniza_calendar_events')) || [];
+    let calCurrentDate = new Date();
+
     function toggleLangMenu() {
         document.getElementById('lang-menu').classList.toggle('active');
     }
@@ -1691,7 +1877,7 @@
         }
     });
 
-    // ФУНКЦИЯ БРАУЗЕРНЫХ УВЕДОМЛЕНИЙ ЗА 10 МИНУТ
+    // УВЕДОМЛЕНИЯ ЗА 10 МИНУТ
     function requestNotificationPermission() {
         if (!("Notification" in window)) {
             alert("Ваш браузер не поддерживает уведомления.");
@@ -2251,6 +2437,24 @@
         }
     }
 
+    // -------------------------------------------------------------
+    // ЛОГИКА ИНТЕРАКТИВНОГО КАЛЕНДАРЯ
+    // -------------------------------------------------------------
+    function prevCalMonth() {
+        calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
+        renderCompactCalendar();
+    }
+
+    function nextCalMonth() {
+        calCurrentDate.setMonth(calCurrentDate.getMonth() + 1);
+        renderCompactCalendar();
+    }
+
+    function resetCalToToday() {
+        calCurrentDate = new Date();
+        renderCompactCalendar();
+    }
+
     function renderCompactCalendar() {
         const calGrid = document.getElementById('compact-calendar-grid');
         calGrid.innerHTML = '';
@@ -2265,10 +2469,9 @@
             calGrid.appendChild(h);
         });
 
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth();
-        const currentDayNum = now.getDate();
+        const todayReal = new Date();
+        const currentYear = calCurrentDate.getFullYear();
+        const currentMonth = calCurrentDate.getMonth();
 
         const monthNames = t.months;
         document.getElementById('cal-month-title').innerText = `${monthNames[currentMonth]} ${currentYear}`;
@@ -2286,11 +2489,105 @@
 
         for (let day = 1; day <= totalDays; day++) {
             const cell = document.createElement('div');
-            const isToday = (day === currentDayNum);
+            const isToday = (day === todayReal.getDate() && currentMonth === todayReal.getMonth() && currentYear === todayReal.getFullYear());
             cell.className = 'cal-day' + (isToday ? ' active' : '');
-            cell.innerText = day;
+            
+            const dayNumSpan = document.createElement('span');
+            dayNumSpan.style.fontSize = '0.75rem';
+            dayNumSpan.style.lineHeight = '1';
+            dayNumSpan.innerText = day;
+            cell.appendChild(dayNumSpan);
+
+            const monthStr = String(currentMonth + 1).padStart(2, '0');
+            const dayStr = String(day).padStart(2, '0');
+            const fullDateStr = `${currentYear}-${monthStr}-${dayStr}`;
+
+            const eventsForDay = calendarEvents.filter(e => e.date === fullDateStr);
+
+            if (eventsForDay.length > 0) {
+                const eventsBox = document.createElement('div');
+                eventsBox.className = 'cal-events-container';
+
+                eventsForDay.forEach(ev => {
+                    const chip = document.createElement('div');
+                    chip.className = `cal-event-chip type-${ev.type || 'study'}`;
+                    chip.innerText = ev.title;
+                    chip.title = `${ev.title} (${ev.timeStart || ''}-${ev.timeEnd || ''})`;
+                    chip.onclick = (e) => {
+                        e.stopPropagation();
+                        openEditCalEventModal(ev.id);
+                    };
+                    eventsBox.appendChild(chip);
+                });
+
+                cell.appendChild(eventsBox);
+            }
+
+            cell.onclick = () => openAddCalEventModal(fullDateStr);
             calGrid.appendChild(cell);
         }
+    }
+
+    function openAddCalEventModal(dateStr) {
+        document.getElementById('event-edit-id').value = '';
+        document.getElementById('event-date-str').value = dateStr;
+        document.getElementById('cal-event-modal-title').innerText = translations[currentLang].event_modal_new;
+        document.getElementById('event-title-input').value = '';
+        document.getElementById('event-time-start').value = '09:00';
+        document.getElementById('event-time-end').value = '10:00';
+        document.getElementById('event-type-select').value = 'study';
+        document.getElementById('event-desc-input').value = '';
+        document.getElementById('btn-delete-event').style.display = 'none';
+
+        document.getElementById('cal-event-modal').classList.add('active');
+    }
+
+    function openEditCalEventModal(id) {
+        const ev = calendarEvents.find(e => e.id === id);
+        if (!ev) return;
+
+        document.getElementById('event-edit-id').value = ev.id;
+        document.getElementById('event-date-str').value = ev.date;
+        document.getElementById('cal-event-modal-title').innerText = translations[currentLang].event_modal_edit;
+        document.getElementById('event-title-input').value = ev.title;
+        document.getElementById('event-time-start').value = ev.timeStart || '09:00';
+        document.getElementById('event-time-end').value = ev.timeEnd || '10:00';
+        document.getElementById('event-type-select').value = ev.type || 'study';
+        document.getElementById('event-desc-input').value = ev.desc || '';
+        document.getElementById('btn-delete-event').style.display = 'block';
+
+        document.getElementById('cal-event-modal').classList.add('active');
+    }
+
+    function saveCalEvent(e) {
+        e.preventDefault();
+        const id = document.getElementById('event-edit-id').value;
+        const dateStr = document.getElementById('event-date-str').value;
+        const title = document.getElementById('event-title-input').value.trim();
+        const timeStart = document.getElementById('event-time-start').value;
+        const timeEnd = document.getElementById('event-time-end').value;
+        const type = document.getElementById('event-type-select').value;
+        const desc = document.getElementById('event-desc-input').value.trim();
+
+        if (id) {
+            calendarEvents = calendarEvents.filter(e => e.id !== id);
+            calendarEvents.push({ id, date: dateStr, title, timeStart, timeEnd, type, desc });
+        } else {
+            calendarEvents.push({ id: Date.now().toString(), date: dateStr, title, timeStart, timeEnd, type, desc });
+        }
+
+        localStorage.setItem('uniza_calendar_events', JSON.stringify(calendarEvents));
+        closeModal('cal-event-modal');
+        renderCompactCalendar();
+    }
+
+    function deleteCalEvent() {
+        const id = document.getElementById('event-edit-id').value;
+        if (!id) return;
+        calendarEvents = calendarEvents.filter(e => e.id !== id);
+        localStorage.setItem('uniza_calendar_events', JSON.stringify(calendarEvents));
+        closeModal('cal-event-modal');
+        renderCompactCalendar();
     }
 
     function initMap() {
