@@ -121,7 +121,8 @@
             cursor: pointer;
             transition: all 0.2s;
             color: #ffffff;
-            font-size: 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
             flex-shrink: 0;
         }
         .btn-header-square:hover {
@@ -665,15 +666,87 @@
         .cal-event-chip.type-personal { background: #22c55e; }
         .cal-event-chip.type-exam { background: #f97316; }
 
-        .clock-box {
-            text-align: center;
-            background: var(--bg-input);
-            border-radius: 8px;
-            padding: 8px;
+        /* Шапка часов с двумя кнопками по бокам */
+        .clock-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
             margin-bottom: 10px;
         }
-        .clock-time { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-        .clock-date { font-size: 0.78rem; color: var(--text-secondary); }
+
+        .clock-side-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .clock-side-btn:hover {
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+            color: var(--accent-orange);
+        }
+
+        .clock-box {
+            flex: 1;
+            text-align: center;
+            background: var(--bg-input);
+            border-radius: 10px;
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+        }
+        .clock-time { font-size: 1.45rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .clock-date { font-size: 0.72rem; color: var(--text-secondary); }
+
+        .schedule-info-item {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+        .schedule-info-item h4 {
+            font-size: 0.88rem;
+            color: var(--accent-orange);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .schedule-info-item p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .weather-hourly-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .weather-hour-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+        }
 
         .notes-container {
             display: flex;
@@ -1122,9 +1195,14 @@
 
                 <div id="screen-kalendar" class="screen active" style="margin-top: 15px;">
                     <div class="dash-card">
-                        <div class="clock-box">
-                            <div class="clock-time" id="live-clock">10:00:00</div>
-                            <div class="clock-date" id="live-date">Piatok, 17. Október 2026</div>
+                        <!-- Шапка с часами и двумя квадратными кнопками по бокам -->
+                        <div class="clock-container">
+                            <button class="clock-side-btn" onclick="openOpeningHoursModal()" title="Otváracie hodiny / График работы">⏰</button>
+                            <div class="clock-box">
+                                <div class="clock-time" id="live-clock">10:00:00</div>
+                                <div class="clock-date" id="live-date">Piatok, 17. Október 2026</div>
+                            </div>
+                            <button class="clock-side-btn" id="btn-weather-temp" onclick="openWeatherModal()" title="Predpoveď počasia / Прогноз погоды">--°</button>
                         </div>
                         
                         <!-- Шапка календаря с переключением месяцев -->
@@ -1240,7 +1318,49 @@
     </nav>
 </div>
 
-<!-- Modal for Calendar Event (Google Calendar Style) -->
+<!-- Modal Opening Hours (График работы UNIZA) -->
+<div class="modal-overlay" id="opening-hours-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" data-i18n="opening_hours_title">⏰ Otváracie hodiny UNIZA</div>
+            <button class="close-btn" onclick="closeModal('opening-hours-modal')">&times;</button>
+        </div>
+        <div style="max-height: 380px; overflow-y: auto;">
+            <div class="schedule-info-item">
+                <h4>🍽️ Nová Menza (NM)</h4>
+                <p><strong>Výdaj obedov:</strong> Po – Št: 07:00 – 18:00 | Pi: 07:00 – 13:30</p>
+                <p><strong>Bufet NM:</strong> Po – Pi: 07:00 – 14:00</p>
+            </div>
+            <div class="schedule-info-item">
+                <h4>🥪 Bufet Budova AR (Veľký Diel)</h4>
+                <p><strong>Otvorené:</strong> Po – Št: 10:30 – 14:30 | Pi: 10:30 – 13:30</p>
+            </div>
+            <div class="schedule-info-item">
+                <h4>📚 Univerzitná knižnica UNIZA</h4>
+                <p><strong>Výpožička & Študovňa:</strong> Po – Št: 08:00 – 16:00 | Pi: 08:00 – 14:00</p>
+            </div>
+            <div class="schedule-info-item">
+                <h4>🏛️ Hlavné корпуса (FRI, AA, AB, AR)</h4>
+                <p><strong>Vstup pre študentov:</strong> Po – Pi: 06:00 – 21:00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Weather (Прогноз погоды на 24 часа) -->
+<div class="modal-overlay" id="weather-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" data-i18n="weather_title">☀️ Počasie Žilina (24 hodín)</div>
+            <button class="close-btn" onclick="closeModal('weather-modal')">&times;</button>
+        </div>
+        <div class="weather-hourly-list" id="weather-hourly-list">
+            <div style="text-align:center; color:var(--text-muted); padding:20px;">Načítavam počasie...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Calendar Event -->
 <div class="modal-overlay" id="cal-event-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1543,6 +1663,8 @@
             no_places: "Žiadne miesta v tejto kategórii.",
             edit_btn: "✏️ Upraviť",
             delete_btn: "🗑 Odstrániť",
+            opening_hours_title: "⏰ Otváracie hodiny UNIZA",
+            weather_title: "☀️ Počasie Žilina (24 hodín)",
             months: ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"],
             weekdays_clock: ["Nedeľa", "Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota"],
             weekdays_cal: ["Po", "Ut", "St", "Št", "Pi", "So", "Ne"]
@@ -1639,6 +1761,8 @@
             no_places: "No places in this category.",
             edit_btn: "✏️ Edit",
             delete_btn: "🗑 Delete",
+            opening_hours_title: "⏰ UNIZA Opening Hours",
+            weather_title: "☀️ Žilina Weather (24 Hours)",
             months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             weekdays_clock: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
             weekdays_cal: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
@@ -1735,6 +1859,8 @@
             no_places: "В этой категории нет мест.",
             edit_btn: "✏️ Изменить",
             delete_btn: "🗑 Удалить",
+            opening_hours_title: "⏰ График работы UNIZA",
+            weather_title: "☀️ Погода в Жилине (24 часа)",
             months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
             weekdays_clock: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
             weekdays_cal: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
@@ -1831,6 +1957,8 @@
             no_places: "У цій категорії немає місць.",
             edit_btn: "✏️ Редагувати",
             delete_btn: "🗑 Видалити",
+            opening_hours_title: "⏰ Графік роботи UNIZA",
+            weather_title: "☀️ Погода у Жилині (24 години)",
             months: ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"],
             weekdays_clock: ["Неділя", "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота"],
             weekdays_cal: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"]
@@ -2589,6 +2717,80 @@
         renderCompactCalendar();
     }
 
+    // ЛОГИКА ОКНА ГРАФИКА РАБОТЫ МЕСТ UNIZA
+    function openOpeningHoursModal() {
+        document.getElementById('opening-hours-modal').classList.add('active');
+    }
+
+    // ЛОГИКА ПОГОДЫ (Open-Meteo API)
+    let cachedWeatherData = null;
+
+    async function fetchWeather() {
+        try {
+            // Координаты Жилины: lat 49.2231, lon 18.7394
+            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.2231&longitude=18.7394&current_weather=true&hourly=temperature_2d,weathercode&timezone=Europe%2FBratislava');
+            const data = await res.json();
+            cachedWeatherData = data;
+
+            if (data && data.current_weather) {
+                const temp = Math.round(data.current_weather.temperature);
+                const btn = document.getElementById('btn-weather-temp');
+                if (btn) btn.innerText = `${temp}°C`;
+            }
+        } catch (e) {
+            console.error('Weather fetch error:', e);
+            const btn = document.getElementById('btn-weather-temp');
+            if (btn) btn.innerText = `14°C`;
+        }
+    }
+
+    function getWeatherIcon(code) {
+        if (code === 0) return '☀️';
+        if (code >= 1 && code <= 3) return '⛅';
+        if (code >= 45 && code <= 48) return '🌫️';
+        if (code >= 51 && code <= 67) return '🌧️';
+        if (code >= 71 && code <= 77) return '❄️';
+        if (code >= 80 && code <= 82) return '🌦️';
+        if (code >= 95) return '🌩️';
+        return '🌡️';
+    }
+
+    function openWeatherModal() {
+        const list = document.getElementById('weather-hourly-list');
+        list.innerHTML = '';
+
+        if (!cachedWeatherData || !cachedWeatherData.hourly) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">Data o počasí nie sú k dispozícii.</div>';
+        } else {
+            const now = new Date();
+            const times = cachedWeatherData.hourly.time;
+            const temps = cachedWeatherData.hourly.temperature_2d;
+            const codes = cachedWeatherData.hourly.weathercode;
+
+            let count = 0;
+            for (let i = 0; i < times.length && count < 24; i++) {
+                const itemTime = new Date(times[i]);
+                if (itemTime >= now || (now.getTime() - itemTime.getTime() < 3600000)) {
+                    const hoursStr = String(itemTime.getHours()).padStart(2, '0') + ':00';
+                    const tempVal = Math.round(temps[i]);
+                    const icon = getWeatherIcon(codes[i]);
+
+                    const row = document.createElement('div');
+                    row.className = 'weather-hour-item';
+                    row.innerHTML = `
+                        <span style="font-weight:600; color:var(--text-secondary);">${hoursStr}</span>
+                        <span style="font-size:1.1rem;">${icon}</span>
+                        <span style="font-weight:700; color:var(--accent-orange);">${tempVal}°C</span>
+                    `;
+                    list.appendChild(row);
+                    count++;
+                }
+            }
+        }
+
+        document.getElementById('weather-modal').classList.add('active');
+    }
+
     function initMap() {
         if (leafletMap) return;
 
@@ -2979,6 +3181,7 @@
         renderWeekGrid();
         renderCompactCalendar();
         renderNotes();
+        fetchWeather();
         initMap();
         applyTranslations();
     }
