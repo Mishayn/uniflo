@@ -518,7 +518,6 @@
             color: #fca5a5;
         }
 
-        /* СЕТКА С КАТЕГОРИЯМИ И ТОЧКАМИ */
         .points-chips-grid {
             display: flex;
             flex-wrap: wrap;
@@ -606,6 +605,7 @@
             grid-template-columns: repeat(7, 1fr);
             gap: 4px;
             text-align: center;
+            width: 100%;
         }
 
         .cal-day-label { font-size: 0.7rem; color: var(--text-muted); padding-bottom: 3px; font-weight: 600; }
@@ -615,7 +615,7 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 4px 2px;
-            min-height: 52px;
+            min-height: 55px;
             font-size: 0.75rem;
             cursor: pointer;
             display: flex;
@@ -624,6 +624,8 @@
             justify-content: flex-start;
             position: relative;
             transition: border-color 0.15s;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .cal-day:hover {
@@ -651,9 +653,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
+            max-width: 100%;
             text-align: left;
             box-sizing: border-box;
             color: #ffffff;
+            word-break: break-all;
         }
 
         .cal-event-chip.type-study { background: #3b82f6; }
@@ -1837,7 +1841,6 @@
     let upcomingExpanded = false;
     let selectedRating = 5;
 
-    // Данные для интерактивного календаря событий
     let calendarEvents = JSON.parse(localStorage.getItem('uniza_calendar_events')) || [];
     let calCurrentDate = new Date();
 
@@ -1877,7 +1880,6 @@
         }
     });
 
-    // УВЕДОМЛЕНИЯ ЗА 10 МИНУТ
     function requestNotificationPermission() {
         if (!("Notification" in window)) {
             alert("Ваш браузер не поддерживает уведомления.");
@@ -1922,7 +1924,6 @@
 
     setInterval(checkLessonReminders, 60000);
 
-    // FIREBASE CONFIGURATION
     const firebaseConfig = {
         apiKey: "AIzaSyB8Ra6zgICw2Og0-xiIHwyNLxx52aM-Y3s",
         authDomain: "unizarozvrhchat.firebaseapp.com",
@@ -2050,7 +2051,6 @@
         list.scrollTop = list.scrollHeight;
     });
 
-    // МОДАЛЬНОЕ ОКНО ОТЗЫВОВ
     function openReviewModal() {
         document.getElementById('review-modal').classList.add('active');
     }
@@ -2117,7 +2117,6 @@
         return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
     }
 
-    // NOTES LOGIC
     let notesList = JSON.parse(localStorage.getItem('uniza_user_notes')) || [
         { id: '2', title: '', text: 'Kúpiť lístky na vlak domov.' },
         { id: '1', title: 'Semestrálka', text: 'Nezabudnúť odovzdať semestrálnku do piatku.' }
@@ -2200,7 +2199,6 @@
         renderNotes();
     }
 
-    // SCHEDULE LOGIC
     let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR11';
     
     function syncGroupInputs(val) {
@@ -2437,9 +2435,7 @@
         }
     }
 
-    // -------------------------------------------------------------
-    // ЛОГИКА ИНТЕРАКТИВНОГО КАЛЕНДАРЯ
-    // -------------------------------------------------------------
+    // ЛОГИКА КАЛЕНДАРЯ
     function prevCalMonth() {
         calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
         renderCompactCalendar();
@@ -2457,6 +2453,7 @@
 
     function renderCompactCalendar() {
         const calGrid = document.getElementById('compact-calendar-grid');
+        if (!calGrid) return;
         calGrid.innerHTML = '';
 
         const t = translations[currentLang];
@@ -2476,7 +2473,9 @@
         const monthNames = t.months;
         document.getElementById('cal-month-title').innerText = `${monthNames[currentMonth]} ${currentYear}`;
 
-        const firstDayIndex = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
+        let firstDayIndex = new Date(currentYear, currentMonth, 1).getDay() - 1;
+        if (firstDayIndex === -1) firstDayIndex = 6;
+
         const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
         const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
 
