@@ -253,8 +253,13 @@
             .screen { display: block !important; }
             .mobile-header-group { display: flex !important; }
             
-            #btn-notif-header { order: 3; }
-            #btn-review-header { order: 2; }
+            /* На компе кнопки возвращаются влево обратно */
+            #btn-notif-header, #btn-review-header {
+                display: flex !important;
+            }
+            .mobile-only-right {
+                display: none !important;
+            }
         }
 
         @media (max-width: 1199px) {
@@ -267,11 +272,15 @@
                 justify-content: space-between;
                 align-items: center;
             }
-            /* На мобилке слева только язык, а колокольчик и звёздочка уходят вправе */
-            .header-left { display: flex; align-items: center; gap: 8px; }
-            #btn-notif-header { order: 10; }
-            #btn-review-header { order: 11; }
-            .header-right { display: flex; align-items: center; gap: 8px; }
+            /* На телефоне прячем кнопки слева и показываем их справа */
+            .desktop-only-btn {
+                display: none !important;
+            }
+            .mobile-only-right {
+                display: flex !important;
+                align-items: center;
+                gap: 8px;
+            }
         }
 
         .dash-column {
@@ -907,19 +916,36 @@
                     <div class="lang-item" onclick="setLanguage('uk')">🇺🇦 Українська</div>
                 </div>
             </div>
+
+            <!-- Для ПК: кнопки слева -->
+            <button class="btn-header-square desktop-only-btn" id="btn-notif-header" onclick="requestNotificationPermission()" title="Upozornenia / Уведомления">
+                🔔
+            </button>
+
+            <button class="btn-header-square desktop-only-btn" id="btn-review-header" onclick="openReviewModal()" title="Recenzie / Отзывы">
+                ⭐
+            </button>
         </div>
 
         <div class="header-title">
             <span>📅 UniFlo</span>
         </div>
 
-        <div class="header-right">
-            <!-- Кнопка уведомлений с колокольчиком -->
-            <button class="btn-header-square" id="btn-notif-header" onclick="requestNotificationPermission()" title="Upozornenia / Уведомления">
+        <!-- Для ПК правая часть c группой, а для телефонов - здесь дублируем кнопки -->
+        <div class="header-right mobile-header-group">
+            <div class="group-selector-container">
+                <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
+                <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Skupina...">
+                <a href="#" id="evzd-link" target="_blank" class="btn-evzd">e-vzd ↗</a>
+            </div>
+        </div>
+
+        <!-- Для телефонов: кнопки справа -->
+        <div class="mobile-only-right">
+            <button class="btn-header-square" onclick="requestNotificationPermission()" title="Upozornenia / Уведомления">
                 🔔
             </button>
-
-            <button class="btn-header-square" id="btn-review-header" onclick="openReviewModal()" title="Recenzie / Отзывы">
+            <button class="btn-header-square" onclick="openReviewModal()" title="Recenzie / Отзывы">
                 ⭐
             </button>
         </div>
@@ -1379,7 +1405,7 @@
             no_places: "Žiadne miesta v tejto kategórii.",
             edit_btn: "✏️ Upraviť",
             delete_btn: "🗑 Odstrániť",
-            months: ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Október", "November", "December"],
+            months: ["Január", "Február", "Marec", "Apríl", "Máj", "Jún", "Júl", "August", "September", "Októbka", "November", "December"],
             weekdays_clock: ["Nedeľa", "Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota"],
             weekdays_cal: ["Po", "Ut", "St", "Št", "Pi", "So", "Ne"]
         },
