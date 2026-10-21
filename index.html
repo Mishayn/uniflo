@@ -3706,3 +3706,60 @@
 
         const newLesson = {
             id: id || Date.now().toString(),
+            day: dayVal,
+            title: document.getElementById('form-title').value,
+            type: document.getElementById('form-type').value,
+            start: startVal,
+            end: endVal,
+            teacher: document.getElementById('form-teacher').value,
+            room: document.getElementById('form-room').value
+        };
+
+        if (id) {
+            const idx = schedule.findIndex(l => l.id === id);
+            schedule[idx] = newLesson;
+        } else {
+            schedule.push(newLesson);
+        }
+
+        localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+        closeModal('lesson-modal');
+        renderAll();
+    }
+
+    function deleteLesson() {
+        const id = document.getElementById('edit-id').value;
+        if (!id) return;
+        schedule = schedule.filter(l => l.id !== id);
+        localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+        closeModal('lesson-modal');
+        renderAll();
+    }
+
+    function renderAll() {
+        renderUpcomingDay();
+        renderWeekGrid();
+        renderCompactCalendar();
+        loadLessonNotes();
+        renderUnifiedNotes();
+        fetchWeather();
+        initMap();
+        applyTranslations();
+    }
+
+    setInterval(() => {
+        const now = new Date();
+        const clockEl = document.getElementById('live-clock');
+        const dateEl = document.getElementById('live-date');
+        if (clockEl) clockEl.innerText = now.toTimeString().split(' ')[0];
+        if (dateEl) {
+            const t = translations[currentLang];
+            dateEl.innerText = `${t.weekdays_clock[now.getDay()]}, ${now.getDate()}. ${t.months[now.getMonth()]} ${now.getFullYear()}`;
+        }
+    }, 1000);
+
+    updateEvzdLink(currentGroup);
+    renderAll();
+</script>
+</body>
+</html>
