@@ -210,7 +210,6 @@
         .timeline-now-indicator { position: absolute; top: -4px; bottom: -4px; width: 4px; background: #3b82f6; border-radius: 2px; box-shadow: 0 0 6px rgba(59, 130, 246, 0.8); z-index: 5; transform: translateX(-50%); }
         .timeline-scale-labels { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
 
-        /* ИЗМЕНЕННЫЙ БЛОК ПОГОДЫ: Сплошная полоса на десктопе */
         .weather-graph-scroll-container { width: 100%; overflow-x: auto; position: relative; scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
         .desktop-weather-view { display: block; }
         .mobile-weather-view { display: none; }
@@ -973,7 +972,7 @@
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${n.title}.doc`; a.click();
     }
 
-    // ПОГОДА (ОБЪЕДИНЕННАЯ)
+    // ПОГОДА (ОБЪЕДИНЕННАЯ В ЕДИНЫЙ БЛОК)
     let hourlyWeatherData = [];
 
     async function fetchWeather() {
@@ -1015,7 +1014,7 @@
         return '☀️';
     }
 
-    // Отрисовка в один единственный сплошной блок
+    // Отрисовка в один сплошной блок без рамок вокруг каждого часа
     function drawWeatherCards() {
         if (!hourlyWeatherData.length) generateFallbackWeatherData();
         const track = document.getElementById('weather-flex-track');
@@ -1024,13 +1023,13 @@
 
         track.style.cssText = `
             display: flex;
-            gap: 12px;
+            gap: 8px;
             min-width: max-content;
             align-items: stretch;
-            background: var(--bg-main);
+            background: #17191d;
             border: 1px solid var(--border-color);
             border-radius: 14px;
-            padding: 16px 14px;
+            padding: 16px 12px;
         `;
 
         const temps = hourlyWeatherData.map(d => d.temp);
@@ -1050,6 +1049,8 @@
                 justify-content: space-between;
                 width: 52px;
                 height: 140px;
+                background: transparent;
+                border: none;
                 flex-shrink: 0;
             `;
 
