@@ -1707,7 +1707,7 @@
 <div class="modal-overlay" id="drawing-modal" onclick="if(event.target===this)closeModal('drawing-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true">
     <div class="notes-modal-header">
-        <div class="modal-title">✏️ Редактор рисунка</div>
+        <div class="notes-modal-title">✏️ Редактор рисунка</div>
         <button class="close-btn" onclick="closeModal('drawing-modal')">&times;</button>
     </div>
     <div style="padding: 10px 14px; background: var(--bg-card); display: flex; flex-direction: column; gap: 8px;">
@@ -2690,7 +2690,6 @@
     }
 
     function saveStateToHistory() {
-        // Сохраняем глубокую копию массива объектов для Ctrl+Z
         historyStack.push(JSON.parse(JSON.stringify(canvasObjects)));
         if (historyStack.length > 30) historyStack.shift();
     }
@@ -2737,6 +2736,8 @@
     function redrawCanvas() {
         if (!canvasCtx) return;
         const canvas = document.getElementById('drawing-canvas');
+        
+        // Всегда строго белый фон холста
         canvasCtx.fillStyle = '#ffffff';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -2773,7 +2774,6 @@
                 }
             }
 
-            // Если объект выбран — рисуем рамку с ручкой изменения размера
             if (idx === selectedObjIndex && currentTool === 'select') {
                 const bounds = getObjectBounds(obj);
                 canvasCtx.strokeStyle = '#f97316';
@@ -2782,7 +2782,6 @@
                 canvasCtx.strokeRect(bounds.x - 4, bounds.y - 4, bounds.width + 8, bounds.height + 8);
                 canvasCtx.setLineDash([]);
 
-                // Уголок растягивания в правом нижнем углу
                 canvasCtx.fillStyle = '#f97316';
                 canvasCtx.fillRect(bounds.x + bounds.width - 4, bounds.y + bounds.height - 4, 10, 10);
             }
@@ -2853,7 +2852,6 @@
             const pos = getPos(e);
 
             if (currentTool === 'select') {
-                // Проверяем клик на ручку изменения размера у выбранного объекта
                 if (selectedObjIndex !== -1 && hitTestResizeHandle(canvasObjects[selectedObjIndex], pos.x, pos.y)) {
                     saveStateToHistory();
                     isResizingObj = true;
@@ -2862,7 +2860,6 @@
                     return;
                 }
 
-                // Ищем объект под курсором (начинаем с верхних / последних)
                 let foundIdx = -1;
                 for (let i = canvasObjects.length - 1; i >= 0; i--) {
                     if (hitTestObject(canvasObjects[i], pos.x, pos.y)) {
@@ -2913,7 +2910,6 @@
                     } else if (obj.type === 'text') {
                         obj.size = Math.max(10, (obj.size || 24) + Math.round(dx / 4));
                     } else if (obj.type === 'path' || obj.type === 'eraser') {
-                        // Масштабируем точки рисунка
                         const b = getObjectBounds(obj);
                         const scaleX = (b.width + dx) / b.width;
                         const scaleY = (b.height + dy) / b.height;
@@ -2959,7 +2955,6 @@
             }
         };
 
-        // Двойной клик для изменения текста
         canvas.ondblclick = (e) => {
             const pos = getPos(e);
             for (let i = canvasObjects.length - 1; i >= 0; i--) {
@@ -3002,7 +2997,6 @@
         saveCurrentDrawingMeta();
     }
 
-    // --- Кастомное окно для текста (одно поле ввода, в стиле заметок) ---
     function openCanvasTextModalForNew() {
         document.getElementById('canvas-text-edit-id').value = '';
         document.getElementById('canvas-text-input').value = '';
