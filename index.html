@@ -769,7 +769,7 @@
             margin-top: 4px;
         }
 
-        /* СТИЛИ ДЛЯ ПОГОДЫ (РАЗДЕЛЬНЫЕ ДЛЯ ПК И МОБИЛЬНЫХ) */
+        /* ЕДИНЫЙ КРАСИВЫЙ СТИЛЬ ДЛЯ CANVAS ГРАФИКА ПОГОДЫ */
         .weather-scroll-box {
             width: 100%;
             overflow-x: auto;
@@ -777,53 +777,6 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 12px;
-        }
-
-        /* ПК-версия (Сетка/Карточки) */
-        @media (min-width: 768px) {
-            .weather-mobile-view { display: none !important; }
-            .weather-desktop-view {
-                display: grid !important;
-                grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
-                gap: 8px;
-                max-height: 380px;
-                overflow-y: auto;
-            }
-        }
-
-        /* Мобильная версия (Canvas График) */
-        @media (max-width: 767px) {
-            .weather-desktop-view { display: none !important; }
-            .weather-mobile-view { display: block !important; }
-        }
-
-        .weather-card-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            text-align: center;
-            min-height: 110px;
-        }
-
-        .weather-card-temp {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .weather-card-icon {
-            font-size: 1.3rem;
-            margin: 4px 0;
-        }
-
-        .weather-card-time {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
         }
 
         .notes-container {
@@ -1325,7 +1278,7 @@
 
                 <div id="screen-kalendar" class="screen active" style="margin-top: 15px;">
                     <div class="dash-card">
-                        <!-- Шапка с часами и двумя квадратными кнопками по бокам -->
+                        <!-- Шапка часов с кнопками -->
                         <div class="clock-container">
                             <button class="clock-side-btn" onclick="openOpeningHoursModal()" title="Otváracie hodiny / График работы">⏰</button>
                             <div class="clock-box">
@@ -1335,7 +1288,7 @@
                             <button class="clock-side-btn" id="btn-weather-temp" onclick="openWeatherModal()" title="Predpoveď počasia / Прогноз погоды">--°</button>
                         </div>
                         
-                        <!-- Шапка календаря с переключением месяцев -->
+                        <!-- Шапка календаря -->
                         <div class="cal-nav-bar">
                             <div class="section-title" data-i18n="calendar">Kalendár</div>
                             <div class="cal-nav-btns">
@@ -1451,7 +1404,7 @@
     </nav>
 </div>
 
-<!-- Modal Opening Hours (Визуальный таймлайн графика работы) -->
+<!-- Modal Opening Hours -->
 <div class="modal-overlay" id="opening-hours-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1462,7 +1415,7 @@
     </div>
 </div>
 
-<!-- Modal Weather (Адаптивное: Карточки для ПК, Canvas для Телефонов) -->
+<!-- Modal Weather (Единое красивое модальное окно с Canvas графиком для ПК и телефонов) -->
 <div class="modal-overlay" id="weather-modal">
     <div class="modal" style="max-width: 680px;">
         <div class="modal-header">
@@ -1474,11 +1427,7 @@
             ↔ Posúvajte pre zobrazenie celého dňa
         </div>
 
-        <!-- ПК версия (Сетка карточек без багов Canvas) -->
-        <div class="weather-desktop-view" id="weather-desktop-grid"></div>
-
-        <!-- Мобильная версия (Canvas График с плавным скроллом пальцем) -->
-        <div class="weather-mobile-view weather-scroll-box" id="weather-canvas-wrapper">
+        <div class="weather-scroll-box" id="weather-canvas-wrapper">
             <canvas id="weather-canvas"></canvas>
         </div>
     </div>
@@ -1564,7 +1513,7 @@
     </div>
 </div>
 
-<!-- Modal for Note Creation/Editing (Обычные заметки) -->
+<!-- Modal for Note Creation/Editing -->
 <div class="modal-overlay" id="note-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1587,7 +1536,7 @@
     </div>
 </div>
 
-<!-- Integrovaný UniFlo Notes editor (Новые заметки) -->
+<!-- Integrovaný UniFlo Notes editor -->
 <div class="modal-overlay" id="lesson-notes-modal" onclick="if(event.target===this)closeModal('lesson-notes-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true" aria-label="UniFlo Notes">
     <div class="notes-modal-header"><div class="modal-title">📝 UniFlo Notes</div><button class="close-btn" onclick="closeModal('lesson-notes-modal')" aria-label="Zavrieť">&times;</button></div>
@@ -1676,7 +1625,7 @@
     </div>
 </div>
 
-<!-- Modal for Map Point (Create / Edit) -->
+<!-- Modal for Map Point -->
 <div class="modal-overlay" id="map-point-modal">
     <div class="modal">
         <div class="modal-header">
@@ -2471,7 +2420,7 @@
         closeModal('note-modal');
     }
 
-    // --- Расширенный редактор UniFlo Notes (новые заметки) ---
+    // --- Редактор UniFlo Notes ---
     const LESSON_NOTE_SUBJECTS = [
         'MPI - Prednáška','MPI - Cvičenie','API - Prednáška','API - Cvičenie',
         'MAT1 - Prednáška','MAT1 - Cvičenie','PZA - Prednáška','PZA - Laboratórne',
@@ -2952,7 +2901,7 @@
         renderCompactCalendar();
     }
 
-    // ЛОГИКА ТАЙМЛАЙНА ГРАФИКА РАБОТЫ МЕСТ UNIZA
+    // ТАЙМЛАЙН ГРАФИКА РАБОТЫ МЕСТ UNIZA
     const unizaPlacesData = [
         { name: "🍽️ Nová Menza (Obedy)", start: 7.0, end: 18.0, label: "07:00 – 18:00" },
         { name: "☕ Bufet Nová Menza", start: 7.0, end: 14.0, label: "07:00 – 14:00" },
@@ -3002,7 +2951,7 @@
         document.getElementById('opening-hours-modal').classList.add('active');
     }
 
-    // ПОГОДА: ТОЧНЫЙ РАСЧЕТ ДЛЯ ЛЮБЫХ ТЕМПЕРАТУР (ВКЛЮЧАЯ МЕНЕЕ 10°C)
+    // ПОГОДА: ПОЛНОСТЬЮ КРАСИВЫЙ CANVAS-ГРАФИК С ТОЧНЫМИ ТЕМПЕРАТУРАМИ
     let hourlyWeatherData = [];
 
     async function fetchWeather() {
@@ -3065,29 +3014,15 @@
         return '☀️';
     }
 
-    // 1. Отрисовка для ПК (Сетка красивых аккуратных карточек)
-    function renderDesktopWeatherGrid() {
-        const grid = document.getElementById('weather-desktop-grid');
-        if (!grid) return;
-        grid.innerHTML = '';
-
-        hourlyWeatherData.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'weather-card-item';
-            card.innerHTML = `
-                <div class="weather-card-temp">${item.temp}°C</div>
-                <div class="weather-card-icon">${getWeatherIcon(item.code)}</div>
-                <div class="weather-card-time">${item.timeStr}</div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    // 2. Отрисовка для Мобильных (Canvas График с точным масштабом любых температур)
-    function drawMobileWeatherCanvas() {
+    // РИСОВАНИЕ ПЛАВНОГО КРАСИВОГО ГРАФИКА
+    function drawWeatherGraph() {
         const canvas = document.getElementById('weather-canvas');
         const wrapper = document.getElementById('weather-canvas-wrapper');
         if (!canvas || !wrapper) return;
+
+        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
+            generateFallbackWeatherData();
+        }
 
         const ctx = canvas.getContext('2d');
         const count = hourlyWeatherData.length;
@@ -3108,7 +3043,7 @@
         let minTemp = Math.min(...temps);
         let maxTemp = Math.max(...temps);
         
-        // Исправленный расчет: гарантируем видимость даже при одинаковых или маленьких/отрицательных температурах
+        // Исправленный расчет: гарантируем точный диапазон независимо от высоты температур (даже ниже 10°)
         if (minTemp === maxTemp) { 
             minTemp -= 2; 
             maxTemp += 2; 
@@ -3128,7 +3063,7 @@
             return { x, y, ...item };
         });
 
-        // Линии
+        // Вертикальные линии
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
         ctx.lineWidth = 1;
         points.forEach(p => {
@@ -3140,7 +3075,7 @@
             ctx.setLineDash([]);
         });
 
-        // Градиент
+        // Плавный градиент под линией
         const gradient = ctx.createLinearGradient(0, topMargin, 0, canvasHeight - bottomMargin);
         gradient.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
         gradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
@@ -3161,7 +3096,7 @@
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        // Кривая
+        // Оранжевая плавная линия
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
         for (let i = 0; i < points.length - 1; i++) {
@@ -3175,7 +3110,7 @@
         ctx.lineCap = 'round';
         ctx.stroke();
 
-        // Точки и текст
+        // Белые точки, значения температур, иконки и часы
         points.forEach((p) => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
@@ -3203,15 +3138,10 @@
     function openWeatherModal() {
         const modal = document.getElementById('weather-modal');
         modal.classList.add('active');
-        
-        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
-            generateFallbackWeatherData();
-        }
 
-        renderDesktopWeatherGrid();
-
+        // Небольшая задержка, чтобы окно точно появилось на ПК перед отрисовкой
         setTimeout(() => {
-            drawMobileWeatherCanvas();
+            drawWeatherGraph();
         }, 50);
     }
 
