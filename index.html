@@ -3047,49 +3047,58 @@
         return '☀️';
     }
 
-    // Отрисовка HTML-карточек для ПК
-    function drawWeatherCards() {
-        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
-            generateFallbackWeatherData();
-        }
-
-        const track = document.getElementById('weather-flex-track');
-        if (!track) return;
-        track.innerHTML = '';
-
-        const temps = hourlyWeatherData.map(d => d.temp);
-        const minTemp = Math.min(...temps);
-        const maxTemp = Math.max(...temps);
-        const tempRange = maxTemp - minTemp || 1;
-
-        hourlyWeatherData.forEach(item => {
-            const heightPercent = Math.max(20, Math.round(((item.temp - minTemp) / tempRange) * 60 + 25));
-            const icon = getWeatherIcon(item.code);
-
-            const col = document.createElement('div');
-            col.style.cssText = `
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: space-between;
-                width: 58px;
-                height: 150px;
-                background: var(--bg-main);
-                border: 1px solid var(--border-color);
-                border-radius: 10px;
-                padding: 12px 4px;
-                flex-shrink: 0;
-            `;
-
-            col.innerHTML = `
-                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary);">${item.temp}°</span>
-                <div style="font-size: 1.3rem; margin: 4px 0;">${icon}</div>
-                <div style="width: 8px; height: ${heightPercent}%; background: linear-gradient(to top, var(--accent-orange), #fde047); border-radius: 4px; margin: 4px 0;"></div>
-                <span style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">${item.timeStr}</span>
-            `;
-            track.appendChild(col);
-        });
+    // Отрисовка погоды в одном общем блоке (для ПК)
+function drawWeatherCards() {
+    if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
+        generateFallbackWeatherData();
     }
+
+    const track = document.getElementById('weather-flex-track');
+    if (!track) return;
+    track.innerHTML = '';
+
+    // Стилизуем сам трек как один большой единый контейнер
+    track.style.cssText = `
+        display: flex;
+        gap: 12px;
+        min-width: max-content;
+        align-items: stretch;
+        background: var(--bg-main);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 16px 14px;
+    `;
+
+    const temps = hourlyWeatherData.map(d => d.temp);
+    const minTemp = Math.min(...temps);
+    const maxTemp = Math.max(...temps);
+    const tempRange = maxTemp - minTemp || 1;
+
+    hourlyWeatherData.forEach(item => {
+        const heightPercent = Math.max(20, Math.round(((item.temp - minTemp) / tempRange) * 60 + 25));
+        const icon = getWeatherIcon(item.code);
+
+        const col = document.createElement('div');
+        // Прозрачные колонки внутри общего блока
+        col.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            width: 52px;
+            height: 140px;
+            flex-shrink: 0;
+        `;
+
+        col.innerHTML = `
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">${item.temp}°</span>
+            <div style="font-size: 1.3rem; margin: 4px 0;">${icon}</div>
+            <div style="width: 8px; height: ${heightPercent}%; background: linear-gradient(to top, var(--accent-orange), #fde047); border-radius: 4px; margin: 4px 0;"></div>
+            <span style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">${item.timeStr}</span>
+        `;
+        track.appendChild(col);
+    });
+}
 
     // Отрисовка Canvas графика для мобильных устройств
     function drawWeatherGraph() {
