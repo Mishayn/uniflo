@@ -209,10 +209,10 @@
             background: var(--accent-orange);
             color: white;
             border: none;
-            padding: 9px 12px;
+            padding: 8px 10px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             cursor: pointer;
             transition: opacity 0.2s;
             text-align: left;
@@ -802,7 +802,7 @@
             .mobile-weather-view { display: block; }
         }
 
-        /* Новый блок структуры заметок по скетчу */
+        /* Новый блок структуры заметок по скетчу (исправленная верстка) */
         .notes-dashboard-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -1409,13 +1409,13 @@
             <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
 
-                    <!-- Блок заметок по новому скетчу -->
+                    <!-- Блок заметок по скетчу -->
                     <div class="notes-dashboard-card">
                         <div class="section-header" style="margin-bottom: 8px;">
                             <div class="section-title" data-i18n="my_notes">📝 Moje Poznámky</div>
                         </div>
                         
-                        <!-- Верхняя панель кнопок по скетчу -->
+                        <!-- Раскладка по твоему наброску: слева кнопки друг под другом, справа большая кнопка с карандашом -->
                         <div class="notes-actions-top-grid">
                             <div class="notes-left-btns">
                                 <button class="btn-main-action" onclick="openNoteModal()">📝 <span data-i18n="create_note">Vytvoriť poznámku</span></button>
@@ -1426,7 +1426,7 @@
                             </button>
                         </div>
 
-                        <!-- Единая лента всех заметок, ворд-документов и рисунков -->
+                        <!-- Единая лента всех записей под кнопками -->
                         <div class="unified-notes-list" id="unified-notes-container"></div>
                     </div>
 
@@ -1672,7 +1672,7 @@
             <button type="button" onclick="formatLessonNote('italic')" title="Kurzíva"><i>I</i></button>
             <button type="button" onclick="formatLessonNote('underline')" title="Podčiarknuté"><u>U</u></button>
             <select aria-label="Písmo" onchange="changeLessonNoteFont(this.value)"><option value="">Písmo</option><option>Arial</option><option>Verdana</option><option>Georgia</option><option>Courier New</option><option>Times New Roman</option></select>
-            <select aria-label="Veľkosť písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
+            <select aria-label="Veľkosť písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkość</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
             <input type="color" aria-label="Farba textu" value="#121316" onchange="changeLessonNoteColor(this.value)">
           </div>
         </div>
@@ -1704,7 +1704,7 @@
                 <button type="button" class="cal-nav-btn" onclick="currentTool='eraser'" style="background:var(--bg-input);">🧹 Ластик</button>
                 <button type="button" class="cal-nav-btn" onclick="addTextToCanvas()" style="background:var(--bg-input);">💬 Текст</button>
                 <button type="button" class="cal-nav-btn" onclick="addImageToCanvas()" style="background:var(--bg-input);">🖼️ Картинка</button>
-                <button type="button" class="cal-nav-btn" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#efca5a5;">🗑️ Очистить</button>
+                <button type="button" class="cal-nav-btn" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444;">🗑️ Очистить</button>
             </div>
         </div>
     </div>
@@ -2544,7 +2544,7 @@
         const allItems = [...basicNotes, ...wordNotes, ...drawings].sort((a, b) => (b.id || 0) - (a.id || 0));
 
         if (allItems.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:0.8rem;">Zatiaľ žiadne poznámky, dokumenty ani kresby.</div>';
+            container.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:0.8rem;">Žiadne poznámky, dokumenty ani kresby.</div>';
             return;
         }
 
@@ -2626,7 +2626,7 @@
     let currentDrawingId = null;
     let currentColor = '#000000';
     let brushSize = 4;
-    let currentTool = 'brush'; // 'brush', 'eraser'
+    let currentTool = 'brush';
     let isDrawing = false;
     let canvasCtx = null;
 
@@ -2720,7 +2720,6 @@
             }
         };
 
-        // Touch support
         canvas.ontouchstart = (e) => {
             isDrawing = true;
             const pos = getPos(e);
