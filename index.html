@@ -3075,6 +3075,7 @@ function drawWeatherGraph() {
         return { x, y, ...item };
     });
 
+    // Отрисовка линий сетки, градиента и графика
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
     ctx.lineWidth = 1;
     points.forEach(p => {
@@ -3147,9 +3148,10 @@ function openWeatherModal() {
     const modal = document.getElementById('weather-modal');
     modal.classList.add('active');
     
+    // Даем браузеру 50-100мс на открытие модального окна и расчет стилей, затем рисуем график
     setTimeout(() => {
         drawWeatherGraph();
-    }, 100);
+    }, 80);
 }
 
     function initMap() {
