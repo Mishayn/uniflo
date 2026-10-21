@@ -2991,11 +2991,9 @@ function openWeatherModal() {
     const modal = document.getElementById('weather-modal');
     modal.classList.add('active');
     
-    // Даем браузеру долю секунды на отображение модального окна, 
-    // чтобы холст получил реальную ширину на ПК и не был черным
     setTimeout(() => {
         drawWeatherGraph();
-    }, 150);
+    }, 100);
 }
 
     function initMap() {
