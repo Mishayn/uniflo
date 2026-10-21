@@ -773,9 +773,9 @@
             margin-top: 4px;
         }
 
-        /* ИСПРАВЛЕННЫЙ БЛОК ПОГОДЫ (Увеличенный размер на ПК) */
+        /* ПОГОДА ИСХОДНЫЙ ВИД */
         #weather-modal .modal {
-            max-width: 900px !important;
+            max-width: 460px !important;
             width: 95vw;
         }
 
@@ -786,18 +786,10 @@
             overflow-y: hidden;
             background: var(--bg-main);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px 16px 28px 16px;
+            border-radius: 8px;
+            padding: 12px 8px;
             position: relative;
             scrollbar-width: thin;
-            scrollbar-color: var(--border-color) transparent;
-        }
-        .weather-graph-scroll-container::-webkit-scrollbar {
-            height: 6px;
-        }
-        .weather-graph-scroll-container::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 3px;
         }
 
         /* Блок заметок */
@@ -859,7 +851,7 @@
         .unified-note-title { font-size: 0.84rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .unified-note-desc { font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ОБНОВЛЕННАЯ ПАНЕЛЬ РЕДАКТОРА (по скриншоту) */
+        /* ДИЗАЙН ПЕИНТА ДЛЯ РЕДАКТОРА РИСУНКОВ */
         #drawing-modal .notes-modal {
             width: min(1360px, 98vw);
             max-width: 1360px;
@@ -871,64 +863,51 @@
             background: var(--bg-card);
         }
 
-        .drawing-toolbar-large {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 14px 18px;
-            background: var(--bg-main);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        /* Строка 1: Инструменты и Ползунок кисти справа */
-        .drawing-toolbar-row1 {
+        .drawing-toolbar-paint {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-main);
+            border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
         }
 
-        /* Строка 2: Палитра цветов растянутая во всю ширину */
-        .color-palette-large {
+        .paint-palette-box {
             display: grid;
-            grid-template-columns: repeat(16, 1fr);
-            gap: 6px;
-            width: 100%;
+            grid-template-columns: repeat(8, 20px);
+            gap: 3px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 4px;
+            border-radius: 6px;
         }
 
-        .color-btn-large {
-            height: 28px;
-            border-radius: 6px;
+        .paint-color-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
             border: 1px solid var(--border-color);
             cursor: pointer;
-            transition: transform 0.1s;
         }
-        .color-btn-large:hover { transform: scale(1.08); }
-        .color-btn-large.active { border: 2px solid #ffffff; box-shadow: 0 0 6px var(--accent-orange); }
+        .paint-color-btn:hover { transform: scale(1.1); }
+        .paint-color-btn.active { border: 2px solid #ffffff; }
 
         .tool-btn-large {
             background: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.88rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
-        .tool-btn-large:hover {
-            border-color: var(--accent-orange);
-            color: var(--accent-orange);
-        }
-        .tool-btn-large.active {
-            background: var(--accent-orange);
-            color: #ffffff;
-            border-color: var(--accent-orange);
-        }
+        .tool-btn-large:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .tool-btn-large.active { background: var(--accent-orange); color: #ffffff; border-color: var(--accent-orange); }
 
         .drawing-canvas-container {
             flex: 1;
@@ -969,15 +948,6 @@
             pointer-events: none;
         }
 
-        .drawing-footer-btns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            padding: 12px 16px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-color);
-        }
-
         /* UniFlo Notes – интегрированный редактор заметок */
         #lesson-notes-modal .notes-modal {
             width: min(1180px, 96vw);
@@ -1014,16 +984,6 @@
         #lesson-notes-modal .notes-export { background:#16a34a; }
         #lesson-notes-modal .notes-delete { background:#dc2626; }
         #lesson-notes-modal .notes-status { color:var(--text-muted); font-size:.72rem; align-self:center; }
-        @media (max-width:700px) {
-            #lesson-notes-modal { padding:5px; }
-            #lesson-notes-modal .notes-modal { width:100%; height:94vh; }
-            #lesson-notes-modal .notes-layout { grid-template-columns:112px minmax(0,1fr); }
-            #lesson-notes-modal .notes-sidebar { padding:7px; }
-            #lesson-notes-modal .notes-list-item { padding:7px; }
-            #lesson-notes-modal .notes-toolbar-top { padding:8px; }
-            #lesson-notes-modal .notes-editor { padding:12px; }
-            #lesson-notes-modal .notes-footer { padding:8px; }
-        }
 
         .chat-box {
             display: flex;
@@ -1592,7 +1552,7 @@
     </div>
 </div>
 
-<!-- Modal Weather (Увеличенный размер на ПК) -->
+<!-- Modal Weather (Исходный размер) -->
 <div class="modal-overlay" id="weather-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1746,7 +1706,7 @@
   </div>
 </div>
 
-<!-- Модальное окно для рисования (Перекомпонованная верхняя панель по скриншоту) -->
+<!-- Модальное окно для рисования в стиле Paint (палитра слева, размер кисти внизу слева) -->
 <div class="modal-overlay" id="drawing-modal" onclick="if(event.target===this)closeModal('drawing-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true">
     
@@ -1755,40 +1715,22 @@
         <button class="close-btn" onclick="closeModal('drawing-modal')" aria-label="Закрыть" style="position: absolute; right: 16px; top: 12px;">&times;</button>
     </div>
     
-    <div style="padding: 12px 16px; background: var(--bg-card); display: flex; flex-direction: column; gap: 10px;">
+    <div style="padding: 10px 16px; background: var(--bg-card); display: flex; flex-direction: column; gap: 8px;">
         <input type="text" id="drawing-title-input" class="form-control" style="font-size:0.95rem; padding:8px 12px;" placeholder="Название рисунка / Схемы..." oninput="saveCurrentDrawingMeta()">
         
-        <div class="drawing-toolbar-large">
-            <!-- СТРОКА 1: Инструменты, выбор/двигать, кисть-ползунок справа -->
-            <div class="drawing-toolbar-row1">
+        <div class="drawing-toolbar-paint">
+            <!-- Палитра слева (как в красном квадрате) -->
+            <div class="paint-palette-box" id="color-palette-grid"></div>
+
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                 <button type="button" id="btn-tool-brush" class="tool-btn-large active" onclick="setCanvasTool('brush')">✏️ Кисть</button>
                 <button type="button" id="btn-tool-select" class="tool-btn-large" onclick="setCanvasTool('select')">🖐️ Выбрать / Двигать</button>
                 <button type="button" id="btn-tool-eraser" class="tool-btn-large" onclick="setCanvasTool('eraser')">🧹 Ластик</button>
                 <button type="button" class="tool-btn-large" onclick="addTextToCanvas()">💬 Текст</button>
-                
                 <label class="tool-btn-large" style="margin:0; cursor:pointer;">
                     🖼️ Файл <input type="file" id="canvas-image-file-input" accept="image/*" style="display:none;" onchange="handleImageFileUpload(event)">
                 </label>
                 <button type="button" class="tool-btn-large" onclick="addImageViaUrl()" title="Вставить по URL">🔗 URL</button>
-
-                <!-- Ползунок "Кисть:" напротив кнопок -->
-                <div style="display:flex; align-items:center; gap:8px; margin-left:12px;">
-                    <label style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Кисть:</label>
-                    <input type="range" id="brush-size-range" min="1" max="40" value="5" oninput="brushSize = this.value" style="width: 100px; height:6px;">
-                </div>
-            </div>
-
-            <!-- СТРОКА 2: Растянутая во всю ширину палитра цветов -->
-            <div class="color-palette-large" id="color-palette-grid"></div>
-
-            <!-- СТРОКА 3: Размер холста и кнопка очистки снизу справа -->
-            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                <span style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Размер:</span>
-                <input type="number" id="canvas-width-input" class="form-control" style="width: 75px; padding: 6px; font-size: 0.85rem; font-weight:700; text-align: center;" min="100" max="5000" onchange="manualResizeCanvas()" title="Ширина холста">
-                <span style="font-size:0.82rem; color:var(--text-muted);">×</span>
-                <input type="number" id="canvas-height-input" class="form-control" style="width: 75px; padding: 6px; font-size: 0.85rem; font-weight:700; text-align: center;" min="100" max="5000" onchange="manualResizeCanvas()" title="Высота холста">
-                <span style="font-size:0.82rem; color:var(--text-muted); margin-right:8px;">px</span>
-                <button type="button" class="tool-btn-large" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444; border-color:rgba(239,68,68,0.4);">🗑️ Очистить</button>
             </div>
         </div>
     </div>
@@ -1800,10 +1742,22 @@
         </div>
     </div>
     
-    <div style="background:var(--bg-card); border-top:1px solid var(--border-color); padding: 12px 16px;">
-        <div class="drawing-footer-btns" style="padding:0; border:none;">
-            <button class="notes-export" onclick="exportDrawingAsImage()" style="width:100%; border:none; border-radius:8px; padding:12px; font-size:0.95rem; font-weight:700; cursor:pointer;">📥 Скачать PNG</button>
-            <button class="notes-delete" onclick="deleteCurrentDrawing()" style="width:100%; border:none; border-radius:8px; padding:12px; font-size:0.95rem; font-weight:700; cursor:pointer;">🗑 Удалить</button>
+    <!-- Нижняя панель (размер кисти слева от масштаба холста) -->
+    <div style="background:var(--bg-card); border-top:1px solid var(--border-color); padding: 10px 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Кисть:</label>
+            <input type="range" id="brush-size-range" min="1" max="40" value="5" oninput="brushSize = this.value" style="width: 110px; height:6px;">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Размер:</span>
+            <input type="number" id="canvas-width-input" class="form-control" style="width: 75px; padding: 6px; font-size: 0.85rem; font-weight:700; text-align: center;" min="100" max="5000" onchange="manualResizeCanvas()">
+            <span style="font-size:0.82rem; color:var(--text-muted);">×</span>
+            <input type="number" id="canvas-height-input" class="form-control" style="width: 75px; padding: 6px; font-size: 0.85rem; font-weight:700; text-align: center;" min="100" max="5000" onchange="manualResizeCanvas()">
+            <span style="font-size:0.82rem; color:var(--text-muted);">px</span>
+            <button type="button" class="tool-btn-large" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444; border-color:rgba(239,68,68,0.4); margin-left:12px;">🗑️ Очистить</button>
+            <button class="notes-export" onclick="exportDrawingAsImage()" style="background:#16a34a; border:none; border-radius:6px; padding:6px 12px; font-size:0.85rem; font-weight:700; cursor:pointer; color:white;">📥 PNG</button>
+            <button class="notes-delete" onclick="deleteCurrentDrawing()" style="background:#dc2626; border:none; border-radius:6px; padding:6px 12px; font-size:0.85rem; font-weight:700; cursor:pointer; color:white;">🗑 Удалить</button>
         </div>
     </div>
   </div>
@@ -2595,7 +2549,7 @@
         return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
     }
 
-    // --- ЛОГИКА ОБЩИХ ЗАМЕТОК И РИСУНКОВ ---
+    // --- ЗАМЕТКИ ---
     function getBasicNotes() {
         try { return JSON.parse(localStorage.getItem('uniflo_basic_notes')) || []; }
         catch (e) { return []; }
@@ -2702,12 +2656,12 @@
         closeModal('note-modal');
     }
 
-    // --- ЛОГИКА ХОЛСТА (С 16 ЦВЕТАМИ, ВЫБОРОМ И CTRL + Z) ---
-    const BASIC_16_COLORS = [
-        '#000000', '#ffffff', '#ef4444', '#f97316',
-        '#facc15', '#22c55e', '#3b82f6', '#8b5cf6',
-        '#ec4899', '#78716c', '#991b1b', '#9a3412',
-        '#166534', '#1e40af', '#581c87', '#374151'
+    // --- РЕДАКТОР В СТИЛЕ PAINT (ПАЛИТРА СЛЕВА, РАЗМЕР КИСТИ СНИЗУ СЛЕВА ОТ МАСШТАБА) ---
+    const PAINT_16_COLORS = [
+        '#000000', '#ffffff', '#808080', '#c0c0c0',
+        '#800000', '#ff0000', '#808000', '#ffff00',
+        '#008000', '#00ff00', '#008080', '#00ffff',
+        '#000080', '#0000ff', '#800080', '#ff00ff'
     ];
 
     let currentDrawingId = null;
@@ -2716,21 +2670,18 @@
     let currentTool = 'brush'; 
     let isDrawing = false;
     let canvasCtx = null;
-
     let canvasElements = [];
-    let historyUndoStack = []; // История отмены Ctrl+Z
+    let historyUndoStack = [];
     let currentStroke = null;
-    let selectedElementIndices = []; 
-    let activeResizeHandle = null; 
+    let selectedElementIndices = [];
+    let activeResizeHandle = null;
     let isDraggingElements = false;
     let isResizingElements = false;
     let isBoxSelecting = false;
     let boxSelectStart = { x: 0, y: 0 };
     let boxSelectCurrent = { x: 0, y: 0 };
     let dragStartMouse = { x: 0, y: 0 };
-    
     let resizeInitialSnapshot = null;
-
     let canvasWidth = 1230;
     let canvasHeight = 510;
 
@@ -2763,7 +2714,6 @@
         saveCurrentDrawingMeta();
     }
 
-    // Слушатель сочетания клавиш Ctrl+Z
     window.addEventListener('keydown', (e) => {
         const drawingModal = document.getElementById('drawing-modal');
         if (drawingModal && drawingModal.classList.contains('active')) {
@@ -2774,18 +2724,18 @@
         }
     });
 
-    function initColorPalette() {
+    function initPaintPalette() {
         const grid = document.getElementById('color-palette-grid');
         if (!grid) return;
         grid.innerHTML = '';
-        BASIC_16_COLORS.forEach(color => {
+        PAINT_16_COLORS.forEach(color => {
             const btn = document.createElement('div');
-            btn.className = 'color-btn-large' + (color === currentColor ? ' active' : '');
+            btn.className = 'paint-color-btn' + (color === currentColor ? ' active' : '');
             btn.style.backgroundColor = color;
             btn.onclick = () => {
                 currentColor = color;
                 if (currentTool === 'eraser' || currentTool === 'select') setCanvasTool('brush');
-                document.querySelectorAll('.color-btn-large').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.paint-color-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             };
             grid.appendChild(btn);
@@ -2794,7 +2744,7 @@
 
     function setCanvasTool(tool) {
         currentTool = tool;
-        document.querySelectorAll('.tool-btn-large').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.drawing-toolbar-paint .tool-btn-large').forEach(btn => btn.classList.remove('active'));
         if (tool === 'brush') document.getElementById('btn-tool-brush').classList.add('active');
         if (tool === 'select') document.getElementById('btn-tool-select').classList.add('active');
         if (tool === 'eraser') document.getElementById('btn-tool-eraser').classList.add('active');
@@ -2803,7 +2753,7 @@
 
     function openDrawingModal(id) {
         document.getElementById('drawing-modal').classList.add('active');
-        initColorPalette();
+        initPaintPalette();
 
         const canvas = document.getElementById('drawing-canvas');
         canvasCtx = canvas.getContext('2d');
@@ -2836,6 +2786,7 @@
 
         document.getElementById('canvas-width-input').value = canvasWidth;
         document.getElementById('canvas-height-input').value = canvasHeight;
+        document.getElementById('brush-size-range').value = brushSize;
 
         updateCanvasDimensions();
         setupCanvasEvents(canvas);
@@ -2993,7 +2944,6 @@
                     if (handle) {
                         isResizingElements = true;
                         activeResizeHandle = handle;
-                        
                         resizeInitialSnapshot = {
                             handle: handle,
                             groupBounds: { ...groupBounds },
@@ -3681,7 +3631,7 @@
         }
     }
 
-    // ЛОГИКА КАЛЕНДАРЯ
+    // КАЛЕНДАРЬ
     function prevCalMonth() {
         calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
         renderCompactCalendar();
@@ -3954,70 +3904,33 @@
             generateFallbackWeatherData();
         }
 
-        const temps = hourlyWeatherData.map(d => d.temp);
-        const minTemp = Math.min(...temps);
-        const maxTemp = Math.max(...temps);
-        const range = (maxTemp - minTemp) || 1;
-
-        const SVG_HEIGHT = 120;
-        const COLUMN_WIDTH = 55;
-        const totalWidth = hourlyWeatherData.length * COLUMN_WIDTH;
-
-        const svgPoints = hourlyWeatherData.map((d, idx) => {
-            const x = idx * COLUMN_WIDTH + COLUMN_WIDTH / 2;
-            const norm = (d.temp - minTemp) / range;
-            const y = SVG_HEIGHT - 22 - (norm * (SVG_HEIGHT - 44));
-            return { x, y, temp: d.temp };
-        });
-
-        let pathD = `M ${svgPoints[0].x} ${svgPoints[0].y}`;
-        for (let i = 1; i < svgPoints.length; i++) {
-            const p1 = svgPoints[i - 1];
-            const p2 = svgPoints[i];
-            const cx = (p1.x + p2.x) / 2;
-            pathD += ` C ${cx} ${p1.y}, ${cx} ${p2.y}, ${p2.x} ${p2.y}`;
-        }
-
-        const fillD = pathD + ` L ${svgPoints[svgPoints.length - 1].x} ${SVG_HEIGHT} L ${svgPoints[0].x} ${SVG_HEIGHT} Z`;
-
-        let columnsHtml = '';
-        hourlyWeatherData.forEach((item, idx) => {
+        hourlyWeatherData.forEach(item => {
             const icon = getWeatherIcon(item.code);
-            const p = svgPoints[idx];
-
-            columnsHtml += `
-                <div style="width: ${COLUMN_WIDTH}px; display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0;">
-                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">${item.timeStr}</div>
-                    <div style="font-size: 1.25rem; margin-bottom: 8px;">${icon}</div>
-                    
-                    <div style="height: ${SVG_HEIGHT}px; width: 100%; position: relative;">
-                        <div style="position: absolute; left: 50%; top: ${p.y - 20}px; transform: translateX(-50%); font-size: 0.8rem; font-weight: 700; color: var(--accent-orange); text-shadow: 0 1px 3px rgba(0,0,0,0.8); z-index: 10;">
-                            ${item.temp}°
-                        </div>
-                    </div>
-                </div>
+            const box = document.createElement('div');
+            box.style.minWidth = '52px';
+            box.style.textAlign = 'center';
+            box.style.padding = '6px 4px';
+            box.style.background = 'var(--bg-main)';
+            box.style.border = '1px solid var(--border-color)';
+            box.style.borderRadius = '6px';
+            box.innerHTML = `
+                <div style="font-size:0.7rem; color:var(--text-muted);">${item.timeStr}</div>
+                <div style="font-size:1.1rem; margin:4px 0;">${icon}</div>
+                <div style="font-size:0.8rem; font-weight:700; color:var(--accent-orange);">${item.temp}°</div>
             `;
+            track.appendChild(box);
         });
-
-        const svgOverlayHtml = `
-            <svg style="position: absolute; left: 0; top: 62px; width: ${totalWidth}px; height: ${SVG_HEIGHT}px; pointer-events: none; z-index: 5;">
-                <defs>
-                    <linearGradient id="weatherGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#f97316" stop-opacity="0.35"/>
-                        <stop offset="100%" stop-color="#f97316" stop-opacity="0.0"/>
-                    </linearGradient>
-                </defs>
-                <path d="${fillD}" fill="url(#weatherGrad)" />
-                <path d="${pathD}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" />
-                ${svgPoints.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#ffffff" stroke="#f97316" stroke-width="2" />`).join('')}
-            </svg>
-        `;
-
-        track.parentElement.style.position = 'relative';
-        track.innerHTML = columnsHtml + svgOverlayHtml;
 
         document.getElementById('weather-modal').classList.add('active');
     }
+
+    // ИСХОДНЫЕ СТАНДАРТНЫЕ МЕТКИ НА КАРТЕ
+    const defaultCampusMarkers = [
+        { id: "def_fri", title: "Fakulta riadenia a informatiky (FRI)", category: "Fakulty / Univerzita", lat: 49.2107, lng: 18.7454, isAdmin: true },
+        { id: "def_menza", title: "Nová Menza / Jedáleň", category: "Menza / Jedáleň", lat: 49.2082, lng: 18.7501, isAdmin: true },
+        { id: "def_kniznica", title: "Univerzitná knižnica", category: "Štúdium / Ticho", lat: 49.2090, lng: 18.7468, isAdmin: true },
+        { id: "def_velkydiel", title: "Internáty Veľký Diel", category: "Internáty / Ubytovanie", lat: 49.2025, lng: 18.7530, isAdmin: true }
+    ];
 
     function initMap() {
         if (leafletMap) return;
@@ -4056,7 +3969,10 @@
     function renderCustomMapPoints() {
         if (!leafletMap) return;
 
-        customMapPoints.forEach(p => {
+        // Объединяем дефолтные метки с пользовательскими
+        const allPoints = [...defaultCampusMarkers, ...customMapPoints];
+
+        allPoints.forEach(p => {
             const isRedAdmin = p.isAdmin === true;
             const iconEmoji = categoryIconsMap[p.category] || (isRedAdmin ? "🔴" : "📍");
 
@@ -4085,16 +4001,20 @@
             const marker = L.marker([p.lat, p.lng], { icon: customMarkerIcon }).addTo(leafletMap);
 
             let adminBadgeHtml = isRedAdmin ? `<span style="background:rgba(239, 68, 68, 0.2); color:#fca5a5; padding:2px 6px; border-radius:4px; font-size:0.68rem; font-weight:700;">Oficiálny bod</span>` : '';
+            
+            let actionsHtml = p.id.toString().startsWith('def_') ? '' : `
+                <div style="margin-top: 8px; display: flex; gap: 4px;">
+                    <button onclick="editMapPointFromPopup('${p.id}')" style="background:#f97316; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:600; cursor:pointer;">✏️ Upraviť</button>
+                    <button onclick="deleteMapPointFromPopup('${p.id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:600; cursor:pointer;">🗑 Odstrániť</button>
+                </div>
+            `;
 
             marker.bindPopup(`
                 <div style="color: #121316; font-family: sans-serif; min-width: 130px;">
                     <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;">${escapeHtml(p.title)}</div>
                     <div style="font-size: 0.75rem; color: #666; margin-bottom: 6px;">${escapeHtml(p.category)}</div>
                     ${adminBadgeHtml}
-                    <div style="margin-top: 8px; display: flex; gap: 4px;">
-                        <button onclick="editMapPointFromPopup('${p.id}')" style="background:#f97316; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:600; cursor:pointer;">✏️ Upraviť</button>
-                        <button onclick="deleteMapPointFromPopup('${p.id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:600; cursor:pointer;">🗑 Odstrániť</button>
-                    </div>
+                    ${actionsHtml}
                 </div>
             `);
 
@@ -4175,8 +4095,10 @@
             "Parkovanie / MHD"
         ];
 
+        const allCombined = [...defaultCampusMarkers, ...customMapPoints];
+
         categories.forEach(cat => {
-            const count = customMapPoints.filter(p => p.category === cat && (filterType === 'admin' ? p.isAdmin === true : !p.isAdmin)).length;
+            const count = allCombined.filter(p => p.category === cat && (filterType === 'admin' ? p.isAdmin === true : !p.isAdmin)).length;
             const emoji = categoryIconsMap[cat] || '📍';
 
             const chip = document.createElement('button');
@@ -4192,7 +4114,8 @@
         if (!container) return;
         container.innerHTML = '';
 
-        const items = customMapPoints.filter(p => p.category === cat && (filterType === 'admin' ? p.isAdmin === true : !p.isAdmin));
+        const allCombined = [...defaultCampusMarkers, ...customMapPoints];
+        const items = allCombined.filter(p => p.category === cat && (filterType === 'admin' ? p.isAdmin === true : !p.isAdmin));
 
         const backBtn = document.createElement('button');
         backBtn.className = 'chip-modal-btn';
@@ -4219,22 +4142,30 @@
             box.style.justifyContent = 'space-between';
             box.style.alignItems = 'center';
 
+            let buttonsHtml = '';
+            if (!String(item.id).startsWith('def_')) {
+                buttonsHtml = `
+                    <div style="display:flex; gap:6px;">
+                        <button onclick="editMapPointFromPopup('${item.id}')" style="background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-color); padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">${translations[currentLang].edit_btn}</button>
+                        <button onclick="deleteMapPointFromPopup('${item.id}')" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.4); padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">${translations[currentLang].delete_btn}</button>
+                    </div>
+                `;
+            }
+
             box.innerHTML = `
                 <div>
                     <div style="font-weight:700; font-size:0.88rem; cursor:pointer; color:var(--accent-orange);" onclick="jumpToMapPoint('${item.id}')">${escapeHtml(item.title)}</div>
                     <div style="font-size:0.72rem; color:var(--text-secondary);">${escapeHtml(item.category)}</div>
                 </div>
-                <div style="display:flex; gap:6px;">
-                    <button onclick="editMapPointFromPopup('${item.id}')" style="background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-color); padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">${translations[currentLang].edit_btn}</button>
-                    <button onclick="deleteMapPointFromPopup('${item.id}')" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.4); padding:4px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer;">${translations[currentLang].delete_btn}</button>
-                </div>
+                ${buttonsHtml}
             `;
             container.appendChild(box);
         });
     }
 
     function jumpToMapPoint(id) {
-        const point = customMapPoints.find(p => p.id === id);
+        const allCombined = [...defaultCampusMarkers, ...customMapPoints];
+        const point = allCombined.find(p => String(p.id) === String(id));
         if (!point) return;
         closeModal('map-points-select-modal');
         if (leafletMap) {
