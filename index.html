@@ -802,7 +802,7 @@
             .mobile-weather-view { display: block; }
         }
 
-        /* Новый блок структуры заметок по скетчу */
+        /* Блок структуры заметок */
         .notes-dashboard-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -861,15 +861,16 @@
         .unified-note-title { font-size: 0.84rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .unified-note-desc { font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Модалка рисовача (Canvas / Полотно) */
+        /* ОБНОВЛЕННАЯ МОДАЛКА ХОЛСТА (Canvas / Рисовач) */
         #drawing-modal .notes-modal {
-            width: min(1000px, 96vw);
-            max-width: 1000px;
-            height: min(88vh, 850px);
+            width: min(1200px, 98vw);
+            max-width: 1200px;
+            height: min(92vh, 900px);
             display: flex;
             flex-direction: column;
             padding: 0;
             overflow: hidden;
+            background: var(--bg-card);
         }
         .drawing-toolbar {
             display: flex;
@@ -896,16 +897,68 @@
         .color-btn:hover { transform: scale(1.1); }
         .color-btn.active { border: 2px solid #ffffff; box-shadow: 0 0 4px var(--accent-orange); }
 
+        .tool-btn-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .tool-btn-item:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+        .tool-btn-item.active {
+            background: var(--accent-orange);
+            color: #ffffff;
+            border-color: var(--accent-orange);
+        }
+
         .drawing-canvas-container {
             flex: 1;
-            background: #ffffff;
+            background: #2a2d34;
             position: relative;
             overflow: auto;
-            cursor: crosshair;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
         }
+
+        .drawing-paper-wrap {
+            position: relative;
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            transition: width 0.2s ease, height 0.2s ease;
+        }
+
         #drawing-canvas {
             display: block;
             touch-action: none;
+            border-radius: 4px;
+        }
+
+        .paste-drop-zone-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 3px dashed var(--accent-orange);
+            background: rgba(249, 115, 22, 0.15);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent-orange);
+            z-index: 50;
+            pointer-events: none;
         }
 
         /* UniFlo Notes – интегрированный редактор заметок */
@@ -1409,7 +1462,7 @@
             <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
 
-                    <!-- Блок заметок по скетчу -->
+                    <!-- Блок заметок -->
                     <div class="notes-dashboard-card">
                         <div class="section-header" style="margin-bottom: 8px;">
                             <div class="section-title" data-i18n="my_notes">📝 Moje Poznámky</div>
@@ -1671,7 +1724,7 @@
             <button type="button" onclick="formatLessonNote('italic')" title="Kurzíva"><i>I</i></button>
             <button type="button" onclick="formatLessonNote('underline')" title="Podčiarknuté"><u>U</u></button>
             <select aria-label="Písmo" onchange="changeLessonNoteFont(this.value)"><option value="">Písmo</option><option>Arial</option><option>Verdana</option><option>Georgia</option><option>Courier New</option><option>Times New Roman</option></select>
-            <select aria-label="Veľkosť písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkość</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
+            <select aria-label="Veľkosť písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
             <input type="color" aria-label="Farba textu" value="#121316" onchange="changeLessonNoteColor(this.value)">
           </div>
         </div>
@@ -1685,52 +1738,60 @@
   </div>
 </div>
 
-<!-- Модальное окно для ввода текста на холст (в стиле заметок) -->
-<div class="modal-overlay" id="canvas-text-modal">
-  <div class="modal">
-    <div class="modal-header">
-        <div class="modal-title" id="canvas-text-modal-title">Добавить текст на холст</div>
-        <button class="close-btn" onclick="closeModal('canvas-text-modal')">&times;</button>
-    </div>
-    <form id="canvas-text-form" onsubmit="saveCanvasTextModal(event)">
-        <input type="hidden" id="canvas-text-edit-id">
-        <div class="form-group">
-            <label>Текст</label>
-            <input type="text" id="canvas-text-input" class="form-control" placeholder="Введите текст..." required>
-        </div>
-        <button type="submit" class="btn-primary">Сохранить текст</button>
-    </form>
-  </div>
-</div>
-
-<!-- Модальное окно для рисования (Холст с объектами, выделением, Ctrl+Z и т.д.) -->
+<!-- Модальное окно для рисования (Продвинутый холст) -->
 <div class="modal-overlay" id="drawing-modal" onclick="if(event.target===this)closeModal('drawing-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true">
     <div class="notes-modal-header">
-        <div class="modal-title">✏️ Редактор рисунка</div>
+        <div class="modal-title">✏️ Редактор рисунка и конспектов</div>
         <button class="close-btn" onclick="closeModal('drawing-modal')">&times;</button>
     </div>
+    
     <div style="padding: 10px 14px; background: var(--bg-card); display: flex; flex-direction: column; gap: 8px;">
-        <input type="text" id="drawing-title-input" class="form-control" placeholder="Название рисунка..." oninput="saveCurrentDrawingMeta()">
+        <input type="text" id="drawing-title-input" class="form-control" placeholder="Название рисунка / Схемы..." oninput="saveCurrentDrawingMeta()">
+        
         <div class="drawing-toolbar">
             <div class="color-palette" id="color-palette-grid"></div>
-            <div style="display:flex; align-items:center; gap:6px; margin-left: auto; flex-wrap: wrap;">
+            
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; width:100%; margin-top:6px;">
                 <label style="font-size:0.75rem; color:var(--text-secondary);">Кисть:</label>
-                <input type="range" id="brush-size-range" min="1" max="40" value="4" oninput="brushSize = parseInt(this.value)" style="width: 80px;">
-                <button type="button" class="cal-nav-btn" onclick="setDrawingTool('select')" id="tool-btn-select" style="background:var(--bg-input);">👆 Выбрать</button>
-                <button type="button" class="cal-nav-btn" onclick="setDrawingTool('brush')" id="tool-btn-brush" style="background:var(--bg-input);">✏️ Кисть</button>
-                <button type="button" class="cal-nav-btn" onclick="setDrawingTool('eraser')" id="tool-btn-eraser" style="background:var(--bg-input);">🧹 Ластик</button>
-                <button type="button" class="cal-nav-btn" onclick="openCanvasTextModalForNew()" style="background:var(--bg-input);">💬 Текст</button>
-                <button type="button" class="cal-nav-btn" onclick="addImageToCanvas()" style="background:var(--bg-input);">🖼️ Картинка</button>
-                <button type="button" class="cal-nav-btn" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444;">🗑️ Очистить</button>
+                <input type="range" id="brush-size-range" min="1" max="40" value="4" oninput="brushSize = this.value" style="width: 70px;">
+                
+                <!-- Инструменты -->
+                <button type="button" id="btn-tool-brush" class="tool-btn-item active" onclick="setCanvasTool('brush')">✏️ Кисть</button>
+                <button type="button" id="btn-tool-select" class="tool-btn-item" onclick="setCanvasTool('select')">🖐️ Выбрать / Двигать</button>
+                <button type="button" id="btn-tool-eraser" class="tool-btn-item" onclick="setCanvasTool('eraser')">🧹 Ластик</button>
+                <button type="button" class="tool-btn-item" onclick="addTextToCanvas()">💬 Текст</button>
+                
+                <!-- Загрузка Картинки -->
+                <label class="tool-btn-item" style="margin:0; cursor:pointer;">
+                    🖼️ Файл <input type="file" id="canvas-image-file-input" accept="image/*" style="display:none;" onchange="handleImageFileUpload(event)">
+                </label>
+                <button type="button" class="tool-btn-item" onclick="addImageViaUrl()" title="Вставить по URL">🔗 URL</button>
+
+                <!-- Расширение холста -->
+                <div style="margin-left:auto; display:flex; gap:4px; align-items:center;">
+                    <span style="font-size:0.72rem; color:var(--text-muted);">Размер холста:</span>
+                    <button type="button" class="tool-btn-item" onclick="expandCanvas(0, 500)" title="Добавить 500px вниз">➕ +500px Вниз</button>
+                    <button type="button" class="tool-btn-item" onclick="expandCanvas(500, 0)" title="Добавить 500px вправо">➕ +500px Вправо</button>
+                    <button type="button" class="tool-btn-item" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444; border-color:rgba(239,68,68,0.4);">🗑️ Очистить</button>
+                </div>
+            </div>
+            
+            <div style="font-size:0.72rem; color:var(--accent-orange); margin-top:2px;">
+                💡 <b>Подсказка:</b> Вы можете вставлять картинки прямо через <b>Ctrl+V</b> или перетаскиванием файла на холст!
             </div>
         </div>
     </div>
+    
     <div class="drawing-canvas-container" id="drawing-canvas-wrap">
-        <canvas id="drawing-canvas" width="900" height="600"></canvas>
+        <div class="drawing-paper-wrap" id="drawing-paper-wrap">
+            <div class="paste-drop-zone-overlay" id="canvas-drop-overlay">Перетащите картинку сюда</div>
+            <canvas id="drawing-canvas" width="1000" height="700"></canvas>
+        </div>
     </div>
+    
     <div class="notes-footer" style="background:var(--bg-card);">
-        <span id="drawing-status" class="notes-status">Ctrl+Z — отмена действия. Двойной клик по тексту — изменить.</span>
+        <span id="drawing-status" class="notes-status">Рисунок сохраняется автоматически.</span>
         <div class="notes-footer-group">
             <button class="notes-export" onclick="exportDrawingAsImage()">📥 Скачать PNG</button>
             <button class="notes-delete" onclick="deleteCurrentDrawing()">🗑 Удалить</button>
@@ -2633,7 +2694,7 @@
         closeModal('note-modal');
     }
 
-    // --- УЛУЧШЕННЫЙ РЕДАКТОР РИСУНКОВ (ОБЪЕКТЫ, ВЫБОР, ПЕРЕНОС, РАСТЯГИВАНИЕ, CTRL+Z) ---
+    // --- ПРОДВИНУТАЯ ЛОГИКА ХОЛСТА (Canvas Engine) ---
     const BASIC_16_COLORS = [
         '#000000', '#ffffff', '#ef4444', '#f97316',
         '#facc15', '#22c55e', '#3b82f6', '#8b5cf6',
@@ -2644,18 +2705,18 @@
     let currentDrawingId = null;
     let currentColor = '#000000';
     let brushSize = 4;
-    let currentTool = 'select'; // Инструменты: 'select', 'brush', 'eraser'
-    let canvasObjects = [];     // Массив объектов на холсте (линии, текст, картинки)
-    let historyStack = [];      // Стек для Ctrl+Z
-    let selectedObjIndex = -1;  // Индекс выбранного объекта
-    let isDraggingObj = false;
-    let isResizingObj = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
+    let currentTool = 'brush'; // 'brush', 'eraser', 'select'
     let isDrawing = false;
-    let currentPathPoints = [];
     let canvasCtx = null;
-    let canvasEventsAttached = false;
+
+    // Векторные объекты холста (штрихи, текст, картинки)
+    let canvasElements = [];
+    let currentStroke = null;
+    let selectedElementIndex = -1;
+    let isDraggingElement = false;
+    let dragOffsetX = 0, dragOffsetY = 0;
+    let canvasWidth = 1000;
+    let canvasHeight = 700;
 
     function initColorPalette() {
         const grid = document.getElementById('color-palette-grid');
@@ -2667,7 +2728,7 @@
             btn.style.backgroundColor = color;
             btn.onclick = () => {
                 currentColor = color;
-                setDrawingTool('brush');
+                if (currentTool === 'eraser' || currentTool === 'select') setCanvasTool('brush');
                 document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             };
@@ -2675,33 +2736,13 @@
         });
     }
 
-    function setDrawingTool(tool) {
+    function setCanvasTool(tool) {
         currentTool = tool;
-        ['select', 'brush', 'eraser'].forEach(t => {
-            const btn = document.getElementById(`tool-btn-${t}`);
-            if (btn) {
-                btn.style.border = (t === tool) ? '2px solid var(--accent-orange)' : '1px solid var(--border-color)';
-            }
-        });
-        if (tool !== 'select') {
-            selectedObjIndex = -1;
-        }
+        document.querySelectorAll('.tool-btn-item').forEach(btn => btn.classList.remove('active'));
+        if (tool === 'brush') document.getElementById('btn-tool-brush').classList.add('active');
+        if (tool === 'select') document.getElementById('btn-tool-select').classList.add('active');
+        if (tool === 'eraser') document.getElementById('btn-tool-eraser').classList.add('active');
         redrawCanvas();
-    }
-
-    function saveStateToHistory() {
-        // Сохраняем глубокую копию массива объектов для Ctrl+Z
-        historyStack.push(JSON.parse(JSON.stringify(canvasObjects)));
-        if (historyStack.length > 30) historyStack.shift();
-    }
-
-    function undoLastAction() {
-        if (historyStack.length > 0) {
-            canvasObjects = historyStack.pop();
-            selectedObjIndex = -1;
-            redrawCanvas();
-            saveCurrentDrawingMeta();
-        }
     }
 
     function openDrawingModal(id) {
@@ -2717,128 +2758,114 @@
         if (drawing) {
             currentDrawingId = drawing.id;
             document.getElementById('drawing-title-input').value = drawing.title || 'Рисунок';
-            canvasObjects = drawing.objects || [];
-            historyStack = [];
-            selectedObjIndex = -1;
-            redrawCanvas();
+            canvasWidth = drawing.width || 1000;
+            canvasHeight = drawing.height || 700;
+            canvasElements = drawing.elements ? JSON.parse(JSON.stringify(drawing.elements)) : [];
+
+            // Восстановление картинок как Image объектов
+            canvasElements.forEach(el => {
+                if (el.type === 'image' && el.src) {
+                    el.imgObj = new Image();
+                    el.imgObj.src = el.src;
+                    el.imgObj.onload = () => redrawCanvas();
+                }
+            });
         } else {
             currentDrawingId = Date.now();
             document.getElementById('drawing-title-input').value = 'Новый рисунок';
-            canvasObjects = [];
-            historyStack = [];
-            selectedObjIndex = -1;
-            redrawCanvas();
+            canvasWidth = 1000;
+            canvasHeight = 700;
+            canvasElements = [];
         }
 
-        setDrawingTool('select');
-        setupCanvasListeners(canvas);
+        updateCanvasDimensions();
+        setupCanvasEvents(canvas);
+        setupPasteAndDropEvents();
+        redrawCanvas();
+    }
+
+    function updateCanvasDimensions() {
+        const canvas = document.getElementById('drawing-canvas');
+        const paper = document.getElementById('drawing-paper-wrap');
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        paper.style.width = canvasWidth + 'px';
+        paper.style.height = canvasHeight + 'px';
+    }
+
+    function expandCanvas(addW, addH) {
+        canvasWidth += addW;
+        canvasHeight += addH;
+        updateCanvasDimensions();
+        redrawCanvas();
+        saveCurrentDrawingMeta();
     }
 
     function redrawCanvas() {
         if (!canvasCtx) return;
         const canvas = document.getElementById('drawing-canvas');
+
+        // Очистка и белая подложка
         canvasCtx.fillStyle = '#ffffff';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        canvasObjects.forEach((obj, idx) => {
-            canvasCtx.save();
-            if (obj.type === 'path' || obj.type === 'eraser') {
-                if (obj.points && obj.points.length > 0) {
-                    canvasCtx.beginPath();
-                    canvasCtx.strokeStyle = obj.color;
-                    canvasCtx.lineWidth = obj.size;
-                    canvasCtx.lineCap = 'round';
-                    canvasCtx.lineJoin = 'round';
-                    canvasCtx.moveTo(obj.points[0].x, obj.points[0].y);
-                    for (let i = 1; i < obj.points.length; i++) {
-                        canvasCtx.lineTo(obj.points[i].x, obj.points[i].y);
-                    }
-                    canvasCtx.stroke();
+        // Отрисовка всех объектов
+        canvasElements.forEach((el, index) => {
+            if (el.type === 'stroke') {
+                if (el.points.length < 2) return;
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = el.color;
+                canvasCtx.lineWidth = el.size;
+                canvasCtx.lineCap = 'round';
+                canvasCtx.lineJoin = 'round';
+                canvasCtx.moveTo(el.points[0].x, el.points[0].y);
+                for (let i = 1; i < el.points.length; i++) {
+                    canvasCtx.lineTo(el.points[i].x, el.points[i].y);
                 }
-            } else if (obj.type === 'text') {
-                canvasCtx.font = `bold ${obj.size || 24}px Inter, sans-serif`;
-                canvasCtx.fillStyle = obj.color;
-                canvasCtx.fillText(obj.text, obj.x, obj.y);
-            } else if (obj.type === 'image') {
-                if (obj.imgElement) {
-                    canvasCtx.drawImage(obj.imgElement, obj.x, obj.y, obj.width, obj.height);
-                } else {
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
-                    img.onload = () => {
-                        obj.imgElement = img;
-                        redrawCanvas();
-                    };
-                    img.src = obj.dataUrl;
-                }
+                canvasCtx.stroke();
+            } else if (el.type === 'text') {
+                canvasCtx.font = `${el.size * 5}px Inter, sans-serif`;
+                canvasCtx.fillStyle = el.color;
+                canvasCtx.fillText(el.text, el.x, el.y);
+            } else if (el.type === 'image' && el.imgObj && el.imgObj.complete) {
+                canvasCtx.drawImage(el.imgObj, el.x, el.y, el.w, el.h);
             }
 
-            // Если объект выбран — рисуем рамку с ручкой изменения размера
-            if (idx === selectedObjIndex && currentTool === 'select') {
-                const bounds = getObjectBounds(obj);
+            // Выделение выбранного элемента в режиме выбора
+            if (currentTool === 'select' && index === selectedElementIndex) {
+                canvasCtx.save();
                 canvasCtx.strokeStyle = '#f97316';
                 canvasCtx.lineWidth = 2;
-                canvasCtx.setLineDash([4, 4]);
-                canvasCtx.strokeRect(bounds.x - 4, bounds.y - 4, bounds.width + 8, bounds.height + 8);
-                canvasCtx.setLineDash([]);
+                canvasCtx.setLineDash([6, 4]);
 
-                // Уголок растягивания в правом нижнем углу
-                canvasCtx.fillStyle = '#f97316';
-                canvasCtx.fillRect(bounds.x + bounds.width - 4, bounds.y + bounds.height - 4, 10, 10);
+                const bounds = getElementBounds(el);
+                canvasCtx.strokeRect(bounds.x - 4, bounds.y - 4, bounds.w + 8, bounds.h + 8);
+                canvasCtx.restore();
             }
-            canvasCtx.restore();
         });
     }
 
-    function getObjectBounds(obj) {
-        if (obj.type === 'text') {
-            canvasCtx.font = `bold ${obj.size || 24}px Inter, sans-serif`;
-            const metrics = canvasCtx.measureText(obj.text);
-            const w = metrics.width || 100;
-            const h = obj.size || 24;
-            return { x: obj.x, y: obj.y - h, width: w, height: h };
-        } else if (obj.type === 'image') {
-            return { x: obj.x, y: obj.y, width: obj.width, height: obj.height };
-        } else if (obj.type === 'path' || obj.type === 'eraser') {
-            if (!obj.points || obj.points.length === 0) return { x: obj.x || 0, y: obj.y || 0, width: 10, height: 10 };
-            let minX = obj.points[0].x, maxX = obj.points[0].x;
-            let minY = obj.points[0].y, maxY = obj.points[0].y;
-            obj.points.forEach(p => {
+    function getElementBounds(el) {
+        if (el.type === 'stroke') {
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            el.points.forEach(p => {
                 if (p.x < minX) minX = p.x;
-                if (p.x > maxX) maxX = p.x;
                 if (p.y < minY) minY = p.y;
+                if (p.x > maxX) maxX = p.x;
                 if (p.y > maxY) maxY = p.y;
             });
-            return { x: minX, y: minY, width: Math.max(10, maxX - minX), height: Math.max(10, maxY - minY) };
+            return { x: minX, y: minY, w: maxX - minX || 10, h: maxY - minY || 10 };
+        } else if (el.type === 'text') {
+            const fontSize = el.size * 5;
+            const approxWidth = el.text.length * fontSize * 0.6;
+            return { x: el.x, y: el.y - fontSize, w: approxWidth, h: fontSize };
+        } else if (el.type === 'image') {
+            return { x: el.x, y: el.y, w: el.w, h: el.h };
         }
-        return { x: 0, y: 0, width: 50, height: 50 };
+        return { x: 0, y: 0, w: 0, h: 0 };
     }
 
-    function hitTestObject(obj, x, y) {
-        const b = getObjectBounds(obj);
-        return x >= b.x - 6 && x <= b.x + b.width + 6 && y >= b.y - 6 && y <= b.y + b.height + 6;
-    }
-
-    function hitTestResizeHandle(obj, x, y) {
-        const b = getObjectBounds(obj);
-        const hx = b.x + b.width;
-        const hy = b.y + b.height;
-        return x >= hx - 8 && x <= hx + 12 && y >= hy - 8 && y <= hy + 12;
-    }
-
-    function setupCanvasListeners(canvas) {
-        if (!canvasEventsAttached) {
-            window.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-                    if (document.getElementById('drawing-modal').classList.contains('active')) {
-                        e.preventDefault();
-                        undoLastAction();
-                    }
-                }
-            });
-            canvasEventsAttached = true;
-        }
-
+    function setupCanvasEvents(canvas) {
         const getPos = (e) => {
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -2849,251 +2876,244 @@
             };
         };
 
-        canvas.onmousedown = (e) => {
+        canvas.onmousedown = canvas.ontouchstart = (e) => {
             const pos = getPos(e);
+            isDrawing = true;
 
             if (currentTool === 'select') {
-                // Проверяем клик на ручку изменения размера у выбранного объекта
-                if (selectedObjIndex !== -1 && hitTestResizeHandle(canvasObjects[selectedObjIndex], pos.x, pos.y)) {
-                    saveStateToHistory();
-                    isResizingObj = true;
-                    dragStartX = pos.x;
-                    dragStartY = pos.y;
-                    return;
-                }
-
-                // Ищем объект под курсором (начинаем с верхних / последних)
-                let foundIdx = -1;
-                for (let i = canvasObjects.length - 1; i >= 0; i--) {
-                    if (hitTestObject(canvasObjects[i], pos.x, pos.y)) {
-                        foundIdx = i;
+                selectedElementIndex = -1;
+                for (let i = canvasElements.length - 1; i >= 0; i--) {
+                    const bounds = getElementBounds(canvasElements[i]);
+                    if (pos.x >= bounds.x - 5 && pos.x <= bounds.x + bounds.w + 5 &&
+                        pos.y >= bounds.y - 5 && pos.y <= bounds.y + bounds.h + 5) {
+                        selectedElementIndex = i;
+                        isDraggingElement = true;
+                        dragOffsetX = pos.x - bounds.x;
+                        dragOffsetY = pos.y - bounds.y;
                         break;
                     }
                 }
-
-                if (foundIdx !== -1) {
-                    selectedObjIndex = foundIdx;
-                    saveStateToHistory();
-                    isDraggingObj = true;
-                    dragStartX = pos.x;
-                    dragStartY = pos.y;
-                } else {
-                    selectedObjIndex = -1;
-                }
                 redrawCanvas();
-            } else if (currentTool === 'brush' || currentTool === 'eraser') {
-                saveStateToHistory();
-                isDrawing = true;
-                currentPathPoints = [pos];
-                const newObj = {
-                    type: currentTool,
-                    color: currentTool === 'eraser' ? '#ffffff' : currentColor,
+                return;
+            }
+
+            if (currentTool === 'eraser') {
+                // Ластик удаляет штрихи/элементы при клике/проводке
+                eraseAtPos(pos);
+                return;
+            }
+
+            if (currentTool === 'brush') {
+                currentStroke = {
+                    type: 'stroke',
+                    color: currentColor,
                     size: brushSize,
-                    points: currentPathPoints
+                    points: [pos]
                 };
-                canvasObjects.push(newObj);
-                selectedObjIndex = -1;
+                canvasElements.push(currentStroke);
+                redrawCanvas();
             }
         };
 
-        canvas.onmousemove = (e) => {
+        canvas.onmousemove = canvas.ontouchmove = (e) => {
+            if (!isDrawing) return;
             const pos = getPos(e);
 
-            if (currentTool === 'select') {
-                if (isResizingObj && selectedObjIndex !== -1) {
-                    const obj = canvasObjects[selectedObjIndex];
-                    const dx = pos.x - dragStartX;
-                    const dy = pos.y - dragStartY;
-                    dragStartX = pos.x;
-                    dragStartY = pos.y;
+            if (currentTool === 'select' && isDraggingElement && selectedElementIndex >= 0) {
+                const el = canvasElements[selectedElementIndex];
+                const bounds = getElementBounds(el);
+                const dx = pos.x - dragOffsetX - bounds.x;
+                const dy = pos.y - dragOffsetY - bounds.y;
 
-                    if (obj.type === 'image') {
-                        obj.width = Math.max(20, obj.width + dx);
-                        obj.height = Math.max(20, obj.height + dy);
-                    } else if (obj.type === 'text') {
-                        obj.size = Math.max(10, (obj.size || 24) + Math.round(dx / 4));
-                    } else if (obj.type === 'path' || obj.type === 'eraser') {
-                        // Масштабируем точки рисунка
-                        const b = getObjectBounds(obj);
-                        const scaleX = (b.width + dx) / b.width;
-                        const scaleY = (b.height + dy) / b.height;
-                        obj.points.forEach(p => {
-                            p.x = b.x + (p.x - b.x) * scaleX;
-                            p.y = b.y + (p.y - b.y) * scaleY;
-                        });
-                    }
-                    redrawCanvas();
-                } else if (isDraggingObj && selectedObjIndex !== -1) {
-                    const obj = canvasObjects[selectedObjIndex];
-                    const dx = pos.x - dragStartX;
-                    const dy = pos.y - dragStartY;
-                    dragStartX = pos.x;
-                    dragStartY = pos.y;
-
-                    if (obj.type === 'text' || obj.type === 'image') {
-                        obj.x += dx;
-                        obj.y += dy;
-                    } else if (obj.type === 'path' || obj.type === 'eraser') {
-                        obj.points.forEach(p => {
-                            p.x += dx;
-                            p.y += dy;
-                        });
-                    }
-                    redrawCanvas();
+                if (el.type === 'stroke') {
+                    el.points.forEach(p => { p.x += dx; p.y += dy; });
+                } else if (el.type === 'text' || el.type === 'image') {
+                    el.x += dx;
+                    el.y += dy;
                 }
-            } else if (isDrawing) {
-                currentPathPoints.push(pos);
+                redrawCanvas();
+                return;
+            }
+
+            if (currentTool === 'eraser') {
+                eraseAtPos(pos);
+                return;
+            }
+
+            if (currentTool === 'brush' && currentStroke) {
+                currentStroke.points.push(pos);
                 redrawCanvas();
             }
         };
 
-        canvas.onmouseup = canvas.onmouseleave = () => {
-            if (isDraggingObj || isResizingObj) {
-                isDraggingObj = false;
-                isResizingObj = false;
-                saveCurrentDrawingMeta();
-            }
+        canvas.onmouseup = canvas.onmouseleave = canvas.ontouchend = () => {
             if (isDrawing) {
                 isDrawing = false;
+                isDraggingElement = false;
+                currentStroke = null;
                 saveCurrentDrawingMeta();
             }
         };
+    }
 
-        // Двойной клик для изменения текста
-        canvas.ondblclick = (e) => {
-            const pos = getPos(e);
-            for (let i = canvasObjects.length - 1; i >= 0; i--) {
-                const obj = canvasObjects[i];
-                if (obj.type === 'text' && hitTestObject(obj, pos.x, pos.y)) {
-                    selectedObjIndex = i;
-                    openCanvasTextModalForEdit(obj);
-                    break;
+    function eraseAtPos(pos) {
+        const radius = brushSize * 2;
+        canvasElements = canvasElements.filter(el => {
+            const bounds = getElementBounds(el);
+            const isInside = pos.x >= bounds.x - radius && pos.x <= bounds.x + bounds.w + radius &&
+                             pos.y >= bounds.y - radius && pos.y <= bounds.y + bounds.h + radius;
+            return !isInside;
+        });
+        redrawCanvas();
+    }
+
+    // Загрузка изображений из файлов и Ctrl+V
+    function setupPasteAndDropEvents() {
+        const modal = document.getElementById('drawing-modal');
+        const paper = document.getElementById('drawing-paper-wrap');
+        const overlay = document.getElementById('canvas-drop-overlay');
+
+        // Ctrl + V вставка
+        window.addEventListener('paste', (e) => {
+            if (!modal.classList.contains('active')) return;
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let item of items) {
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    readAndAddImageBlob(blob);
                 }
             }
-        };
+        });
 
-        canvas.ontouchstart = (e) => {
-            if (e.touches.length === 1) {
-                const touchEvent = { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY, type: 'touchstart' };
-                canvas.onmousedown(touchEvent);
-            }
+        // Drag and Drop
+        paper.ondragover = (e) => { e.preventDefault(); overlay.style.display = 'flex'; };
+        paper.ondragleave = () => { overlay.style.display = 'none'; };
+        paper.ondrop = (e) => {
             e.preventDefault();
-        };
-
-        canvas.ontouchmove = (e) => {
-            if (e.touches.length === 1) {
-                const touchEvent = { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY, type: 'touchmove' };
-                canvas.onmousemove(touchEvent);
+            overlay.style.display = 'none';
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                readAndAddImageBlob(e.dataTransfer.files[0]);
             }
-            e.preventDefault();
-        };
-
-        canvas.ontouchend = () => {
-            canvas.onmouseup();
         };
     }
 
-    function clearCanvas() {
-        if (!confirm("Очистить весь холст?")) return;
-        saveStateToHistory();
-        canvasObjects = [];
-        selectedObjIndex = -1;
-        redrawCanvas();
-        saveCurrentDrawingMeta();
-    }
-
-    // --- Кастомное окно для текста (одно поле ввода, в стиле заметок) ---
-    function openCanvasTextModalForNew() {
-        document.getElementById('canvas-text-edit-id').value = '';
-        document.getElementById('canvas-text-input').value = '';
-        document.getElementById('canvas-text-modal-title').textContent = 'Добавить текст на холст';
-        document.getElementById('canvas-text-modal').classList.add('active');
-    }
-
-    function openCanvasTextModalForEdit(obj) {
-        document.getElementById('canvas-text-edit-id').value = selectedObjIndex;
-        document.getElementById('canvas-text-input').value = obj.text;
-        document.getElementById('canvas-text-modal-title').textContent = 'Изменить текст';
-        document.getElementById('canvas-text-modal').classList.add('active');
-    }
-
-    function saveCanvasTextModal(e) {
-        e.preventDefault();
-        const textVal = document.getElementById('canvas-text-input').value.trim();
-        if (!textVal) return;
-
-        const editIdxStr = document.getElementById('canvas-text-edit-id').value;
-        saveStateToHistory();
-
-        if (editIdxStr !== '') {
-            const idx = parseInt(editIdxStr);
-            if (canvasObjects[idx] && canvasObjects[idx].type === 'text') {
-                canvasObjects[idx].text = textVal;
-            }
-        } else {
-            const newTextObj = {
-                type: 'text',
-                text: textVal,
-                x: 100,
-                y: 150,
-                size: 24,
-                color: currentColor
-            };
-            canvasObjects.push(newTextObj);
-            selectedObjIndex = canvasObjects.length - 1;
+    function handleImageFileUpload(e) {
+        if (e.target.files && e.target.files[0]) {
+            readAndAddImageBlob(e.target.files[0]);
         }
-
-        closeModal('canvas-text-modal');
-        setDrawingTool('select');
-        redrawCanvas();
-        saveCurrentDrawingMeta();
     }
 
-    function addImageToCanvas() {
+    function readAndAddImageBlob(blob) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                let w = img.width;
+                let h = img.height;
+                if (w > 500) { h = (500 / w) * h; w = 500; } // Автомасштабирование ширины
+
+                const newImgEl = {
+                    type: 'image',
+                    src: event.target.result,
+                    imgObj: img,
+                    x: 50,
+                    y: 50,
+                    w: w,
+                    h: h
+                };
+                canvasElements.push(newImgEl);
+                setCanvasTool('select');
+                selectedElementIndex = canvasElements.length - 1;
+                redrawCanvas();
+                saveCurrentDrawingMeta();
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(blob);
+    }
+
+    function addImageViaUrl() {
         const url = prompt("Введите прямую ссылку на картинку (URL):");
         if (!url) return;
-
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => {
-            saveStateToHistory();
-            const newImgObj = {
+            let w = img.width || 300;
+            let h = img.height || 200;
+            if (w > 400) { h = (400 / w) * h; w = 400; }
+
+            const newImgEl = {
                 type: 'image',
-                dataUrl: url,
-                imgElement: img,
-                x: 80,
-                y: 80,
-                width: 250,
-                height: Math.round(250 * (img.height / img.width))
+                src: url,
+                imgObj: img,
+                x: 50,
+                y: 50,
+                w: w,
+                h: h
             };
-            canvasObjects.push(newImgObj);
-            selectedObjIndex = canvasObjects.length - 1;
-            setDrawingTool('select');
+            canvasElements.push(newImgEl);
+            setCanvasTool('select');
+            selectedElementIndex = canvasElements.length - 1;
             redrawCanvas();
             saveCurrentDrawingMeta();
         };
-        img.onerror = () => {
-            alert("Не удалось загрузить изображение по этой ссылке.");
-        };
+        img.onerror = () => alert("Не удалось загрузить изображение по этой ссылке.");
         img.src = url;
     }
 
+    function addTextToCanvas() {
+        const text = prompt("Введите текст для добавления на холст:");
+        if (!text) return;
+        const textEl = {
+            type: 'text',
+            text: text,
+            color: currentColor,
+            size: brushSize,
+            x: 80,
+            y: 100
+        };
+        canvasElements.push(textEl);
+        setCanvasTool('select');
+        selectedElementIndex = canvasElements.length - 1;
+        redrawCanvas();
+        saveCurrentDrawingMeta();
+    }
+
+    function clearCanvas() {
+        if (!confirm("Очистить полностью весь холст?")) return;
+        canvasElements = [];
+        redrawCanvas();
+        saveCurrentDrawingMeta();
+    }
+
     function saveCurrentDrawingMeta() {
-        const title = document.getElementById('drawing-title-input').value.trim() || 'Рисунок';
         const canvas = document.getElementById('drawing-canvas');
         if (!canvas) return;
+        const title = document.getElementById('drawing-title-input').value.trim() || 'Рисунок';
         const dataUrl = canvas.toDataURL('image/png');
+
+        // Очищаем круговые ссылки для сохранения в JSON
+        const cleanElements = canvasElements.map(el => {
+            const { imgObj, ...rest } = el;
+            return rest;
+        });
 
         let drawings = getDrawingsList();
         const existingIdx = drawings.findIndex(d => String(d.id) === String(currentDrawingId));
-        const item = { id: currentDrawingId || Date.now(), title, dataUrl, objects: canvasObjects };
+        const item = { 
+            id: currentDrawingId || Date.now(), 
+            title, 
+            dataUrl, 
+            width: canvasWidth, 
+            height: canvasHeight, 
+            elements: cleanElements 
+        };
 
         if (existingIdx >= 0) drawings[existingIdx] = item;
         else drawings.unshift(item);
 
         setDrawingsList(drawings);
-        const statusEl = document.getElementById('drawing-status');
-        if (statusEl) statusEl.textContent = 'Рисунок сохранен. Ctrl+Z — отмена.';
+        document.getElementById('drawing-status').textContent = 'Успешно сохранено';
     }
 
     function deleteCurrentDrawing() {
