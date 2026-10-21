@@ -855,9 +855,9 @@
 
         /* ОБНОВЛЕННАЯ МОДАЛКА ХОЛСТА (Canvas / Рисовач) */
         #drawing-modal .notes-modal {
-            width: min(1200px, 98vw);
-            max-width: 1200px;
-            height: min(92vh, 900px);
+            width: min(1280px, 98vw);
+            max-width: 1280px;
+            height: min(94vh, 920px);
             display: flex;
             flex-direction: column;
             padding: 0;
@@ -867,7 +867,7 @@
         .drawing-toolbar {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             padding: 10px 14px;
             background: var(--bg-main);
             border-bottom: 1px solid var(--border-color);
@@ -929,7 +929,6 @@
             background: #ffffff;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             border-radius: 4px;
-            transition: width 0.1s ease, height 0.1s ease;
         }
 
         #drawing-canvas {
@@ -951,6 +950,15 @@
             color: var(--accent-orange);
             z-index: 50;
             pointer-events: none;
+        }
+
+        .drawing-footer-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
         }
 
         /* UniFlo Notes – интегрированный редактор заметок */
@@ -1721,65 +1729,67 @@
   </div>
 </div>
 
-<!-- Модальное окно для рисования (Продвинутый холст) -->
+<!-- Модальное окно для рисования (Продвинутый холст с обновленным дизайном) -->
 <div class="modal-overlay" id="drawing-modal" onclick="if(event.target===this)closeModal('drawing-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true">
-    <div class="notes-modal-header">
+    
+    <!-- Шапка модального окна с назвнием и крестиком справа -->
+    <div class="notes-modal-header" style="position: relative; padding: 12px 16px;">
         <div class="modal-title">✏️ Редактор рисунка и конспектов</div>
-        <button class="close-btn" onclick="closeModal('drawing-modal')">&times;</button>
+        <button class="close-btn" onclick="closeModal('drawing-modal')" aria-label="Закрыть" style="position: absolute; right: 16px; top: 12px;">&times;</button>
     </div>
     
     <div style="padding: 10px 14px; background: var(--bg-card); display: flex; flex-direction: column; gap: 8px;">
         <input type="text" id="drawing-title-input" class="form-control" placeholder="Название рисунка / Схемы..." oninput="saveCurrentDrawingMeta()">
         
+        <!-- Единая строка инструментов как на скриншоте -->
         <div class="drawing-toolbar">
             <div class="color-palette" id="color-palette-grid"></div>
             
-            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; width:100%; margin-top:6px;">
+            <div style="display:flex; align-items:center; gap:6px;">
                 <label style="font-size:0.75rem; color:var(--text-secondary);">Кисть:</label>
                 <input type="range" id="brush-size-range" min="1" max="40" value="4" oninput="brushSize = this.value" style="width: 70px;">
-                
-                <!-- Инструменты -->
-                <button type="button" id="btn-tool-brush" class="tool-btn-item active" onclick="setCanvasTool('brush')">✏️ Кисть</button>
-                <button type="button" id="btn-tool-select" class="tool-btn-item" onclick="setCanvasTool('select')">🖐️ Выбрать / Двигать</button>
-                <button type="button" id="btn-tool-eraser" class="tool-btn-item" onclick="setCanvasTool('eraser')">🧹 Ластик</button>
-                <button type="button" class="tool-btn-item" onclick="addTextToCanvas()">💬 Текст</button>
-                
-                <!-- Загрузка Картинки -->
-                <label class="tool-btn-item" style="margin:0; cursor:pointer;">
-                    🖼️ Файл <input type="file" id="canvas-image-file-input" accept="image/*" style="display:none;" onchange="handleImageFileUpload(event)">
-                </label>
-                <button type="button" class="tool-btn-item" onclick="addImageViaUrl()" title="Вставить по URL">🔗 URL</button>
-
-                <!-- Размер холста (Ширина и Высота) -->
-                <div style="margin-left:auto; display:flex; gap:6px; align-items:center;">
-                    <span style="font-size:0.72rem; color:var(--text-muted);">Размер:</span>
-                    <input type="number" id="canvas-width-input" class="form-control" style="width: 70px; padding: 4px; font-size: 0.75rem;" min="100" max="5000" onchange="manualResizeCanvas()" title="Ширина холста">
-                    <span style="font-size:0.72rem; color:var(--text-muted);">×</span>
-                    <input type="number" id="canvas-height-input" class="form-control" style="width: 70px; padding: 4px; font-size: 0.75rem;" min="100" max="5000" onchange="manualResizeCanvas()" title="Высота холста">
-                    <span style="font-size:0.72rem; color:var(--text-muted);">px</span>
-                    <button type="button" class="tool-btn-item" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444; border-color:rgba(239,68,68,0.4);">🗑️ Очистить</button>
-                </div>
             </div>
             
-            <div style="font-size:0.72rem; color:var(--accent-orange); margin-top:2px;">
-                💡 <b>Подсказка:</b> Зажмите <b>Ctrl</b> для множественного выбора. Перетаскивайте рамку для выделения множества объектов. Углы выбранных объектов можно тянуть для изменения размера!
+            <button type="button" id="btn-tool-brush" class="tool-btn-item active" onclick="setCanvasTool('brush')">✏️ Кисть</button>
+            <button type="button" id="btn-tool-select" class="tool-btn-item" onclick="setCanvasTool('select')">🖐️ Выбрать / Двигать</button>
+            <button type="button" id="btn-tool-eraser" class="tool-btn-item" onclick="setCanvasTool('eraser')">🧹 Ластик</button>
+            <button type="button" class="tool-btn-item" onclick="addTextToCanvas()">💬 Текст</button>
+            
+            <label class="tool-btn-item" style="margin:0; cursor:pointer;">
+                🖼️ Файл <input type="file" id="canvas-image-file-input" accept="image/*" style="display:none;" onchange="handleImageFileUpload(event)">
+            </label>
+            <button type="button" class="tool-btn-item" onclick="addImageViaUrl()" title="Вставить по URL">🔗 URL</button>
+
+            <!-- Размер холста (Ширина x Высота) -->
+            <div style="margin-left:auto; display:flex; gap:6px; align-items:center;">
+                <span style="font-size:0.72rem; color:var(--text-muted);">Размер:</span>
+                <input type="number" id="canvas-width-input" class="form-control" style="width: 65px; padding: 4px; font-size: 0.75rem; text-align: center;" min="100" max="5000" onchange="manualResizeCanvas()" title="Ширина холста">
+                <span style="font-size:0.72rem; color:var(--text-muted);">×</span>
+                <input type="number" id="canvas-height-input" class="form-control" style="width: 65px; padding: 4px; font-size: 0.75rem; text-align: center;" min="100" max="5000" onchange="manualResizeCanvas()" title="Высота холста">
+                <span style="font-size:0.72rem; color:var(--text-muted);">px</span>
+                <button type="button" class="tool-btn-item" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444; border-color:rgba(239,68,68,0.4);">🗑️ Очистить</button>
             </div>
+        </div>
+        
+        <div style="font-size:0.72rem; color:var(--accent-orange); margin-top:1px;">
+            💡 <b>Подсказка:</b> Зажмите <b>Ctrl</b> для множественного выбора. Перетаскивайте рамку для выделения множества объектов. Углы выбранных объектов можно тянуть для изменения размера!
         </div>
     </div>
     
     <div class="drawing-canvas-container" id="drawing-canvas-wrap">
         <div class="drawing-paper-wrap" id="drawing-paper-wrap">
             <div class="paste-drop-zone-overlay" id="canvas-drop-overlay">Перетащите картинку сюда</div>
-            <canvas id="drawing-canvas" width="700" height="500"></canvas>
+            <canvas id="drawing-canvas" width="1150" height="510"></canvas>
         </div>
     </div>
     
-    <div class="notes-footer" style="background:var(--bg-card);">
-        <span id="drawing-status" class="notes-status">Рисунок сохраняется автоматически.</span>
-        <div class="notes-footer-group">
-            <button class="notes-export" onclick="exportDrawingAsImage()">📥 Скачать PNG</button>
-            <button class="notes-delete" onclick="deleteCurrentDrawing()">🗑 Удалить</button>
+    <!-- Нижний футер с крупными кнопками Скачать и Удалить -->
+    <div style="background:var(--bg-card); border-top:1px solid var(--border-color); padding: 10px 14px;">
+        <span id="drawing-status" class="notes-status" style="display:block; margin-bottom:6px;">Рисунок сохраняется автоматически.</span>
+        <div class="drawing-footer-btns">
+            <button class="notes-export" onclick="exportDrawingAsImage()" style="width:100%; border:none; border-radius:8px; padding:10px; font-weight:700; cursor:pointer;">📥 Скачать PNG</button>
+            <button class="notes-delete" onclick="deleteCurrentDrawing()" style="width:100%; border:none; border-radius:8px; padding:10px; font-weight:700; cursor:pointer;">🗑 Удалить</button>
         </div>
     </div>
   </div>
@@ -2678,7 +2688,7 @@
         closeModal('note-modal');
     }
 
-    // --- ПРОДВИНУТАЯ ЛОГИКА ХОЛСТА (Canvas Engine с resize и множественным выбором) ---
+    // --- ПРОДВИНУТАЯ ЛОГИКА ХОЛСТА (Canvas Engine с точным и плавным Resize) ---
     const BASIC_16_COLORS = [
         '#000000', '#ffffff', '#ef4444', '#f97316',
         '#facc15', '#22c55e', '#3b82f6', '#8b5cf6',
@@ -2689,24 +2699,26 @@
     let currentDrawingId = null;
     let currentColor = '#000000';
     let brushSize = 4;
-    let currentTool = 'brush'; // 'brush', 'eraser', 'select'
+    let currentTool = 'brush'; 
     let isDrawing = false;
     let canvasCtx = null;
 
     let canvasElements = [];
     let currentStroke = null;
-    let selectedElementIndices = []; // Массив индексов выбранных элементов для множественного выбора
-    let activeResizeHandle = null; // 'nw', 'ne', 'sw', 'se'
+    let selectedElementIndices = []; 
+    let activeResizeHandle = null; 
     let isDraggingElements = false;
     let isResizingElements = false;
     let isBoxSelecting = false;
     let boxSelectStart = { x: 0, y: 0 };
     let boxSelectCurrent = { x: 0, y: 0 };
     let dragStartMouse = { x: 0, y: 0 };
-    let initialBoundsSnapshot = [];
+    
+    // Структура для идеального вычисления изменений размеров
+    let resizeInitialSnapshot = null;
 
-    let canvasWidth = 700;
-    let canvasHeight = 500;
+    let canvasWidth = 1150;
+    let canvasHeight = 510;
 
     function initColorPalette() {
         const grid = document.getElementById('color-palette-grid');
@@ -2748,8 +2760,8 @@
         if (drawing) {
             currentDrawingId = drawing.id;
             document.getElementById('drawing-title-input').value = drawing.title || 'Рисунок';
-            canvasWidth = drawing.width || 700;
-            canvasHeight = drawing.height || 500;
+            canvasWidth = drawing.width || 1150;
+            canvasHeight = drawing.height || 510;
             canvasElements = drawing.elements ? JSON.parse(JSON.stringify(drawing.elements)) : [];
 
             canvasElements.forEach(el => {
@@ -2762,8 +2774,8 @@
         } else {
             currentDrawingId = Date.now();
             document.getElementById('drawing-title-input').value = 'Новый рисунок';
-            canvasWidth = 700;
-            canvasHeight = 500;
+            canvasWidth = 1150;
+            canvasHeight = 510;
             canvasElements = [];
         }
 
@@ -2802,7 +2814,7 @@
         canvasCtx.fillStyle = '#ffffff';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        canvasElements.forEach((el, index) => {
+        canvasElements.forEach((el) => {
             if (el.type === 'stroke') {
                 if (el.points.length < 2) return;
                 canvasCtx.beginPath();
@@ -2824,7 +2836,7 @@
             }
         });
 
-        // Если есть выбранные элементы, рисуем рамку и угловые ручки изменения размера (Resize Handles)
+        // Отрисовка рамки выделения и маркеров Resize
         if (currentTool === 'select' && selectedElementIndices.length > 0) {
             const groupBounds = getGroupBounds(selectedElementIndices);
             canvasCtx.save();
@@ -2834,7 +2846,6 @@
             canvasCtx.strokeRect(groupBounds.x - 4, groupBounds.y - 4, groupBounds.w + 8, groupBounds.h + 8);
             canvasCtx.restore();
 
-            // Рисуем угловые маркеры ресайза
             const handleSize = 8;
             canvasCtx.fillStyle = '#f97316';
             // nw
@@ -2847,7 +2858,7 @@
             canvasCtx.fillRect(groupBounds.x + groupBounds.w + 4 - handleSize/2, groupBounds.y + groupBounds.h + 4 - handleSize/2, handleSize, handleSize);
         }
 
-        // Рамка выделения перетаскиванием (Box Selection)
+        // Рамка выделения через зажатие мыши (Box Selection)
         if (isBoxSelecting) {
             canvasCtx.save();
             canvasCtx.strokeStyle = '#3b82f6';
@@ -2897,7 +2908,7 @@
     }
 
     function getResizeHandleAtPos(pos, groupBounds) {
-        const handleSize = 12;
+        const handleSize = 14;
         const x1 = groupBounds.x - 4, y1 = groupBounds.y - 4;
         const x2 = groupBounds.x + groupBounds.w + 4, y2 = groupBounds.y + groupBounds.h + 4;
 
@@ -2925,23 +2936,27 @@
             dragStartMouse = pos;
 
             if (currentTool === 'select') {
-                // Проверяем клик по угловым маркерам ресайза
                 if (selectedElementIndices.length > 0) {
                     const groupBounds = getGroupBounds(selectedElementIndices);
                     const handle = getResizeHandleAtPos(pos, groupBounds);
                     if (handle) {
                         isResizingElements = true;
                         activeResizeHandle = handle;
-                        initialBoundsSnapshot = selectedElementIndices.map(idx => {
-                            const el = canvasElements[idx];
-                            const b = getElementBounds(el);
-                            return { idx, b, el: JSON.parse(JSON.stringify(el)) };
-                        });
+                        
+                        // Запоминаем точный снимок всех выбранных элементов для идеального изменения размера
+                        resizeInitialSnapshot = {
+                            handle: handle,
+                            groupBounds: { ...groupBounds },
+                            startPos: { ...pos },
+                            elements: selectedElementIndices.map(idx => ({
+                                idx: idx,
+                                raw: JSON.parse(JSON.stringify(canvasElements[idx]))
+                            }))
+                        };
                         return;
                     }
                 }
 
-                // Проверяем клик по объекту
                 let clickedIndex = -1;
                 for (let i = canvasElements.length - 1; i >= 0; i--) {
                     const bounds = getElementBounds(canvasElements[i]);
@@ -2954,13 +2969,9 @@
 
                 if (clickedIndex >= 0) {
                     if (e.ctrlKey) {
-                        // Мультивыбор с зажатым Ctrl
                         const exists = selectedElementIndices.includes(clickedIndex);
-                        if (exists) {
-                            selectedElementIndices = selectedElementIndices.filter(i => i !== clickedIndex);
-                        } else {
-                            selectedElementIndices.push(clickedIndex);
-                        }
+                        if (exists) selectedElementIndices = selectedElementIndices.filter(i => i !== clickedIndex);
+                        else selectedElementIndices.push(clickedIndex);
                     } else {
                         if (!selectedElementIndices.includes(clickedIndex)) {
                             selectedElementIndices = [clickedIndex];
@@ -2968,7 +2979,6 @@
                     }
                     isDraggingElements = true;
                 } else {
-                    // Клик на пустое пространство -> начинаем рамочное выделение (Box Selection) или сброс
                     if (!e.ctrlKey) selectedElementIndices = [];
                     isBoxSelecting = true;
                     boxSelectStart = pos;
@@ -3000,37 +3010,58 @@
             const pos = getPos(e);
 
             if (currentTool === 'select') {
-                if (isResizingElements && selectedElementIndices.length > 0) {
-                    // Изменение размера выбранных объектов
-                    const groupBounds = getGroupBounds(selectedElementIndices);
-                    let dx = pos.x - dragStartMouse.x;
-                    let dy = pos.y - dragStartMouse.y;
+                // Точный плавно работающий Resize без дёрганий
+                if (isResizingElements && resizeInitialSnapshot) {
+                    const snap = resizeInitialSnapshot;
+                    const origG = snap.groupBounds;
+                    let newG = { ...origG };
 
-                    initialBoundsSnapshot.forEach(item => {
+                    if (snap.handle === 'se') {
+                        newG.w = Math.max(10, origG.w + (pos.x - snap.startPos.x));
+                        newG.h = Math.max(10, origG.h + (pos.y - snap.startPos.y));
+                    } else if (snap.handle === 'sw') {
+                        const dw = pos.x - snap.startPos.x;
+                        newG.w = Math.max(10, origG.w - dw);
+                        newG.x = origG.x + (origG.w - newG.w);
+                        newG.h = Math.max(10, origG.h + (pos.y - snap.startPos.y));
+                    } else if (snap.handle === 'ne') {
+                        newG.w = Math.max(10, origG.w + (pos.x - snap.startPos.x));
+                        const dh = pos.y - snap.startPos.y;
+                        newG.h = Math.max(10, origG.h - dh);
+                        newG.y = origG.y + (origG.h - newG.h);
+                    } else if (snap.handle === 'nw') {
+                        const dw = pos.x - snap.startPos.x;
+                        const dh = pos.y - snap.startPos.y;
+                        newG.w = Math.max(10, origG.w - dw);
+                        newG.x = origG.x + (origG.w - newG.w);
+                        newG.h = Math.max(10, origG.h - dh);
+                        newG.y = origG.y + (origG.h - newG.h);
+                    }
+
+                    const scaleX = newG.w / origG.w;
+                    const scaleY = newG.h / origG.h;
+
+                    snap.elements.forEach(item => {
                         const el = canvasElements[item.idx];
-                        const b = item.b;
+                        const origEl = item.raw;
 
-                        if (el.type === 'image') {
-                            let newW = b.w, newH = b.h, newX = b.x, newY = b.y;
-                            if (activeResizeHandle === 'se') { newW = Math.max(10, b.w + dx); newH = Math.max(10, b.h + dy); }
-                            else if (activeResizeHandle === 'sw') { newW = Math.max(10, b.w - dx); newH = Math.max(10, b.h + dy); newX = b.x + dx; }
-                            else if (activeResizeHandle === 'ne') { newW = Math.max(10, b.w + dx); newH = Math.max(10, b.h - dy); newY = b.y + dy; }
-                            else if (activeResizeHandle === 'nw') { newW = Math.max(10, b.w - dx); newH = Math.max(10, b.h - dy); newX = b.x + dx; newY = b.y + dy; }
-                            el.w = newW; el.h = newH; el.x = newX; el.y = newY;
-                        } else if (el.type === 'text') {
-                            let scaleFactor = 1;
-                            if (activeResizeHandle === 'se') scaleFactor = 1 + (dx / groupBounds.w);
-                            else if (activeResizeHandle === 'sw') scaleFactor = 1 - (dx / groupBounds.w);
-                            el.size = Math.max(2, Math.min(60, item.el.size * scaleFactor));
-                        } else if (el.type === 'stroke') {
-                            let scaleX = groupBounds.w > 0 ? (groupBounds.w + dx) / groupBounds.w : 1;
-                            let scaleY = groupBounds.h > 0 ? (groupBounds.h + dy) / groupBounds.h : 1;
-                            el.points = item.el.points.map(p => ({
-                                x: groupBounds.x + (p.x - groupBounds.x) * scaleX,
-                                y: groupBounds.y + (p.y - groupBounds.y) * scaleY
+                        if (el.type === 'stroke') {
+                            el.points = origEl.points.map(p => ({
+                                x: newG.x + (p.x - origG.x) * scaleX,
+                                y: newG.y + (p.y - origG.y) * scaleY
                             }));
+                        } else if (el.type === 'image') {
+                            el.x = newG.x + (origEl.x - origG.x) * scaleX;
+                            el.y = newG.y + (origEl.y - origG.y) * scaleY;
+                            el.w = Math.max(5, origEl.w * scaleX);
+                            el.h = Math.max(5, origEl.h * scaleY);
+                        } else if (el.type === 'text') {
+                            el.x = newG.x + (origEl.x - origG.x) * scaleX;
+                            el.y = newG.y + (origEl.y - origG.y) * scaleY;
+                            el.size = Math.max(2, Math.min(100, origEl.size * Math.min(scaleX, scaleY)));
                         }
                     });
+
                     redrawCanvas();
                     return;
                 }
@@ -3055,7 +3086,6 @@
 
                 if (isBoxSelecting) {
                     boxSelectCurrent = pos;
-                    // Автоматически определяем объекты, попавшие в прямоугольник выделения
                     const bx = Math.min(boxSelectStart.x, boxSelectCurrent.x);
                     const by = Math.min(boxSelectStart.y, boxSelectCurrent.y);
                     const bw = Math.abs(boxSelectStart.x - boxSelectCurrent.x);
@@ -3091,6 +3121,7 @@
                 isResizingElements = false;
                 isBoxSelecting = false;
                 currentStroke = null;
+                resizeInitialSnapshot = null;
                 saveCurrentDrawingMeta();
                 redrawCanvas();
             }
