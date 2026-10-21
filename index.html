@@ -468,6 +468,7 @@
             z-index: 1;
         }
 
+        /* КАРТА ИСХОДНЫЙ ВИД */
         #map-container {
             width: 100%;
             height: 352px;
@@ -574,7 +575,7 @@
             box-shadow: 0 0 6px rgba(0,0,0,0.5);
         }
 
-        /* СТИЛИ ИНТЕРАКТИВНОГО КАЛЕНДАРЯ */
+        /* КАЛЕНДАРЬ */
         .cal-nav-bar {
             display: flex;
             align-items: center;
@@ -669,7 +670,7 @@
         .cal-event-chip.type-personal { background: #22c55e; }
         .cal-event-chip.type-exam { background: #f97316; }
 
-        /* Шапка часов с кнопками */
+        /* ЧАСЫ */
         .clock-container {
             display: flex;
             align-items: center;
@@ -711,7 +712,7 @@
         .clock-time { font-size: 1.45rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 0.72rem; color: var(--text-secondary); }
 
-        /* СТИЛИ ВИЗУАЛЬНОГО ТАЙМЛАЙНА ГРАФИКА РАБОТЫ */
+        /* ТАЙМЛАЙН РАБОТЫ */
         .schedule-place-block {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
@@ -772,7 +773,12 @@
             margin-top: 4px;
         }
 
-        /* СТИЛИ ГРАФИКА ПОГОДЫ С СКРОЛЛОМ */
+        /* ИСПРАВЛЕННЫЙ БЛОК ПОГОДЫ (Увеличенный размер на ПК) */
+        #weather-modal .modal {
+            max-width: 900px !important;
+            width: 95vw;
+        }
+
         .weather-graph-scroll-container {
             width: 100%;
             max-width: 100%;
@@ -781,7 +787,7 @@
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 16px 12px;
+            padding: 20px 16px 28px 16px;
             position: relative;
             scrollbar-width: thin;
             scrollbar-color: var(--border-color) transparent;
@@ -794,7 +800,7 @@
             border-radius: 3px;
         }
 
-        /* Блок структуры заметок */
+        /* Блок заметок */
         .notes-dashboard-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -853,7 +859,7 @@
         .unified-note-title { font-size: 0.84rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .unified-note-desc { font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ОБНОВЛЕННАЯ МОДАЛКА ХОЛСТА (Увеличенная панель инструментов) */
+        /* ОБНОВЛЕННАЯ ПАНЕЛЬ РЕДАКТОРА (по скриншоту) */
         #drawing-modal .notes-modal {
             width: min(1360px, 98vw);
             max-width: 1360px;
@@ -865,7 +871,6 @@
             background: var(--bg-card);
         }
 
-        /* Увеличенная панель управления */
         .drawing-toolbar-large {
             display: flex;
             flex-direction: column;
@@ -875,39 +880,32 @@
             border-bottom: 1px solid var(--border-color);
         }
 
+        /* Строка 1: Инструменты и Ползунок кисти справа */
         .drawing-toolbar-row1 {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
             gap: 12px;
-            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .drawing-toolbar-row2 {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        /* Увеличенная палитра */
+        /* Строка 2: Палитра цветов растянутая во всю ширину */
         .color-palette-large {
             display: grid;
-            grid-template-columns: repeat(8, 28px);
+            grid-template-columns: repeat(16, 1fr);
             gap: 6px;
+            width: 100%;
         }
 
         .color-btn-large {
-            width: 28px;
             height: 28px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
             cursor: pointer;
             transition: transform 0.1s;
         }
-        .color-btn-large:hover { transform: scale(1.1); }
+        .color-btn-large:hover { transform: scale(1.08); }
         .color-btn-large.active { border: 2px solid #ffffff; box-shadow: 0 0 6px var(--accent-orange); }
 
-        /* Увеличенные кнопки инструментов */
         .tool-btn-large {
             background: var(--bg-input);
             border: 1px solid var(--border-color);
@@ -1594,9 +1592,9 @@
     </div>
 </div>
 
-<!-- Modal Weather -->
+<!-- Modal Weather (Увеличенный размер на ПК) -->
 <div class="modal-overlay" id="weather-modal">
-    <div class="modal" style="max-width: 650px;">
+    <div class="modal">
         <div class="modal-header">
             <div class="modal-title" data-i18n="weather_title">☀️ Počasie Žilina (24 hodín)</div>
             <button class="close-btn" onclick="closeModal('weather-modal')">&times;</button>
@@ -1693,7 +1691,7 @@
     </div>
 </div>
 
-<!-- Modal for Note Creation/Editing (Обычные заметки) -->
+<!-- Modal for Note Creation/Editing -->
 <div class="modal-overlay" id="note-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1748,11 +1746,10 @@
   </div>
 </div>
 
-<!-- Модальное окно для рисования (Обновленный увеличенный дизайн) -->
+<!-- Модальное окно для рисования (Перекомпонованная верхняя панель по скриншоту) -->
 <div class="modal-overlay" id="drawing-modal" onclick="if(event.target===this)closeModal('drawing-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true">
     
-    <!-- Шапка модального окна -->
     <div class="notes-modal-header" style="position: relative; padding: 12px 16px;">
         <div class="modal-title">✏️ Редактор рисунка и конспектов</div>
         <button class="close-btn" onclick="closeModal('drawing-modal')" aria-label="Закрыть" style="position: absolute; right: 16px; top: 12px;">&times;</button>
@@ -1761,32 +1758,31 @@
     <div style="padding: 12px 16px; background: var(--bg-card); display: flex; flex-direction: column; gap: 10px;">
         <input type="text" id="drawing-title-input" class="form-control" style="font-size:0.95rem; padding:8px 12px;" placeholder="Название рисунка / Схемы..." oninput="saveCurrentDrawingMeta()">
         
-        <!-- Увеличенная верхняя панель инструментов -->
         <div class="drawing-toolbar-large">
-            <!-- Строка 1: Крупные цвета, кисть и кнопки действий -->
+            <!-- СТРОКА 1: Инструменты, выбор/двигать, кисть-ползунок справа -->
             <div class="drawing-toolbar-row1">
-                <div class="color-palette-large" id="color-palette-grid"></div>
+                <button type="button" id="btn-tool-brush" class="tool-btn-large active" onclick="setCanvasTool('brush')">✏️ Кисть</button>
+                <button type="button" id="btn-tool-select" class="tool-btn-large" onclick="setCanvasTool('select')">🖐️ Выбрать / Двигать</button>
+                <button type="button" id="btn-tool-eraser" class="tool-btn-large" onclick="setCanvasTool('eraser')">🧹 Ластик</button>
+                <button type="button" class="tool-btn-large" onclick="addTextToCanvas()">💬 Текст</button>
                 
-                <div style="display:flex; align-items:center; gap:8px; margin-left:6px;">
+                <label class="tool-btn-large" style="margin:0; cursor:pointer;">
+                    🖼️ Файл <input type="file" id="canvas-image-file-input" accept="image/*" style="display:none;" onchange="handleImageFileUpload(event)">
+                </label>
+                <button type="button" class="tool-btn-large" onclick="addImageViaUrl()" title="Вставить по URL">🔗 URL</button>
+
+                <!-- Ползунок "Кисть:" напротив кнопок -->
+                <div style="display:flex; align-items:center; gap:8px; margin-left:12px;">
                     <label style="font-size:0.85rem; font-weight:600; color:var(--text-secondary);">Кисть:</label>
-                    <input type="range" id="brush-size-range" min="1" max="40" value="5" oninput="brushSize = this.value" style="width: 90px; height:6px;">
-                </div>
-                
-                <div style="display:flex; gap:8px; flex-wrap:wrap; flex:1; justify-content:flex-end;">
-                    <button type="button" id="btn-tool-brush" class="tool-btn-large active" onclick="setCanvasTool('brush')">✏️ Кисть</button>
-                    <button type="button" id="btn-tool-select" class="tool-btn-large" onclick="setCanvasTool('select')">🖐️ Выбрать / Двигать</button>
-                    <button type="button" id="btn-tool-eraser" class="tool-btn-large" onclick="setCanvasTool('eraser')">🧹 Ластик</button>
-                    <button type="button" class="tool-btn-large" onclick="addTextToCanvas()">💬 Текст</button>
-                    
-                    <label class="tool-btn-large" style="margin:0; cursor:pointer;">
-                        🖼️ Файл <input type="file" id="canvas-image-file-input" accept="image/*" style="display:none;" onchange="handleImageFileUpload(event)">
-                    </label>
-                    <button type="button" class="tool-btn-large" onclick="addImageViaUrl()" title="Вставить по URL">🔗 URL</button>
+                    <input type="range" id="brush-size-range" min="1" max="40" value="5" oninput="brushSize = this.value" style="width: 100px; height:6px;">
                 </div>
             </div>
 
-            <!-- Строка 2: Перенесенный вниз блок размеров холста и очистки -->
-            <div class="drawing-toolbar-row2">
+            <!-- СТРОКА 2: Растянутая во всю ширину палитра цветов -->
+            <div class="color-palette-large" id="color-palette-grid"></div>
+
+            <!-- СТРОКА 3: Размер холста и кнопка очистки снизу справа -->
+            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
                 <span style="font-size:0.82rem; font-weight:600; color:var(--text-secondary);">Размер:</span>
                 <input type="number" id="canvas-width-input" class="form-control" style="width: 75px; padding: 6px; font-size: 0.85rem; font-weight:700; text-align: center;" min="100" max="5000" onchange="manualResizeCanvas()" title="Ширина холста">
                 <span style="font-size:0.82rem; color:var(--text-muted);">×</span>
@@ -1804,7 +1800,6 @@
         </div>
     </div>
     
-    <!-- Нижний футер со скачиванием и удалением (без текста "Успешно сохранено") -->
     <div style="background:var(--bg-card); border-top:1px solid var(--border-color); padding: 12px 16px;">
         <div class="drawing-footer-btns" style="padding:0; border:none;">
             <button class="notes-export" onclick="exportDrawingAsImage()" style="width:100%; border:none; border-radius:8px; padding:12px; font-size:0.95rem; font-weight:700; cursor:pointer;">📥 Скачать PNG</button>
@@ -2600,7 +2595,7 @@
         return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
     }
 
-    // --- ЛОГИКА ОБЩИХ ЗАМЕТОК, ВОРДОВ И РИСУНКОВ ---
+    // --- ЛОГИКА ОБЩИХ ЗАМЕТОК И РИСУНКОВ ---
     function getBasicNotes() {
         try { return JSON.parse(localStorage.getItem('uniflo_basic_notes')) || []; }
         catch (e) { return []; }
@@ -2707,7 +2702,7 @@
         closeModal('note-modal');
     }
 
-    // --- ПРОДВИНУТАЯ ЛОГИКА ХОЛСТА (Размер по умолчанию 1230 x 510) ---
+    // --- ЛОГИКА ХОЛСТА (С 16 ЦВЕТАМИ, ВЫБОРОМ И CTRL + Z) ---
     const BASIC_16_COLORS = [
         '#000000', '#ffffff', '#ef4444', '#f97316',
         '#facc15', '#22c55e', '#3b82f6', '#8b5cf6',
@@ -2723,6 +2718,7 @@
     let canvasCtx = null;
 
     let canvasElements = [];
+    let historyUndoStack = []; // История отмены Ctrl+Z
     let currentStroke = null;
     let selectedElementIndices = []; 
     let activeResizeHandle = null; 
@@ -2737,6 +2733,46 @@
 
     let canvasWidth = 1230;
     let canvasHeight = 510;
+
+    function saveCanvasStateForUndo() {
+        const snapshot = JSON.stringify(canvasElements.map(el => {
+            const { imgObj, ...rest } = el;
+            return rest;
+        }));
+        historyUndoStack.push(snapshot);
+        if (historyUndoStack.length > 30) historyUndoStack.shift();
+    }
+
+    function undoCanvasState() {
+        if (historyUndoStack.length === 0) return;
+        const prevSnapshot = historyUndoStack.pop();
+        const restored = JSON.parse(prevSnapshot);
+
+        canvasElements = restored.map(el => {
+            if (el.type === 'image' && el.src) {
+                const img = new Image();
+                img.src = el.src;
+                img.onload = () => redrawCanvas();
+                return { ...el, imgObj: img };
+            }
+            return el;
+        });
+
+        selectedElementIndices = [];
+        redrawCanvas();
+        saveCurrentDrawingMeta();
+    }
+
+    // Слушатель сочетания клавиш Ctrl+Z
+    window.addEventListener('keydown', (e) => {
+        const drawingModal = document.getElementById('drawing-modal');
+        if (drawingModal && drawingModal.classList.contains('active')) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                undoCanvasState();
+            }
+        }
+    });
 
     function initColorPalette() {
         const grid = document.getElementById('color-palette-grid');
@@ -2771,6 +2807,7 @@
 
         const canvas = document.getElementById('drawing-canvas');
         canvasCtx = canvas.getContext('2d');
+        historyUndoStack = [];
 
         const drawings = getDrawingsList();
         let drawing = id ? drawings.find(d => String(d.id) === String(id)) : null;
@@ -2854,7 +2891,6 @@
             }
         });
 
-        // Отрисовка рамки выделения
         if (currentTool === 'select' && selectedElementIndices.length > 0) {
             const groupBounds = getGroupBounds(selectedElementIndices);
             canvasCtx.save();
@@ -2947,6 +2983,8 @@
             const pos = getPos(e);
             isDrawing = true;
             dragStartMouse = pos;
+
+            saveCanvasStateForUndo();
 
             if (currentTool === 'select') {
                 if (selectedElementIndices.length > 0) {
@@ -3184,6 +3222,7 @@
     }
 
     function readAndAddImageBlob(blob) {
+        saveCanvasStateForUndo();
         const reader = new FileReader();
         reader.onload = (event) => {
             const img = new Image();
@@ -3215,6 +3254,7 @@
     function addImageViaUrl() {
         const url = prompt("Введите прямую ссылку на картинку (URL):");
         if (!url) return;
+        saveCanvasStateForUndo();
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => {
@@ -3244,6 +3284,7 @@
     function addTextToCanvas() {
         const text = prompt("Введите текст для добавления на холст:");
         if (!text) return;
+        saveCanvasStateForUndo();
         const textEl = {
             type: 'text',
             text: text,
@@ -3261,6 +3302,7 @@
 
     function clearCanvas() {
         if (!confirm("Очистить полностью весь холст?")) return;
+        saveCanvasStateForUndo();
         canvasElements = [];
         selectedElementIndices = [];
         redrawCanvas();
@@ -3917,14 +3959,14 @@
         const maxTemp = Math.max(...temps);
         const range = (maxTemp - minTemp) || 1;
 
-        const SVG_HEIGHT = 100;
-        const COLUMN_WIDTH = 45;
+        const SVG_HEIGHT = 120;
+        const COLUMN_WIDTH = 55;
         const totalWidth = hourlyWeatherData.length * COLUMN_WIDTH;
 
         const svgPoints = hourlyWeatherData.map((d, idx) => {
             const x = idx * COLUMN_WIDTH + COLUMN_WIDTH / 2;
             const norm = (d.temp - minTemp) / range;
-            const y = SVG_HEIGHT - 18 - (norm * (SVG_HEIGHT - 36));
+            const y = SVG_HEIGHT - 22 - (norm * (SVG_HEIGHT - 44));
             return { x, y, temp: d.temp };
         });
 
@@ -3945,11 +3987,11 @@
 
             columnsHtml += `
                 <div style="width: ${COLUMN_WIDTH}px; display: flex; flex-direction: column; align-items: center; position: relative; flex-shrink: 0;">
-                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">${item.timeStr}</div>
-                    <div style="font-size: 1.1rem; margin-bottom: 6px;">${icon}</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">${item.timeStr}</div>
+                    <div style="font-size: 1.25rem; margin-bottom: 8px;">${icon}</div>
                     
                     <div style="height: ${SVG_HEIGHT}px; width: 100%; position: relative;">
-                        <div style="position: absolute; left: 50%; top: ${p.y - 18}px; transform: translateX(-50%); font-size: 0.75rem; font-weight: 700; color: var(--accent-orange); text-shadow: 0 1px 3px rgba(0,0,0,0.8); z-index: 10;">
+                        <div style="position: absolute; left: 50%; top: ${p.y - 20}px; transform: translateX(-50%); font-size: 0.8rem; font-weight: 700; color: var(--accent-orange); text-shadow: 0 1px 3px rgba(0,0,0,0.8); z-index: 10;">
                             ${item.temp}°
                         </div>
                     </div>
@@ -3958,7 +4000,7 @@
         });
 
         const svgOverlayHtml = `
-            <svg style="position: absolute; left: 0; top: 58px; width: ${totalWidth}px; height: ${SVG_HEIGHT}px; pointer-events: none; z-index: 5;">
+            <svg style="position: absolute; left: 0; top: 62px; width: ${totalWidth}px; height: ${SVG_HEIGHT}px; pointer-events: none; z-index: 5;">
                 <defs>
                     <linearGradient id="weatherGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stop-color="#f97316" stop-opacity="0.35"/>
