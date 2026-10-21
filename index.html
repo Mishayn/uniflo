@@ -1426,7 +1426,7 @@
         <div style="max-height: 420px; overflow-y: auto;" id="opening-hours-content"></div>
     </div>
 </div>
-
+    
 <!-- Modal Weather -->
 <div class="modal-overlay" id="weather-modal">
     <div class="modal" style="max-width: 650px;">
@@ -1439,8 +1439,8 @@
             ↔ Posúvajte pre zobrazenie celého dňa
         </div>
 
-        <div class="weather-graph-scroll-container">
-            <div id="weather-flex-track" style="display: flex; gap: 8px; min-width: max-content; align-items: stretch;"></div>
+        <div class="weather-graph-scroll-container" id="weather-canvas-wrapper">
+            <canvas id="weather-canvas"></canvas>
         </div>
     </div>
 </div>
@@ -3027,53 +3027,128 @@
     }
 
     function drawWeatherGraph() {
-        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
-            generateFallbackWeatherData();
-        }
-
-        const track = document.getElementById('weather-flex-track');
-        if (!track) return;
-        track.innerHTML = '';
-
-        const temps = hourlyWeatherData.map(d => d.temp);
-        const minTemp = Math.min(...temps);
-        const maxTemp = Math.max(...temps);
-        const tempRange = maxTemp - minTemp || 1;
-
-        hourlyWeatherData.forEach(item => {
-            const heightPercent = Math.max(20, Math.round(((item.temp - minTemp) / tempRange) * 60 + 25));
-            const icon = getWeatherIcon(item.code);
-
-            const col = document.createElement('div');
-            col.style.cssText = `
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: space-between;
-                width: 58px;
-                height: 150px;
-                background: var(--bg-main);
-                border: 1px solid var(--border-color);
-                border-radius: 10px;
-                padding: 12px 4px;
-                flex-shrink: 0;
-            `;
-
-            col.innerHTML = `
-                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary);">${item.temp}°</span>
-                <div style="font-size: 1.3rem; margin: 4px 0;">${icon}</div>
-                <div style="width: 8px; height: ${heightPercent}%; background: linear-gradient(to top, var(--accent-orange), #fde047); border-radius: 4px; margin: 4px 0;"></div>
-                <span style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">${item.timeStr}</span>
-            `;
-            track.appendChild(col);
-        });
+    if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
+        generateFallbackWeatherData();
     }
 
-    function openWeatherModal() {
-        const modal = document.getElementById('weather-modal');
-        modal.classList.add('active');
+    const canvas = document.getElementById('weather-canvas');
+    const wrapper = document.getElementById('weather-canvas-wrapper');
+    if (!canvas || !wrapper) return;
+
+    const ctx = canvas.getContext('2d');
+    const count = hourlyWeatherData.length;
+    const colWidth = 65; // ширина на одну точку графика
+    const totalWidth = count * colWidth;
+    const canvasHeight = 220;
+
+    // Учитываем ретина-дисплеи (смартфоны и макбуки), чтобы линии были четкими
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = totalWidth * dpr;
+    canvas.height = canvasHeight * dpr;
+    canvas.style.width = totalWidth + 'px';
+    canvas.style.height = canvasHeight + 'px';
+    wrapper.style.width = '100%';
+
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, totalWidth, canvasHeight);
+
+    const temps = hourlyWeatherData.map(d => d.temp);
+    let minTemp = Math.min(...temps);
+    let maxTemp = Math.max(...temps);
+    if (minTemp === maxTemp) { minTemp -= 2; maxTemp += 2; }
+    
+    const topMargin = 55;
+    const bottomMargin = 45;
+    const graphHeight = canvasHeight - topMargin - bottomMargin;
+
+    const points = hourlyWeatherData.map((item, idx) => {
+        const x = idx * colWidth + colWidth / 2;
+        const norm = (item.temp - minTemp) / (maxTemp - minTemp);
+        const y = canvasHeight - bottomMargin - (norm * graphHeight);
+        return { x, y, ...item };
+    });
+
+    // Вертикальные линии сетки
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    points.forEach(p => {
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(p.x, 20);
+        ctx.lineTo(p.x, canvasHeight - bottomMargin + 10);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    });
+
+    // Градиентная заливка под линией графика
+    const gradient = ctx.createLinearGradient(0, topMargin, 0, canvasHeight - bottomMargin);
+    gradient.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
+    gradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, canvasHeight - bottomMargin);
+    ctx.lineTo(points[0].x, points[0].y);
+
+    for (let i = 0; i < points.length - 1; i++) {
+        const xc = (points[i].x + points[i + 1].x) / 2;
+        const yc = (points[i].y + points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+    }
+    const last = points[points.length - 1];
+    ctx.lineTo(last.x, last.y);
+    ctx.lineTo(last.x, canvasHeight - bottomMargin);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    // Сама плавная кривая линии графика
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 1; i++) {
+        const xc = (points[i].x + points[i + 1].x) / 2;
+        const yc = (points[i].y + points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+    }
+    ctx.lineTo(last.x, last.y);
+    ctx.strokeStyle = '#f97316';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Точки, цифры температуры, иконки и время внизу
+    points.forEach((p) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#f97316';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.font = '600 12px Inter, sans-serif';
+        ctx.fillStyle = '#f0f2f5';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${p.temp}°`, p.x, p.y - 10);
+
+        const icon = getWeatherIcon(p.code);
+        ctx.font = '15px Inter, sans-serif';
+        ctx.fillText(icon, p.x, canvasHeight - bottomMargin + 20);
+
+        ctx.font = '500 11px Inter, sans-serif';
+        ctx.fillStyle = '#9aa0a6';
+        ctx.fillText(p.timeStr, p.x, canvasHeight - 8);
+    });
+}
+
+function openWeatherModal() {
+    const modal = document.getElementById('weather-modal');
+    modal.classList.add('active');
+    
+    // Даем браузеру долю секунды на отображение модалки, затем запускаем отрисовку Canvas
+    setTimeout(() => {
         drawWeatherGraph();
-    }
+    }, 50);
+}
 
     function initMap() {
         if (leafletMap) return;
