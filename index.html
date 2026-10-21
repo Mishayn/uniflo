@@ -817,6 +817,58 @@
         .note-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
         .note-preview { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* UniFlo Notes – интегрированный редактор заметок */
+        #lesson-notes-modal .notes-modal {
+            width: min(1180px, 96vw);
+            max-width: 1180px;
+            height: min(88vh, 900px);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+        #lesson-notes-modal .notes-modal-header {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:14px 18px; border-bottom:1px solid var(--border-color); flex-shrink:0;
+        }
+        #lesson-notes-modal .notes-layout { display:grid; grid-template-columns:230px minmax(0,1fr); flex:1; min-height:0; }
+        #lesson-notes-modal .notes-sidebar { padding:12px; border-right:1px solid var(--border-color); overflow:auto; background:var(--bg-main); }
+        #lesson-notes-modal .notes-new-btn { width:100%; margin-bottom:12px; }
+        #lesson-notes-modal .notes-list { display:flex; flex-direction:column; gap:7px; }
+        #lesson-notes-modal .notes-list-item { width:100%; text-align:left; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; padding:10px; color:var(--text-primary); cursor:pointer; overflow-wrap:anywhere; }
+        #lesson-notes-modal .notes-list-item.active, #lesson-notes-modal .notes-list-item:hover { border-color:var(--accent-orange); }
+        #lesson-notes-modal .notes-list-title { display:block; font-size:.84rem; font-weight:700; margin-bottom:4px; }
+        #lesson-notes-modal .notes-list-lesson { display:block; font-size:.72rem; color:var(--accent-orange); }
+        #lesson-notes-modal .notes-workspace { display:flex; flex-direction:column; min-width:0; min-height:0; }
+        #lesson-notes-modal .notes-toolbar-top { padding:12px; border-bottom:1px solid var(--border-color); display:flex; flex-direction:column; gap:8px; }
+        #lesson-notes-modal .notes-title-input, #lesson-notes-modal .notes-lesson-select { width:100%; background:var(--bg-input); border:1px solid var(--border-color); border-radius:7px; padding:9px 10px; color:var(--text-primary); outline:none; }
+        #lesson-notes-modal .notes-format-toolbar { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+        #lesson-notes-modal .notes-format-toolbar button, #lesson-notes-modal .notes-format-toolbar select, #lesson-notes-modal .notes-format-toolbar input { background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-color); padding:7px; border-radius:6px; min-height:32px; }
+        #lesson-notes-modal .notes-format-toolbar button { cursor:pointer; min-width:32px; }
+        #lesson-notes-modal .notes-editor { flex:1; min-height:150px; padding:18px; overflow:auto; outline:none; line-height:1.55; overflow-wrap:anywhere; }
+        #lesson-notes-modal .notes-editor:empty:before { content:'Začni písať poznámku...'; color:var(--text-muted); }
+        #lesson-notes-modal .notes-footer { display:flex; gap:8px; justify-content:space-between; flex-wrap:wrap; padding:12px; border-top:1px solid var(--border-color); background:var(--bg-card); }
+        #lesson-notes-modal .notes-footer-group { display:flex; gap:8px; flex-wrap:wrap; }
+        #lesson-notes-modal .notes-footer button { border:0; border-radius:7px; padding:9px 12px; cursor:pointer; color:white; font-weight:600; }
+        #lesson-notes-modal .notes-export { background:#16a34a; }
+        #lesson-notes-modal .notes-delete { background:#dc2626; }
+        #lesson-notes-modal .notes-status { color:var(--text-muted); font-size:.72rem; align-self:center; }
+        #basic-notes-list { display:flex; flex-direction:column; gap:7px; margin-top:8px; }
+        .basic-note-card { background:var(--bg-main); border:1px solid var(--border-color); border-radius:8px; padding:9px 11px; cursor:pointer; }
+        .basic-note-card:hover { border-color:var(--accent-orange); }
+        .basic-note-card strong { display:block; font-size:.82rem; margin-bottom:3px; }
+        .basic-note-card span { display:block; font-size:.73rem; color:var(--text-secondary); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+        @media (max-width:700px) {
+            #lesson-notes-modal { padding:5px; }
+            #lesson-notes-modal .notes-modal { width:100%; height:94vh; }
+            #lesson-notes-modal .notes-layout { grid-template-columns:112px minmax(0,1fr); }
+            #lesson-notes-modal .notes-sidebar { padding:7px; }
+            #lesson-notes-modal .notes-list-item { padding:7px; }
+            #lesson-notes-modal .notes-toolbar-top { padding:8px; }
+            #lesson-notes-modal .notes-editor { padding:12px; }
+            #lesson-notes-modal .notes-footer { padding:8px; }
+        }
+
         .chat-box {
             display: flex;
             flex-direction: column;
@@ -1282,7 +1334,10 @@
                             <div class="section-title" data-i18n="my_notes">📝 Moje Poznámky</div>
                             <button onclick="openNoteModal()" style="background:none; border:none; color:var(--accent-orange); font-size:0.8rem; font-weight:600; cursor:pointer;" data-i18n="create_note">+ Vytvoriť poznámku</button>
                         </div>
-                        <div class="notes-container" id="notes-list-container"></div>
+                        <div class="notes-container" style="max-height:none; overflow:visible;">
+                            <button class="btn-main-action" onclick="openLessonNotes()" style="margin-bottom:8px;">📝 Otvoriť UniFlo Notes</button>
+                            <div id="basic-notes-list"></div>
+                        </div>
                     </div>
 
                     <!-- Онлайн Чат -->
@@ -1478,7 +1533,7 @@
     </div>
 </div>
 
-<!-- Modal for Note Creation/Editing -->
+<!-- Modal for Note Creation/Editing (Обычные заметки) -->
 <div class="modal-overlay" id="note-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1499,6 +1554,38 @@
             <button type="button" class="btn-primary btn-delete" id="btn-delete-note" onclick="deleteNote()" style="display:none;" data-i18n="delete_note">Odstrániť poznámku</button>
         </form>
     </div>
+</div>
+
+<!-- Integrovaný UniFlo Notes editor (Новые заметки) -->
+<div class="modal-overlay" id="lesson-notes-modal" onclick="if(event.target===this)closeModal('lesson-notes-modal')">
+  <div class="modal notes-modal" role="dialog" aria-modal="true" aria-label="UniFlo Notes">
+    <div class="notes-modal-header"><div class="modal-title">📝 UniFlo Notes</div><button class="close-btn" onclick="closeModal('lesson-notes-modal')" aria-label="Zavrieť">&times;</button></div>
+    <div class="notes-layout">
+      <aside class="notes-sidebar">
+        <button class="btn-main-action notes-new-btn" onclick="createLessonNote()">+ Nová poznámka</button>
+        <div id="lesson-notes-list" class="notes-list"></div>
+      </aside>
+      <section class="notes-workspace">
+        <div class="notes-toolbar-top">
+          <input id="lesson-note-title" class="notes-title-input" placeholder="Názov poznámky..." oninput="saveLessonNote()">
+          <select id="lesson-note-subject" class="notes-lesson-select" onchange="saveLessonNote()"><option value="">📄 Nepriradená poznámka</option></select>
+          <div class="notes-format-toolbar">
+            <button type="button" onclick="formatLessonNote('bold')" title="Tučné"><b>B</b></button>
+            <button type="button" onclick="formatLessonNote('italic')" title="Kurzíva"><i>I</i></button>
+            <button type="button" onclick="formatLessonNote('underline')" title="Podčiarknuté"><u>U</u></button>
+            <select aria-label="Písmo" onchange="changeLessonNoteFont(this.value)"><option value="">Písmo</option><option>Arial</option><option>Verdana</option><option>Georgia</option><option>Courier New</option><option>Times New Roman</option></select>
+            <select aria-label="Veľkosť písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
+            <input type="color" aria-label="Farba textu" value="#f0f2f5" onchange="changeLessonNoteColor(this.value)">
+          </div>
+        </div>
+        <div id="lesson-note-editor" class="notes-editor" contenteditable="true" oninput="saveLessonNote()"></div>
+        <div class="notes-footer">
+          <span id="lesson-notes-status" class="notes-status">Poznámky sa ukladajú automaticky.</span>
+          <div class="notes-footer-group"><button class="notes-export" onclick="exportLessonNoteToWord()">📄 Export Word</button><button class="notes-delete" onclick="deleteLessonNote()">🗑 Odstrániť</button></div>
+        </div>
+      </section>
+    </div>
+  </div>
 </div>
 
 <!-- Modal for Lesson -->
@@ -2287,86 +2374,161 @@
         return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
     }
 
-    let notesList = JSON.parse(localStorage.getItem('uniza_user_notes')) || [
-        { id: '2', title: '', text: 'Kúpiť lístky na vlak domov.' },
-        { id: '1', title: 'Semestrálka', text: 'Nezabudnúť odovzdať semestrálnku do piatku.' }
-    ];
+    // --- ЛОГИКА ЗАМЕТОК ---
+    function getBasicNotes() {
+        try { return JSON.parse(localStorage.getItem('uniflo_basic_notes')) || []; }
+        catch (e) { return []; }
+    }
+    function setBasicNotes(notes) { 
+        localStorage.setItem('uniflo_basic_notes', JSON.stringify(notes)); 
+        renderNotes(); 
+    }
 
     function renderNotes() {
-        const container = document.getElementById('notes-list-container');
-        if (!container) return;
-        container.innerHTML = '';
+        const list = document.getElementById('basic-notes-list');
+        if (!list) return;
+        const notes = getBasicNotes();
+        list.innerHTML = '';
 
-        if (notesList.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">Žiadne poznámky.</div>';
+        if (notes.length === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:0.8rem;">Žiadne rýchle poznámky.</div>';
             return;
         }
 
-        notesList.forEach(note => {
-            let displayTitle = note.title ? note.title.trim() : '';
-            if (!displayTitle) {
-                const firstParagraph = note.text.trim().split('\n')[0] || '';
-                const words = firstParagraph.split(/\s+/);
-                displayTitle = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
-            }
-
+        notes.forEach(note => {
             const item = document.createElement('div');
-            item.className = 'note-item';
-            item.onclick = () => openEditNoteModal(note.id);
-            item.innerHTML = `
-                <div class="note-title">📌 ${escapeHtml(displayTitle)}</div>
-                <div class="note-preview">${escapeHtml(note.text)}</div>
-            `;
-            container.appendChild(item);
+            item.className = 'basic-note-card';
+            const title = document.createElement('strong');
+            title.textContent = note.title || 'Bez názvu';
+            const preview = document.createElement('span');
+            preview.textContent = (note.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'Prázdna poznámka';
+            item.append(title, preview);
+            item.onclick = () => openNoteModal(note.id);
+            list.appendChild(item);
         });
     }
 
-    function openNoteModal() {
-        document.getElementById('note-edit-id').value = '';
-        document.getElementById('note-modal-title').innerText = translations[currentLang].note_modal_new;
-        document.getElementById('note-title-input').value = '';
-        document.getElementById('note-text-content').value = '';
-        document.getElementById('btn-delete-note').style.display = 'none';
-        document.getElementById('note-modal').classList.add('active');
-    }
-
-    function openEditNoteModal(id) {
-        const note = notesList.find(n => n.id === id);
-        if (!note) return;
-
-        document.getElementById('note-edit-id').value = note.id;
-        document.getElementById('note-modal-title').innerText = translations[currentLang].note_modal_edit;
-        document.getElementById('note-title-input').value = note.title || '';
-        document.getElementById('note-text-content').value = note.text;
-        document.getElementById('btn-delete-note').style.display = 'block';
+    function openNoteModal(id) {
+        const note = id ? getBasicNotes().find(n => String(n.id) === String(id)) : null;
+        document.getElementById('note-edit-id').value = note ? note.id : '';
+        document.getElementById('note-title-input').value = note ? note.title : '';
+        document.getElementById('note-text-content').value = note ? note.content : '';
+        document.getElementById('note-modal-title').textContent = note ? translations[currentLang].note_modal_edit : translations[currentLang].note_modal_new;
+        document.getElementById('btn-delete-note').style.display = note ? 'block' : 'none';
         document.getElementById('note-modal').classList.add('active');
     }
 
     function saveNote(e) {
         e.preventDefault();
+        const notes = getBasicNotes();
         const id = document.getElementById('note-edit-id').value;
-        const title = document.getElementById('note-title-input').value;
-        const text = document.getElementById('note-text-content').value;
-
-        if (id) {
-            notesList = notesList.filter(n => n.id !== id);
-            notesList.unshift({ id: id, title: title, text: text });
-        } else {
-            notesList.unshift({ id: Date.now().toString(), title: title, text: text });
-        }
-
-        localStorage.setItem('uniza_user_notes', JSON.stringify(notesList));
+        const note = { 
+            id: id || Date.now().toString(), 
+            title: document.getElementById('note-title-input').value.trim() || 'Bez názvu', 
+            content: document.getElementById('note-text-content').value 
+        };
+        const idx = notes.findIndex(n => String(n.id) === String(id));
+        if (id && idx >= 0) notes[idx] = note; else notes.unshift(note);
+        setBasicNotes(notes);
         closeModal('note-modal');
-        renderNotes();
     }
 
     function deleteNote() {
         const id = document.getElementById('note-edit-id').value;
-        if (!id) return;
-        notesList = notesList.filter(n => n.id !== id);
-        localStorage.setItem('uniza_user_notes', JSON.stringify(notesList));
+        if (!id || !confirm('Naozaj odstrániť túto poznámku?')) return;
+        setBasicNotes(getBasicNotes().filter(n => String(n.id) !== String(id)));
         closeModal('note-modal');
-        renderNotes();
+    }
+
+    // --- Расширенный редактор UniFlo Notes (новые заметки) ---
+    const LESSON_NOTE_SUBJECTS = [
+        'MPI - Prednáška','MPI - Cvičenie','API - Prednáška','API - Cvičenie',
+        'MAT1 - Prednáška','MAT1 - Cvičenie','PZA - Prednáška','PZA - Laboratórne',
+        'WEBTE - Prednáška','WEBTE - Cvičenie'
+    ];
+    let lessonNotes = [];
+    let currentLessonNoteId = null;
+
+    function loadLessonNotes() {
+        try { lessonNotes = JSON.parse(localStorage.getItem('uniflo_notes')) || []; }
+        catch (e) { lessonNotes = []; }
+        const select = document.getElementById('lesson-note-subject');
+        if (select) {
+            LESSON_NOTE_SUBJECTS.forEach(subject => {
+                const option = document.createElement('option'); option.value = subject; option.textContent = subject; select.appendChild(option);
+            });
+        }
+        renderLessonNotes();
+    }
+    function persistLessonNotes() { localStorage.setItem('uniflo_notes', JSON.stringify(lessonNotes)); }
+
+    function openLessonNotes() {
+        document.getElementById('lesson-notes-modal').classList.add('active');
+        renderLessonNotes();
+        if (!currentLessonNoteId && lessonNotes.length) openLessonNote(lessonNotes[0].id);
+        else if (!currentLessonNoteId) createLessonNote();
+        setTimeout(() => { const map = document.getElementById('map-container'); if (leafletMap && map) leafletMap.invalidateSize(); }, 100);
+    }
+
+    function createLessonNote() {
+        const note = { id: Date.now().toString() + Math.random().toString(16).slice(2), title: 'Nová poznámka', lesson: '', content: '' };
+        lessonNotes.unshift(note); currentLessonNoteId = note.id; persistLessonNotes(); openLessonNote(note.id);
+        document.getElementById('lesson-note-title').focus();
+    }
+
+    function renderLessonNotes() {
+        const list = document.getElementById('lesson-notes-list'); if (!list) return;
+        list.innerHTML = '';
+        lessonNotes.forEach(note => {
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = 'notes-list-item' + (String(note.id) === String(currentLessonNoteId) ? ' active' : '');
+            const title = document.createElement('span'); title.className = 'notes-list-title'; title.textContent = note.title || 'Bez názvu';
+            const lesson = document.createElement('span'); lesson.className = 'notes-list-lesson'; lesson.textContent = note.lesson || 'Bez predmetu';
+            button.append(title, lesson); button.onclick = () => openLessonNote(note.id); list.appendChild(button);
+        });
+    }
+
+    function openLessonNote(id) {
+        const note = lessonNotes.find(n => String(n.id) === String(id)); if (!note) return;
+        currentLessonNoteId = note.id;
+        document.getElementById('lesson-note-title').value = note.title || '';
+        document.getElementById('lesson-note-subject').value = note.lesson || '';
+        document.getElementById('lesson-note-editor').innerHTML = note.content || '';
+        document.getElementById('lesson-notes-status').textContent = 'Poznámka uložená v tomto prehliadači';
+        renderLessonNotes();
+    }
+
+    function saveLessonNote() {
+        if (!currentLessonNoteId) return;
+        const note = lessonNotes.find(n => String(n.id) === String(currentLessonNoteId)); if (!note) return;
+        note.title = document.getElementById('lesson-note-title').value || 'Bez názvu';
+        note.lesson = document.getElementById('lesson-note-subject').value;
+        note.content = document.getElementById('lesson-note-editor').innerHTML;
+        persistLessonNotes(); renderLessonNotes();
+        document.getElementById('lesson-notes-status').textContent = 'Automaticky uložené';
+    }
+
+    function deleteLessonNote() {
+        if (!currentLessonNoteId) return;
+        if (!confirm('Naozaj odstrániť poznámku?')) return;
+        lessonNotes = lessonNotes.filter(n => String(n.id) !== String(currentLessonNoteId));
+        currentLessonNoteId = null; persistLessonNotes(); renderLessonNotes();
+        if (lessonNotes.length) openLessonNote(lessonNotes[0].id);
+        else { document.getElementById('lesson-note-title').value = ''; document.getElementById('lesson-note-subject').value = ''; document.getElementById('lesson-note-editor').innerHTML = ''; document.getElementById('lesson-notes-status').textContent = 'Vytvor novú poznámku.'; }
+    }
+
+    function formatLessonNote(command) { document.getElementById('lesson-note-editor').focus(); document.execCommand(command, false, null); saveLessonNote(); }
+    function changeLessonNoteFont(font) { if (!font) return; document.getElementById('lesson-note-editor').focus(); document.execCommand('fontName', false, font); saveLessonNote(); }
+    function changeLessonNoteSize(size) { if (!size) return; document.getElementById('lesson-note-editor').focus(); document.execCommand('fontSize', false, size); saveLessonNote(); }
+    function changeLessonNoteColor(color) { document.getElementById('lesson-note-editor').focus(); document.execCommand('foreColor', false, color); saveLessonNote(); }
+
+    function exportLessonNoteToWord() {
+        const note = lessonNotes.find(n => String(n.id) === String(currentLessonNoteId)); if (!note) { alert('Najprv vytvor alebo vyber poznámku.'); return; }
+        const safeTitle = (note.title || 'poznamka').replace(/[\\/:*?"<>|]/g, '_');
+        const escapeText = value => String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><h1>' + escapeText(note.title) + '</h1><h3>' + escapeText(note.lesson) + '</h3>' + (note.content || '') + '</body></html>';
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = safeTitle + '.doc'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     }
 
     let currentGroup = localStorage.getItem('uniza_active_group') || '5ZYR11';
@@ -2759,7 +2921,7 @@
         renderCompactCalendar();
     }
 
-    // ЛОГИКА ТАЙМЛАЙНА ГРАФИКА РАБОТЫ МЕСТ UNIZA (СИНЯЯ МЕТКА = ТЕКУЩЕЕ ВРЕМЯ)
+    // ЛОГИКА ТАЙМЛАЙНА ГРАФИКА РАБОТЫ МЕСТ UNIZA
     const unizaPlacesData = [
         { name: "🍽️ Nová Menza (Obedy)", start: 7.0, end: 18.0, label: "07:00 – 18:00" },
         { name: "☕ Bufet Nová Menza", start: 7.0, end: 14.0, label: "07:00 – 14:00" },
@@ -2815,7 +2977,6 @@ let hourlyWeatherData = [];
 async function fetchWeather() {
     const btn = document.getElementById('btn-weather-temp');
     try {
-        // Используем temperature_2m для получения данных строго каждый час
         const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.2231&longitude=18.7394&current_weather=true&hourly=temperature_2m,weathercode&timezone=Europe%2FBratislava');
         if (!res.ok) throw new Error("Meteo HTTP error");
         const data = await res.json();
@@ -2884,11 +3045,10 @@ function drawWeatherGraph() {
 
     const ctx = canvas.getContext('2d');
     const count = hourlyWeatherData.length;
-    const colWidth = 60; // Фиксированная ширина на каждый час, обеспечивая скролл
+    const colWidth = 60;
     const totalWidth = count * colWidth;
     const canvasHeight = 220;
 
-    // Корректная установка размеров для ПК и мобильных (исправляет черный экран)
     const dpr = window.devicePixelRatio || 1;
     canvas.width = totalWidth * dpr;
     canvas.height = canvasHeight * dpr;
@@ -2915,7 +3075,6 @@ function drawWeatherGraph() {
         return { x, y, ...item };
     });
 
-    // Вертикальные линии сетки
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
     ctx.lineWidth = 1;
     points.forEach(p => {
@@ -2927,7 +3086,6 @@ function drawWeatherGraph() {
         ctx.setLineDash([]);
     });
 
-    // Градиентная заливка
     const gradient = ctx.createLinearGradient(0, topMargin, 0, canvasHeight - bottomMargin);
     gradient.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
     gradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
@@ -2948,7 +3106,6 @@ function drawWeatherGraph() {
     ctx.fillStyle = gradient;
     ctx.fill();
 
-    // Линия графика
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
     for (let i = 0; i < points.length - 1; i++) {
@@ -2962,7 +3119,6 @@ function drawWeatherGraph() {
     ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Точки, текст и иконки
     points.forEach((p) => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
@@ -3385,6 +3541,7 @@ function openWeatherModal() {
         renderUpcomingDay();
         renderWeekGrid();
         renderCompactCalendar();
+        loadLessonNotes();
         renderNotes();
         fetchWeather();
         initMap();
