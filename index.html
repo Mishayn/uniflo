@@ -794,14 +794,6 @@
             border-radius: 3px;
         }
 
-        .desktop-weather-view { display: block; }
-        .mobile-weather-view { display: none; }
-
-        @media (max-width: 1199px) {
-            .desktop-weather-view { display: none; }
-            .mobile-weather-view { display: block; }
-        }
-
         /* Блок структуры заметок */
         .notes-dashboard-card {
             background: var(--bg-card);
@@ -937,7 +929,7 @@
             background: #ffffff;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             border-radius: 4px;
-            transition: width 0.2s ease, height 0.2s ease;
+            transition: width 0.1s ease, height 0.1s ease;
         }
 
         #drawing-canvas {
@@ -1583,21 +1575,12 @@
             <button class="close-btn" onclick="closeModal('weather-modal')">&times;</button>
         </div>
         
-        <div class="desktop-weather-view">
+        <div>
             <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-align: right;" data-i18n="weather_scroll_hint">
                 ↔ Posúvajte pre zobrazenie celého dňa
             </div>
             <div class="weather-graph-scroll-container">
                 <div id="weather-flex-track" style="display: flex; gap: 8px; min-width: max-content; align-items: stretch;"></div>
-            </div>
-        </div>
-
-        <div class="mobile-weather-view">
-            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-align: right;" data-i18n="weather_scroll_hint">
-                ↔ Posúvajte pre zobrazenie celého dňa
-            </div>
-            <div class="weather-graph-scroll-container" id="weather-canvas-wrapper">
-                <canvas id="weather-canvas" style="display: block;"></canvas>
             </div>
         </div>
     </div>
@@ -1768,17 +1751,19 @@
                 </label>
                 <button type="button" class="tool-btn-item" onclick="addImageViaUrl()" title="Вставить по URL">🔗 URL</button>
 
-                <!-- Расширение холста -->
-                <div style="margin-left:auto; display:flex; gap:4px; align-items:center;">
-                    <span style="font-size:0.72rem; color:var(--text-muted);">Размер холста:</span>
-                    <button type="button" class="tool-btn-item" onclick="expandCanvas(0, 500)" title="Добавить 500px вниз">➕ +500px Вниз</button>
-                    <button type="button" class="tool-btn-item" onclick="expandCanvas(500, 0)" title="Добавить 500px вправо">➕ +500px Вправо</button>
+                <!-- Размер холста (Ширина и Высота) -->
+                <div style="margin-left:auto; display:flex; gap:6px; align-items:center;">
+                    <span style="font-size:0.72rem; color:var(--text-muted);">Размер:</span>
+                    <input type="number" id="canvas-width-input" class="form-control" style="width: 70px; padding: 4px; font-size: 0.75rem;" min="100" max="5000" onchange="manualResizeCanvas()" title="Ширина холста">
+                    <span style="font-size:0.72rem; color:var(--text-muted);">×</span>
+                    <input type="number" id="canvas-height-input" class="form-control" style="width: 70px; padding: 4px; font-size: 0.75rem;" min="100" max="5000" onchange="manualResizeCanvas()" title="Высота холста">
+                    <span style="font-size:0.72rem; color:var(--text-muted);">px</span>
                     <button type="button" class="tool-btn-item" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444; border-color:rgba(239,68,68,0.4);">🗑️ Очистить</button>
                 </div>
             </div>
             
             <div style="font-size:0.72rem; color:var(--accent-orange); margin-top:2px;">
-                💡 <b>Подсказка:</b> Вы можете вставлять картинки прямо через <b>Ctrl+V</b> или перетаскиванием файла на холст!
+                💡 <b>Подсказка:</b> Зажмите <b>Ctrl</b> для множественного выбора. Перетаскивайте рамку для выделения множества объектов. Углы выбранных объектов можно тянуть для изменения размера!
             </div>
         </div>
     </div>
@@ -1786,7 +1771,7 @@
     <div class="drawing-canvas-container" id="drawing-canvas-wrap">
         <div class="drawing-paper-wrap" id="drawing-paper-wrap">
             <div class="paste-drop-zone-overlay" id="canvas-drop-overlay">Перетащите картинку сюда</div>
-            <canvas id="drawing-canvas" width="1000" height="700"></canvas>
+            <canvas id="drawing-canvas" width="700" height="500"></canvas>
         </div>
     </div>
     
@@ -2610,7 +2595,6 @@
         renderUnifiedNotes();
     }
 
-    // Отрисовка объединенной ленты по скетчу под кнопками
     function renderUnifiedNotes() {
         const container = document.getElementById('unified-notes-container');
         if (!container) return;
@@ -2694,7 +2678,7 @@
         closeModal('note-modal');
     }
 
-    // --- ПРОДВИНУТАЯ ЛОГИКА ХОЛСТА (Canvas Engine) ---
+    // --- ПРОДВИНУТАЯ ЛОГИКА ХОЛСТА (Canvas Engine с resize и множественным выбором) ---
     const BASIC_16_COLORS = [
         '#000000', '#ffffff', '#ef4444', '#f97316',
         '#facc15', '#22c55e', '#3b82f6', '#8b5cf6',
@@ -2709,14 +2693,20 @@
     let isDrawing = false;
     let canvasCtx = null;
 
-    // Векторные объекты холста (штрихи, текст, картинки)
     let canvasElements = [];
     let currentStroke = null;
-    let selectedElementIndex = -1;
-    let isDraggingElement = false;
-    let dragOffsetX = 0, dragOffsetY = 0;
-    let canvasWidth = 1000;
-    let canvasHeight = 700;
+    let selectedElementIndices = []; // Массив индексов выбранных элементов для множественного выбора
+    let activeResizeHandle = null; // 'nw', 'ne', 'sw', 'se'
+    let isDraggingElements = false;
+    let isResizingElements = false;
+    let isBoxSelecting = false;
+    let boxSelectStart = { x: 0, y: 0 };
+    let boxSelectCurrent = { x: 0, y: 0 };
+    let dragStartMouse = { x: 0, y: 0 };
+    let initialBoundsSnapshot = [];
+
+    let canvasWidth = 700;
+    let canvasHeight = 500;
 
     function initColorPalette() {
         const grid = document.getElementById('color-palette-grid');
@@ -2758,11 +2748,10 @@
         if (drawing) {
             currentDrawingId = drawing.id;
             document.getElementById('drawing-title-input').value = drawing.title || 'Рисунок';
-            canvasWidth = drawing.width || 1000;
-            canvasHeight = drawing.height || 700;
+            canvasWidth = drawing.width || 700;
+            canvasHeight = drawing.height || 500;
             canvasElements = drawing.elements ? JSON.parse(JSON.stringify(drawing.elements)) : [];
 
-            // Восстановление картинок как Image объектов
             canvasElements.forEach(el => {
                 if (el.type === 'image' && el.src) {
                     el.imgObj = new Image();
@@ -2773,10 +2762,13 @@
         } else {
             currentDrawingId = Date.now();
             document.getElementById('drawing-title-input').value = 'Новый рисунок';
-            canvasWidth = 1000;
-            canvasHeight = 700;
+            canvasWidth = 700;
+            canvasHeight = 500;
             canvasElements = [];
         }
+
+        document.getElementById('canvas-width-input').value = canvasWidth;
+        document.getElementById('canvas-height-input').value = canvasHeight;
 
         updateCanvasDimensions();
         setupCanvasEvents(canvas);
@@ -2793,9 +2785,11 @@
         paper.style.height = canvasHeight + 'px';
     }
 
-    function expandCanvas(addW, addH) {
-        canvasWidth += addW;
-        canvasHeight += addH;
+    function manualResizeCanvas() {
+        const wInput = parseInt(document.getElementById('canvas-width-input').value);
+        const hInput = parseInt(document.getElementById('canvas-height-input').value);
+        if (wInput >= 100 && wInput <= 5000) canvasWidth = wInput;
+        if (hInput >= 100 && hInput <= 5000) canvasHeight = hInput;
         updateCanvasDimensions();
         redrawCanvas();
         saveCurrentDrawingMeta();
@@ -2805,11 +2799,9 @@
         if (!canvasCtx) return;
         const canvas = document.getElementById('drawing-canvas');
 
-        // Очистка и белая подложка
         canvasCtx.fillStyle = '#ffffff';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Отрисовка всех объектов
         canvasElements.forEach((el, index) => {
             if (el.type === 'stroke') {
                 if (el.points.length < 2) return;
@@ -2830,19 +2822,46 @@
             } else if (el.type === 'image' && el.imgObj && el.imgObj.complete) {
                 canvasCtx.drawImage(el.imgObj, el.x, el.y, el.w, el.h);
             }
-
-            // Выделение выбранного элемента в режиме выбора
-            if (currentTool === 'select' && index === selectedElementIndex) {
-                canvasCtx.save();
-                canvasCtx.strokeStyle = '#f97316';
-                canvasCtx.lineWidth = 2;
-                canvasCtx.setLineDash([6, 4]);
-
-                const bounds = getElementBounds(el);
-                canvasCtx.strokeRect(bounds.x - 4, bounds.y - 4, bounds.w + 8, bounds.h + 8);
-                canvasCtx.restore();
-            }
         });
+
+        // Если есть выбранные элементы, рисуем рамку и угловые ручки изменения размера (Resize Handles)
+        if (currentTool === 'select' && selectedElementIndices.length > 0) {
+            const groupBounds = getGroupBounds(selectedElementIndices);
+            canvasCtx.save();
+            canvasCtx.strokeStyle = '#f97316';
+            canvasCtx.lineWidth = 2;
+            canvasCtx.setLineDash([6, 4]);
+            canvasCtx.strokeRect(groupBounds.x - 4, groupBounds.y - 4, groupBounds.w + 8, groupBounds.h + 8);
+            canvasCtx.restore();
+
+            // Рисуем угловые маркеры ресайза
+            const handleSize = 8;
+            canvasCtx.fillStyle = '#f97316';
+            // nw
+            canvasCtx.fillRect(groupBounds.x - 4 - handleSize/2, groupBounds.y - 4 - handleSize/2, handleSize, handleSize);
+            // ne
+            canvasCtx.fillRect(groupBounds.x + groupBounds.w + 4 - handleSize/2, groupBounds.y - 4 - handleSize/2, handleSize, handleSize);
+            // sw
+            canvasCtx.fillRect(groupBounds.x - 4 - handleSize/2, groupBounds.y + groupBounds.h + 4 - handleSize/2, handleSize, handleSize);
+            // se
+            canvasCtx.fillRect(groupBounds.x + groupBounds.w + 4 - handleSize/2, groupBounds.y + groupBounds.h + 4 - handleSize/2, handleSize, handleSize);
+        }
+
+        // Рамка выделения перетаскиванием (Box Selection)
+        if (isBoxSelecting) {
+            canvasCtx.save();
+            canvasCtx.strokeStyle = '#3b82f6';
+            canvasCtx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+            canvasCtx.lineWidth = 1.5;
+            canvasCtx.setLineDash([4, 4]);
+            const bx = Math.min(boxSelectStart.x, boxSelectCurrent.x);
+            const by = Math.min(boxSelectStart.y, boxSelectCurrent.y);
+            const bw = Math.abs(boxSelectStart.x - boxSelectCurrent.x);
+            const bh = Math.abs(boxSelectStart.y - boxSelectCurrent.y);
+            canvasCtx.fillRect(bx, by, bw, bh);
+            canvasCtx.strokeRect(bx, by, bw, bh);
+            canvasCtx.restore();
+        }
     }
 
     function getElementBounds(el) {
@@ -2865,6 +2884,30 @@
         return { x: 0, y: 0, w: 0, h: 0 };
     }
 
+    function getGroupBounds(indices) {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        indices.forEach(idx => {
+            const b = getElementBounds(canvasElements[idx]);
+            if (b.x < minX) minX = b.x;
+            if (b.y < minY) minY = b.y;
+            if (b.x + b.w > maxX) maxX = b.x + b.w;
+            if (b.y + b.h > maxY) maxY = b.y + b.h;
+        });
+        return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+    }
+
+    function getResizeHandleAtPos(pos, groupBounds) {
+        const handleSize = 12;
+        const x1 = groupBounds.x - 4, y1 = groupBounds.y - 4;
+        const x2 = groupBounds.x + groupBounds.w + 4, y2 = groupBounds.y + groupBounds.h + 4;
+
+        if (Math.abs(pos.x - x1) <= handleSize && Math.abs(pos.y - y1) <= handleSize) return 'nw';
+        if (Math.abs(pos.x - x2) <= handleSize && Math.abs(pos.y - y1) <= handleSize) return 'ne';
+        if (Math.abs(pos.x - x1) <= handleSize && Math.abs(pos.y - y2) <= handleSize) return 'sw';
+        if (Math.abs(pos.x - x2) <= handleSize && Math.abs(pos.y - y2) <= handleSize) return 'se';
+        return null;
+    }
+
     function setupCanvasEvents(canvas) {
         const getPos = (e) => {
             const rect = canvas.getBoundingClientRect();
@@ -2879,26 +2922,63 @@
         canvas.onmousedown = canvas.ontouchstart = (e) => {
             const pos = getPos(e);
             isDrawing = true;
+            dragStartMouse = pos;
 
             if (currentTool === 'select') {
-                selectedElementIndex = -1;
+                // Проверяем клик по угловым маркерам ресайза
+                if (selectedElementIndices.length > 0) {
+                    const groupBounds = getGroupBounds(selectedElementIndices);
+                    const handle = getResizeHandleAtPos(pos, groupBounds);
+                    if (handle) {
+                        isResizingElements = true;
+                        activeResizeHandle = handle;
+                        initialBoundsSnapshot = selectedElementIndices.map(idx => {
+                            const el = canvasElements[idx];
+                            const b = getElementBounds(el);
+                            return { idx, b, el: JSON.parse(JSON.stringify(el)) };
+                        });
+                        return;
+                    }
+                }
+
+                // Проверяем клик по объекту
+                let clickedIndex = -1;
                 for (let i = canvasElements.length - 1; i >= 0; i--) {
                     const bounds = getElementBounds(canvasElements[i]);
                     if (pos.x >= bounds.x - 5 && pos.x <= bounds.x + bounds.w + 5 &&
                         pos.y >= bounds.y - 5 && pos.y <= bounds.y + bounds.h + 5) {
-                        selectedElementIndex = i;
-                        isDraggingElement = true;
-                        dragOffsetX = pos.x - bounds.x;
-                        dragOffsetY = pos.y - bounds.y;
+                        clickedIndex = i;
                         break;
                     }
+                }
+
+                if (clickedIndex >= 0) {
+                    if (e.ctrlKey) {
+                        // Мультивыбор с зажатым Ctrl
+                        const exists = selectedElementIndices.includes(clickedIndex);
+                        if (exists) {
+                            selectedElementIndices = selectedElementIndices.filter(i => i !== clickedIndex);
+                        } else {
+                            selectedElementIndices.push(clickedIndex);
+                        }
+                    } else {
+                        if (!selectedElementIndices.includes(clickedIndex)) {
+                            selectedElementIndices = [clickedIndex];
+                        }
+                    }
+                    isDraggingElements = true;
+                } else {
+                    // Клик на пустое пространство -> начинаем рамочное выделение (Box Selection) или сброс
+                    if (!e.ctrlKey) selectedElementIndices = [];
+                    isBoxSelecting = true;
+                    boxSelectStart = pos;
+                    boxSelectCurrent = pos;
                 }
                 redrawCanvas();
                 return;
             }
 
             if (currentTool === 'eraser') {
-                // Ластик удаляет штрихи/элементы при клике/проводке
                 eraseAtPos(pos);
                 return;
             }
@@ -2919,20 +2999,78 @@
             if (!isDrawing) return;
             const pos = getPos(e);
 
-            if (currentTool === 'select' && isDraggingElement && selectedElementIndex >= 0) {
-                const el = canvasElements[selectedElementIndex];
-                const bounds = getElementBounds(el);
-                const dx = pos.x - dragOffsetX - bounds.x;
-                const dy = pos.y - dragOffsetY - bounds.y;
+            if (currentTool === 'select') {
+                if (isResizingElements && selectedElementIndices.length > 0) {
+                    // Изменение размера выбранных объектов
+                    const groupBounds = getGroupBounds(selectedElementIndices);
+                    let dx = pos.x - dragStartMouse.x;
+                    let dy = pos.y - dragStartMouse.y;
 
-                if (el.type === 'stroke') {
-                    el.points.forEach(p => { p.x += dx; p.y += dy; });
-                } else if (el.type === 'text' || el.type === 'image') {
-                    el.x += dx;
-                    el.y += dy;
+                    initialBoundsSnapshot.forEach(item => {
+                        const el = canvasElements[item.idx];
+                        const b = item.b;
+
+                        if (el.type === 'image') {
+                            let newW = b.w, newH = b.h, newX = b.x, newY = b.y;
+                            if (activeResizeHandle === 'se') { newW = Math.max(10, b.w + dx); newH = Math.max(10, b.h + dy); }
+                            else if (activeResizeHandle === 'sw') { newW = Math.max(10, b.w - dx); newH = Math.max(10, b.h + dy); newX = b.x + dx; }
+                            else if (activeResizeHandle === 'ne') { newW = Math.max(10, b.w + dx); newH = Math.max(10, b.h - dy); newY = b.y + dy; }
+                            else if (activeResizeHandle === 'nw') { newW = Math.max(10, b.w - dx); newH = Math.max(10, b.h - dy); newX = b.x + dx; newY = b.y + dy; }
+                            el.w = newW; el.h = newH; el.x = newX; el.y = newY;
+                        } else if (el.type === 'text') {
+                            let scaleFactor = 1;
+                            if (activeResizeHandle === 'se') scaleFactor = 1 + (dx / groupBounds.w);
+                            else if (activeResizeHandle === 'sw') scaleFactor = 1 - (dx / groupBounds.w);
+                            el.size = Math.max(2, Math.min(60, item.el.size * scaleFactor));
+                        } else if (el.type === 'stroke') {
+                            let scaleX = groupBounds.w > 0 ? (groupBounds.w + dx) / groupBounds.w : 1;
+                            let scaleY = groupBounds.h > 0 ? (groupBounds.h + dy) / groupBounds.h : 1;
+                            el.points = item.el.points.map(p => ({
+                                x: groupBounds.x + (p.x - groupBounds.x) * scaleX,
+                                y: groupBounds.y + (p.y - groupBounds.y) * scaleY
+                            }));
+                        }
+                    });
+                    redrawCanvas();
+                    return;
                 }
-                redrawCanvas();
-                return;
+
+                if (isDraggingElements && selectedElementIndices.length > 0) {
+                    const dx = pos.x - dragStartMouse.x;
+                    const dy = pos.y - dragStartMouse.y;
+                    dragStartMouse = pos;
+
+                    selectedElementIndices.forEach(idx => {
+                        const el = canvasElements[idx];
+                        if (el.type === 'stroke') {
+                            el.points.forEach(p => { p.x += dx; p.y += dy; });
+                        } else if (el.type === 'text' || el.type === 'image') {
+                            el.x += dx;
+                            el.y += dy;
+                        }
+                    });
+                    redrawCanvas();
+                    return;
+                }
+
+                if (isBoxSelecting) {
+                    boxSelectCurrent = pos;
+                    // Автоматически определяем объекты, попавшие в прямоугольник выделения
+                    const bx = Math.min(boxSelectStart.x, boxSelectCurrent.x);
+                    const by = Math.min(boxSelectStart.y, boxSelectCurrent.y);
+                    const bw = Math.abs(boxSelectStart.x - boxSelectCurrent.x);
+                    const bh = Math.abs(boxSelectStart.y - boxSelectCurrent.y);
+
+                    selectedElementIndices = [];
+                    canvasElements.forEach((el, idx) => {
+                        const b = getElementBounds(el);
+                        if (b.x >= bx && b.x + b.w <= bx + bw && b.y >= by && b.y + b.h <= by + bh) {
+                            selectedElementIndices.push(idx);
+                        }
+                    });
+                    redrawCanvas();
+                    return;
+                }
             }
 
             if (currentTool === 'eraser') {
@@ -2949,9 +3087,12 @@
         canvas.onmouseup = canvas.onmouseleave = canvas.ontouchend = () => {
             if (isDrawing) {
                 isDrawing = false;
-                isDraggingElement = false;
+                isDraggingElements = false;
+                isResizingElements = false;
+                isBoxSelecting = false;
                 currentStroke = null;
                 saveCurrentDrawingMeta();
+                redrawCanvas();
             }
         };
     }
@@ -2967,13 +3108,11 @@
         redrawCanvas();
     }
 
-    // Загрузка изображений из файлов и Ctrl+V
     function setupPasteAndDropEvents() {
         const modal = document.getElementById('drawing-modal');
         const paper = document.getElementById('drawing-paper-wrap');
         const overlay = document.getElementById('canvas-drop-overlay');
 
-        // Ctrl + V вставка
         window.addEventListener('paste', (e) => {
             if (!modal.classList.contains('active')) return;
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
@@ -2985,7 +3124,6 @@
             }
         });
 
-        // Drag and Drop
         paper.ondragover = (e) => { e.preventDefault(); overlay.style.display = 'flex'; };
         paper.ondragleave = () => { overlay.style.display = 'none'; };
         paper.ondrop = (e) => {
@@ -3010,7 +3148,7 @@
             img.onload = () => {
                 let w = img.width;
                 let h = img.height;
-                if (w > 500) { h = (500 / w) * h; w = 500; } // Автомасштабирование ширины
+                if (w > 400) { h = (400 / w) * h; w = 400; }
 
                 const newImgEl = {
                     type: 'image',
@@ -3023,7 +3161,7 @@
                 };
                 canvasElements.push(newImgEl);
                 setCanvasTool('select');
-                selectedElementIndex = canvasElements.length - 1;
+                selectedElementIndices = [canvasElements.length - 1];
                 redrawCanvas();
                 saveCurrentDrawingMeta();
             };
@@ -3053,7 +3191,7 @@
             };
             canvasElements.push(newImgEl);
             setCanvasTool('select');
-            selectedElementIndex = canvasElements.length - 1;
+            selectedElementIndices = [canvasElements.length - 1];
             redrawCanvas();
             saveCurrentDrawingMeta();
         };
@@ -3074,7 +3212,7 @@
         };
         canvasElements.push(textEl);
         setCanvasTool('select');
-        selectedElementIndex = canvasElements.length - 1;
+        selectedElementIndices = [canvasElements.length - 1];
         redrawCanvas();
         saveCurrentDrawingMeta();
     }
@@ -3082,6 +3220,7 @@
     function clearCanvas() {
         if (!confirm("Очистить полностью весь холст?")) return;
         canvasElements = [];
+        selectedElementIndices = [];
         redrawCanvas();
         saveCurrentDrawingMeta();
     }
@@ -3092,7 +3231,6 @@
         const title = document.getElementById('drawing-title-input').value.trim() || 'Рисунок';
         const dataUrl = canvas.toDataURL('image/png');
 
-        // Очищаем круговые ссылки для сохранения в JSON
         const cleanElements = canvasElements.map(el => {
             const { imgObj, ...rest } = el;
             return rest;
@@ -3774,62 +3912,9 @@
         });
     }
 
-    function drawWeatherGraph() {
-        if (!hourlyWeatherData || hourlyWeatherData.length === 0) generateFallbackWeatherData();
-        const canvas = document.getElementById('weather-canvas');
-        const wrapper = document.getElementById('weather-canvas-wrapper');
-        if (!canvas || !wrapper) return;
-        const ctx = canvas.getContext('2d');
-        const count = hourlyWeatherData.length;
-        const colWidth = 60;
-        const totalWidth = count * colWidth;
-        const canvasHeight = 220;
-
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = totalWidth * dpr;
-        canvas.height = canvasHeight * dpr;
-        canvas.style.width = totalWidth + 'px';
-        canvas.style.height = canvasHeight + 'px';
-        wrapper.style.width = '100%';
-
-        ctx.scale(dpr, dpr);
-        ctx.clearRect(0, 0, totalWidth, canvasHeight);
-
-        const temps = hourlyWeatherData.map(d => d.temp);
-        let minTemp = Math.min(...temps);
-        let maxTemp = Math.max(...temps);
-        if (minTemp === maxTemp) { minTemp -= 2; maxTemp += 2; }
-        
-        const topMargin = 55;
-        const bottomMargin = 45;
-        const graphHeight = canvasHeight - topMargin - bottomMargin;
-
-        const points = hourlyWeatherData.map((item, idx) => {
-            const x = idx * colWidth + colWidth / 2;
-            const norm = (item.temp - minTemp) / (maxTemp - minTemp);
-            const y = canvasHeight - bottomMargin - (norm * graphHeight);
-            return { x, y, ...item };
-        });
-
-        points.forEach((p) => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
-
-            ctx.font = '600 12px Inter, sans-serif';
-            ctx.fillStyle = '#f0f2f5';
-            ctx.textAlign = 'center';
-            ctx.fillText(`${p.temp}°`, p.x, p.y - 10);
-            ctx.fillText(getWeatherIcon(p.code), p.x, canvasHeight - bottomMargin + 20);
-            ctx.fillText(p.timeStr, p.x, canvasHeight - 8);
-        });
-    }
-
     function openWeatherModal() {
         document.getElementById('weather-modal').classList.add('active');
         drawWeatherCards();
-        setTimeout(drawWeatherGraph, 80);
     }
 
     function initMap() {
