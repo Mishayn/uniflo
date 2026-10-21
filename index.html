@@ -1375,9 +1375,9 @@
     </div>
 </div>
 
-<!-- Modal Weather (Красивый график погоды по часам) -->
+<!-- Modal Weather -->
 <div class="modal-overlay" id="weather-modal">
-    <div class="modal" style="max-width: 520px;">
+    <div class="modal" style="max-width: 600px;">
         <div class="modal-header">
             <div class="modal-title" data-i18n="weather_title">☀️ Počasie Žilina (24 hodín)</div>
             <button class="close-btn" onclick="closeModal('weather-modal')">&times;</button>
@@ -1387,7 +1387,7 @@
             ↔ Posúvajte pre zobrazenie celého dňa
         </div>
 
-        <div class="weather-graph-scroll-container">
+        <div class="weather-graph-scroll-container" id="weather-scroll-box">
             <div class="weather-graph-canvas-wrapper" id="weather-canvas-wrapper">
                 <canvas id="weather-canvas" height="220"></canvas>
             </div>
@@ -2807,212 +2807,187 @@
     }
 
     // ПОГОДА: РЕНДЕР КРАСИВОГО ГРАФИКА НА CANVAS С ПОЧАСОВОЙ ПРОКРУТКОЙ
-    let hourlyWeatherData = [];
+let hourlyWeatherData = [];
 
-    async function fetchWeather() {
-        const btn = document.getElementById('btn-weather-temp');
-        try {
-            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.2231&longitude=18.7394&current_weather=true&hourly=temperature_2d,weathercode&timezone=Europe%2FBratislava');
-            if (!res.ok) throw new Error("Meteo HTTP error");
-            const data = await res.json();
+async function fetchWeather() {
+    const btn = document.getElementById('btn-weather-temp');
+    try {
+        // Используем temperature_2m для получения данных строго каждый час
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.2231&longitude=18.7394&current_weather=true&hourly=temperature_2m,weathercode&timezone=Europe%2FBratislava');
+        if (!res.ok) throw new Error("Meteo HTTP error");
+        const data = await res.json();
 
-            if (data && data.hourly) {
-                const now = new Date();
-                hourlyWeatherData = [];
-                const times = data.hourly.time;
-                const temps = data.hourly.temperature_2d;
-                const codes = data.hourly.weathercode;
+        if (data && data.hourly) {
+            const now = new Date();
+            hourlyWeatherData = [];
+            const times = data.hourly.time;
+            const temps = data.hourly.temperature_2m;
+            const codes = data.hourly.weathercode;
 
-                for (let i = 0; i < times.length && hourlyWeatherData.length < 24; i++) {
-                    const itemTime = new Date(times[i]);
-                    if (itemTime >= now || (now.getTime() - itemTime.getTime() < 3600000)) {
-                        hourlyWeatherData.push({
-                            timeStr: String(itemTime.getHours()).padStart(2, '0') + ':00',
-                            temp: Math.round(temps[i]),
-                            code: codes[i]
-                        });
-                    }
-                }
-
-                if (data.current_weather && btn) {
-                    btn.innerText = `${Math.round(data.current_weather.temperature)}°C`;
-                }
-            }
-        } catch (e) {
-            console.warn('Open-Meteo failed, trying fallback weather service...', e);
-            try {
-                const fallbackRes = await fetch('https://wttr.in/Zilina?format=j1');
-                const fbData = await fallbackRes.json();
-                
-                hourlyWeatherData = [];
-                if (fbData && fbData.weather && fbData.weather[0] && fbData.weather[0].hourly) {
-                    fbData.weather[0].hourly.forEach(item => {
-                        const h = parseInt(item.time) / 100;
-                        hourlyWeatherData.push({
-                            timeStr: String(h).padStart(2, '0') + ':00',
-                            temp: Math.round(parseFloat(item.tempC)),
-                            code: 0
-                        });
+            for (let i = 0; i < times.length && hourlyWeatherData.length < 24; i++) {
+                const itemTime = new Date(times[i]);
+                if (itemTime >= now || (now.getTime() - itemTime.getTime() < 3600000)) {
+                    hourlyWeatherData.push({
+                        timeStr: String(itemTime.getHours()).padStart(2, '0') + ':00',
+                        temp: Math.round(temps[i]),
+                        code: codes[i]
                     });
                 }
-                if (fbData.current_condition && fbData.current_condition[0] && btn) {
-                    btn.innerText = `${Math.round(parseFloat(fbData.current_condition[0].temp_C))}°C`;
-                }
-            } catch (err2) {
-                console.error("All weather services failed", err2);
-                generateFallbackWeatherData();
-                if (btn) btn.innerText = `14°C`;
+            }
+
+            if (data.current_weather && btn) {
+                btn.innerText = `${Math.round(data.current_weather.temperature)}°C`;
             }
         }
+    } catch (e) {
+        console.warn('Open-Meteo failed, generating fallback...', e);
+        generateFallbackWeatherData();
+        if (btn) btn.innerText = `14°C`;
     }
+}
 
-    function generateFallbackWeatherData() {
-        hourlyWeatherData = [];
-        const nowH = new Date().getHours();
-        for (let i = 0; i < 24; i++) {
-            const hourVal = (nowH + i) % 24;
-            hourlyWeatherData.push({
-                timeStr: String(hourVal).padStart(2, '0') + ':00',
-                temp: 12 + Math.round(Math.sin(i / 3) * 5),
-                code: 0
-            });
-        }
-    }
-
-    function getWeatherIcon(code) {
-        if (code === 0) return '☀️';
-        if (code >= 1 && code <= 3) return '⛅';
-        if (code >= 45 && code <= 48) return '🌫️';
-        if (code >= 51 && code <= 67) return '🌧️';
-        if (code >= 71 && code <= 77) return '❄️';
-        if (code >= 80 && code <= 82) return '🌦️';
-        if (code >= 95) return '🌩️';
-        return '☀️';
-    }
-
-    function drawWeatherGraph() {
-        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
-            generateFallbackWeatherData();
-        }
-
-        const canvas = document.getElementById('weather-canvas');
-        const wrapper = document.getElementById('weather-canvas-wrapper');
-        if (!canvas || !wrapper) return;
-
-        const ctx = canvas.getContext('2d');
-        const count = hourlyWeatherData.length;
-        const colWidth = 65; // Ширина каждого часа в px
-        const totalWidth = Math.max(count * colWidth, 1400);
-        const canvasHeight = 220;
-
-        // Настройка физического размера canvas с учетом DPR (Retina)
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = totalWidth * dpr;
-        canvas.height = canvasHeight * dpr;
-        canvas.style.width = totalWidth + 'px';
-        canvas.style.height = canvasHeight + 'px';
-        wrapper.style.width = totalWidth + 'px';
-
-        ctx.scale(dpr, dpr);
-        ctx.clearRect(0, 0, totalWidth, canvasHeight);
-
-        // Находим мин и макс температуру для масштаба
-        const temps = hourlyWeatherData.map(d => d.temp);
-        let minTemp = Math.min(...temps);
-        let maxTemp = Math.max(...temps);
-        if (minTemp === maxTemp) { minTemp -= 2; maxTemp += 2; }
-        
-        const topMargin = 60;
-        const bottomMargin = 45;
-        const graphHeight = canvasHeight - topMargin - bottomMargin;
-
-        const points = hourlyWeatherData.map((item, idx) => {
-            const x = idx * colWidth + colWidth / 2;
-            const norm = (item.temp - minTemp) / (maxTemp - minTemp);
-            const y = canvasHeight - bottomMargin - (norm * graphHeight);
-            return { x, y, ...item };
+function generateFallbackWeatherData() {
+    hourlyWeatherData = [];
+    const nowH = new Date().getHours();
+    for (let i = 0; i < 24; i++) {
+        const hourVal = (nowH + i) % 24;
+        hourlyWeatherData.push({
+            timeStr: String(hourVal).padStart(2, '0') + ':00',
+            temp: 12 + Math.round(Math.sin(i / 3) * 5),
+            code: 0
         });
+    }
+}
 
-        // 1. Рисуем сетку времени (вертикальные пунктиры)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-        ctx.lineWidth = 1;
-        points.forEach(p => {
-            ctx.beginPath();
-            ctx.setLineDash([4, 4]);
-            ctx.moveTo(p.x, 20);
-            ctx.lineTo(p.x, canvasHeight - bottomMargin + 10);
-            ctx.stroke();
-            ctx.setLineDash([]);
-        });
+function getWeatherIcon(code) {
+    if (code === 0) return '☀️';
+    if (code >= 1 && code <= 3) return '⛅';
+    if (code >= 45 && code <= 48) return '🌫️';
+    if (code >= 51 && code <= 67) return '🌧️';
+    if (code >= 71 && code <= 77) return '❄️';
+    if (code >= 80 && code <= 82) return '🌦️';
+    if (code >= 95) return '🌩️';
+    return '☀️';
+}
 
-        // 2. Рисуем градиентную заливку под графиком
-        const gradient = ctx.createLinearGradient(0, topMargin, 0, canvasHeight - bottomMargin);
-        gradient.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
-        gradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
+function drawWeatherGraph() {
+    if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
+        generateFallbackWeatherData();
+    }
 
+    const canvas = document.getElementById('weather-canvas');
+    const wrapper = document.getElementById('weather-canvas-wrapper');
+    if (!canvas || !wrapper) return;
+
+    const ctx = canvas.getContext('2d');
+    const count = hourlyWeatherData.length;
+    const colWidth = 60; // Фиксированная ширина на каждый час, обеспечивая скролл
+    const totalWidth = count * colWidth;
+    const canvasHeight = 220;
+
+    // Корректная установка размеров для ПК и мобильных (исправляет черный экран)
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = totalWidth * dpr;
+    canvas.height = canvasHeight * dpr;
+    canvas.style.width = totalWidth + 'px';
+    canvas.style.height = canvasHeight + 'px';
+    wrapper.style.width = totalWidth + 'px';
+
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, totalWidth, canvasHeight);
+
+    const temps = hourlyWeatherData.map(d => d.temp);
+    let minTemp = Math.min(...temps);
+    let maxTemp = Math.max(...temps);
+    if (minTemp === maxTemp) { minTemp -= 2; maxTemp += 2; }
+    
+    const topMargin = 55;
+    const bottomMargin = 45;
+    const graphHeight = canvasHeight - topMargin - bottomMargin;
+
+    const points = hourlyWeatherData.map((item, idx) => {
+        const x = idx * colWidth + colWidth / 2;
+        const norm = (item.temp - minTemp) / (maxTemp - minTemp);
+        const y = canvasHeight - bottomMargin - (norm * graphHeight);
+        return { x, y, ...item };
+    });
+
+    // Вертикальные линии сетки
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    points.forEach(p => {
         ctx.beginPath();
-        ctx.moveTo(points[0].x, canvasHeight - bottomMargin);
-        ctx.lineTo(points[0].x, points[0].y);
-
-        for (let i = 0; i < points.length - 1; i++) {
-            const xc = (points[i].x + points[i + 1].x) / 2;
-            const yc = (points[i].y + points[i + 1].y) / 2;
-            ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
-        }
-        const last = points[points.length - 1];
-        ctx.lineTo(last.x, last.y);
-        ctx.lineTo(last.x, canvasHeight - bottomMargin);
-        ctx.closePath();
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // 3. Рисуем сглаженную линию графика
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let i = 0; i < points.length - 1; i++) {
-            const xc = (points[i].x + points[i + 1].x) / 2;
-            const yc = (points[i].y + points[i + 1].y) / 2;
-            ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
-        }
-        ctx.lineTo(last.x, last.y);
-        ctx.strokeStyle = '#f97316';
-        ctx.lineWidth = 3;
-        ctx.lineCap = 'round';
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(p.x, 20);
+        ctx.lineTo(p.x, canvasHeight - bottomMargin + 10);
         ctx.stroke();
+        ctx.setLineDash([]);
+    });
 
-        // 4. Рисуем точки, градусы, иконки и время
-        points.forEach((p) => {
-            // Белая светящаяся точка на линии
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
-            ctx.shadowColor = '#f97316';
-            ctx.shadowBlur = 8;
-            ctx.fill();
-            ctx.shadowBlur = 0; // Сброс тени
+    // Градиентная заливка
+    const gradient = ctx.createLinearGradient(0, topMargin, 0, canvasHeight - bottomMargin);
+    gradient.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
+    gradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
 
-            // Градус над точкой
-            ctx.font = '600 12px Inter, sans-serif';
-            ctx.fillStyle = '#f0f2f5';
-            ctx.textAlign = 'center';
-            ctx.fillText(`${p.temp}°`, p.x, p.y - 10);
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, canvasHeight - bottomMargin);
+    ctx.lineTo(points[0].x, points[0].y);
 
-            // Иконка погоды под графиком
-            const icon = getWeatherIcon(p.code);
-            ctx.font = '16px Inter, sans-serif';
-            ctx.fillText(icon, p.x, canvasHeight - bottomMargin + 20);
-
-            // Время (каждый час)
-            ctx.font = '500 11px Inter, sans-serif';
-            ctx.fillStyle = '#9aa0a6';
-            ctx.fillText(p.timeStr, p.x, canvasHeight - 8);
-        });
+    for (let i = 0; i < points.length - 1; i++) {
+        const xc = (points[i].x + points[i + 1].x) / 2;
+        const yc = (points[i].y + points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
     }
+    const last = points[points.length - 1];
+    ctx.lineTo(last.x, last.y);
+    ctx.lineTo(last.x, canvasHeight - bottomMargin);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
 
-    function openWeatherModal() {
-        document.getElementById('weather-modal').classList.add('active');
-        setTimeout(drawWeatherGraph, 50);
+    // Линия графика
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length - 1; i++) {
+        const xc = (points[i].x + points[i + 1].x) / 2;
+        const yc = (points[i].y + points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
     }
+    ctx.lineTo(last.x, last.y);
+    ctx.strokeStyle = '#f97316';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Точки, текст и иконки
+    points.forEach((p) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#f97316';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.font = '600 12px Inter, sans-serif';
+        ctx.fillStyle = '#f0f2f5';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${p.temp}°`, p.x, p.y - 10);
+
+        const icon = getWeatherIcon(p.code);
+        ctx.font = '15px Inter, sans-serif';
+        ctx.fillText(icon, p.x, canvasHeight - bottomMargin + 20);
+
+        ctx.font = '500 11px Inter, sans-serif';
+        ctx.fillStyle = '#9aa0a6';
+        ctx.fillText(p.timeStr, p.x, canvasHeight - 8);
+    });
+}
+
+function openWeatherModal() {
+    document.getElementById('weather-modal').classList.add('active');
+    setTimeout(drawWeatherGraph, 100);
+}
 
     function initMap() {
         if (leafletMap) return;
