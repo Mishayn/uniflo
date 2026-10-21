@@ -3147,11 +3147,7 @@ function drawWeatherGraph() {
 function openWeatherModal() {
     const modal = document.getElementById('weather-modal');
     modal.classList.add('active');
-    
-    // Даем больше времени на перерисовку DOM и отображение flex-контейнера
-    setTimeout(() => {
-        drawWeatherGraph();
-    }, 150);
+    drawWeatherGraph();
 }
 
     function initMap() {
@@ -3540,15 +3536,17 @@ function openWeatherModal() {
     }
 
     function renderAll() {
-        renderUpcomingDay();
-        renderWeekGrid();
-        renderCompactCalendar();
-        loadLessonNotes();
-        renderNotes();
-        fetchWeather();
-        initMap();
-        applyTranslations();
-    }
+    renderUpcomingDay();
+    renderWeekGrid();
+    renderCompactCalendar();
+    loadLessonNotes();
+    renderNotes();
+    fetchWeather().then(() => {
+        drawWeatherGraph(); // Сразу рисуем график в фоне, чтобы он всегда был готов
+    });
+    initMap();
+    applyTranslations();
+}
 
     setInterval(() => {
         const now = new Date();
