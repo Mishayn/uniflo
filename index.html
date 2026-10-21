@@ -205,18 +205,21 @@
         }
 
         .btn-main-action {
-            flex: 1;
+            width: 100%;
             background: var(--accent-orange);
             color: white;
             border: none;
-            padding: 10px;
+            padding: 9px 12px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             cursor: pointer;
             transition: opacity 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-
         .btn-main-action:hover { opacity: 0.9; }
 
         .btn-square-reset {
@@ -791,7 +794,6 @@
             border-radius: 3px;
         }
 
-        /* Управление видимостью версий погоды для ПК и мобильных */
         .desktop-weather-view { display: block; }
         .mobile-weather-view { display: none; }
 
@@ -800,25 +802,111 @@
             .mobile-weather-view { display: block; }
         }
 
-        .notes-container {
+        /* Новый блок структуры заметок по скетчу */
+        .notes-dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            width: 100%;
+        }
+        .notes-actions-top-grid {
+            display: grid;
+            grid-template-columns: 1fr 64px;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .notes-left-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .btn-big-pencil {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--accent-orange);
+        }
+        .btn-big-pencil:hover {
+            border-color: var(--accent-orange);
+            background: var(--bg-card-hover);
+        }
+        .unified-notes-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 215px;
+            max-height: 240px;
             overflow-y: auto;
         }
-
-        .note-item {
+        .unified-note-item {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 10px 12px;
+            padding: 9px 12px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             transition: border-color 0.2s;
         }
-        .note-item:hover { border-color: var(--accent-orange); }
-        .note-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
-        .note-preview { font-size: 0.73rem; color: var(--text-secondary); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .unified-note-item:hover { border-color: var(--accent-orange); }
+        .unified-note-icon { font-size: 1.1rem; flex-shrink: 0; }
+        .unified-note-info { flex: 1; min-width: 0; }
+        .unified-note-title { font-size: 0.84rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .unified-note-desc { font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Модалка рисовача (Canvas / Полотно) */
+        #drawing-modal .notes-modal {
+            width: min(1000px, 96vw);
+            max-width: 1000px;
+            height: min(88vh, 850px);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+        .drawing-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--bg-main);
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+        }
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(8, 22px);
+            gap: 4px;
+        }
+        .color-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .color-btn:hover { transform: scale(1.1); }
+        .color-btn.active { border: 2px solid #ffffff; box-shadow: 0 0 4px var(--accent-orange); }
+
+        .drawing-canvas-container {
+            flex: 1;
+            background: #ffffff;
+            position: relative;
+            overflow: auto;
+            cursor: crosshair;
+        }
+        #drawing-canvas {
+            display: block;
+            touch-action: none;
+        }
 
         /* UniFlo Notes – интегрированный редактор заметок */
         #lesson-notes-modal .notes-modal {
@@ -856,11 +944,6 @@
         #lesson-notes-modal .notes-export { background:#16a34a; }
         #lesson-notes-modal .notes-delete { background:#dc2626; }
         #lesson-notes-modal .notes-status { color:var(--text-muted); font-size:.72rem; align-self:center; }
-        #basic-notes-list { display:flex; flex-direction:column; gap:7px; margin-top:8px; }
-        .basic-note-card { background:var(--bg-main); border:1px solid var(--border-color); border-radius:8px; padding:9px 11px; cursor:pointer; }
-        .basic-note-card:hover { border-color:var(--accent-orange); }
-        .basic-note-card strong { display:block; font-size:.82rem; margin-bottom:3px; }
-        .basic-note-card span { display:block; font-size:.73rem; color:var(--text-secondary); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
         @media (max-width:700px) {
             #lesson-notes-modal { padding:5px; }
             #lesson-notes-modal .notes-modal { width:100%; height:94vh; }
@@ -1166,7 +1249,6 @@
                 </div>
             </div>
 
-            <!-- Для ПК: кнопки слева -->
             <button class="btn-header-square desktop-only-btn" id="btn-notif-header" onclick="requestNotificationPermission()" title="Upozornenia / Уведомления">
                 🔔
             </button>
@@ -1180,7 +1262,6 @@
             <span>📅 UniFlo</span>
         </div>
 
-        <!-- Для ПК правая часть c группой -->
         <div class="header-right mobile-header-group">
             <div class="group-selector-container">
                 <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
@@ -1189,7 +1270,6 @@
             </div>
         </div>
 
-        <!-- Для телефонов: кнопки справа -->
         <div class="mobile-only-right">
             <button class="btn-header-square" onclick="requestNotificationPermission()" title="Upozornenia / Уведомления">
                 🔔
@@ -1299,7 +1379,6 @@
 
                 <div id="screen-kalendar" class="screen active" style="margin-top: 15px;">
                     <div class="dash-card">
-                        <!-- Шапка с часами и двумя квадратными кнопками по бокам -->
                         <div class="clock-container">
                             <button class="clock-side-btn" onclick="openOpeningHoursModal()" title="Otváracie hodiny / График работы">⏰</button>
                             <div class="clock-box">
@@ -1309,7 +1388,6 @@
                             <button class="clock-side-btn" id="btn-weather-temp" onclick="openWeatherModal()" title="Predpoveď počasia / Прогноз погоды">--°</button>
                         </div>
                         
-                        <!-- Шапка календаря с переключением месяцев -->
                         <div class="cal-nav-bar">
                             <div class="section-title" data-i18n="calendar">Kalendár</div>
                             <div class="cal-nav-btns">
@@ -1331,16 +1409,25 @@
             <div id="screen-akcie" class="screen active" style="height:100%;">
                 <div class="dash-column-3">
 
-                    <!-- Заметки -->
-                    <div class="dash-card">
-                        <div class="section-header">
+                    <!-- Блок заметок по новому скетчу -->
+                    <div class="notes-dashboard-card">
+                        <div class="section-header" style="margin-bottom: 8px;">
                             <div class="section-title" data-i18n="my_notes">📝 Moje Poznámky</div>
-                            <button onclick="openNoteModal()" style="background:none; border:none; color:var(--accent-orange); font-size:0.8rem; font-weight:600; cursor:pointer;" data-i18n="create_note">+ Vytvoriť poznámku</button>
                         </div>
-                        <div class="notes-container" style="max-height:none; overflow:visible;">
-                            <button class="btn-main-action" onclick="openLessonNotes()" style="margin-bottom:8px;">📝 Otvoriť UniFlo Notes</button>
-                            <div id="basic-notes-list"></div>
+                        
+                        <!-- Верхняя панель кнопок по скетчу -->
+                        <div class="notes-actions-top-grid">
+                            <div class="notes-left-btns">
+                                <button class="btn-main-action" onclick="openNoteModal()">📝 <span data-i18n="create_note">Vytvoriť poznámku</span></button>
+                                <button class="btn-main-action" onclick="openLessonNotes()" style="background:#2563eb;">📄 UniFlo Word</button>
+                            </div>
+                            <button class="btn-big-pencil" onclick="openDrawingModal()" title="Kreslenie / Рисунок">
+                                ✏️
+                            </button>
                         </div>
+
+                        <!-- Единая лента всех заметок, ворд-документов и рисунков -->
+                        <div class="unified-notes-list" id="unified-notes-container"></div>
                     </div>
 
                     <!-- Онлайн Чат -->
@@ -1425,7 +1512,7 @@
     </nav>
 </div>
 
-<!-- Modal Opening Hours (Визуальный таймлайн графика работы) -->
+<!-- Modal Opening Hours -->
 <div class="modal-overlay" id="opening-hours-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1436,7 +1523,7 @@
     </div>
 </div>
 
-<!-- Modal Weather (Комбинированный: карточки для ПК, Canvas для мобильных) -->
+<!-- Modal Weather -->
 <div class="modal-overlay" id="weather-modal">
     <div class="modal" style="max-width: 650px;">
         <div class="modal-header">
@@ -1444,7 +1531,6 @@
             <button class="close-btn" onclick="closeModal('weather-modal')">&times;</button>
         </div>
         
-        <!-- Версия для ПК: карточки со скроллом -->
         <div class="desktop-weather-view">
             <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-align: right;" data-i18n="weather_scroll_hint">
                 ↔ Posúvajte pre zobrazenie celého dňa
@@ -1454,7 +1540,6 @@
             </div>
         </div>
 
-        <!-- Версия для мобильных: Canvas график -->
         <div class="mobile-weather-view">
             <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-align: right;" data-i18n="weather_scroll_hint">
                 ↔ Posúvajte pre zobrazenie celého dňa
@@ -1569,34 +1654,69 @@
     </div>
 </div>
 
-<!-- Integrovaný UniFlo Notes editor (Новые заметки) -->
+<!-- Интегрированный UniFlo Notes editor -->
 <div class="modal-overlay" id="lesson-notes-modal" onclick="if(event.target===this)closeModal('lesson-notes-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true" aria-label="UniFlo Notes">
-    <div class="notes-modal-header"><div class="modal-title">📝 UniFlo Notes</div><button class="close-btn" onclick="closeModal('lesson-notes-modal')" aria-label="Zavrieť">&times;</button></div>
+    <div class="notes-modal-header"><div class="modal-title">📄 UniFlo Word Dokument</div><button class="close-btn" onclick="closeModal('lesson-notes-modal')" aria-label="Zavrieť">&times;</button></div>
     <div class="notes-layout">
       <aside class="notes-sidebar">
-        <button class="btn-main-action notes-new-btn" onclick="createLessonNote()">+ Nová poznámka</button>
+        <button class="btn-main-action notes-new-btn" onclick="createLessonNote()">+ Nový dokument</button>
         <div id="lesson-notes-list" class="notes-list"></div>
       </aside>
       <section class="notes-workspace">
         <div class="notes-toolbar-top">
-          <input id="lesson-note-title" class="notes-title-input" placeholder="Názov poznámky..." oninput="saveLessonNote()">
-          <select id="lesson-note-subject" class="notes-lesson-select" onchange="saveLessonNote()"><option value="">📄 Nepriradená poznámka</option></select>
+          <input id="lesson-note-title" class="notes-title-input" placeholder="Názov dokumentu..." oninput="saveLessonNote()">
+          <select id="lesson-note-subject" class="notes-lesson-select" onchange="saveLessonNote()"><option value="">📄 Nepriradený dokument</option></select>
           <div class="notes-format-toolbar">
             <button type="button" onclick="formatLessonNote('bold')" title="Tučné"><b>B</b></button>
             <button type="button" onclick="formatLessonNote('italic')" title="Kurzíva"><i>I</i></button>
             <button type="button" onclick="formatLessonNote('underline')" title="Podčiarknuté"><u>U</u></button>
             <select aria-label="Písmo" onchange="changeLessonNoteFont(this.value)"><option value="">Písmo</option><option>Arial</option><option>Verdana</option><option>Georgia</option><option>Courier New</option><option>Times New Roman</option></select>
-            <select aria-label="Veľkość písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
-            <input type="color" aria-label="Farba textu" value="#f0f2f5" onchange="changeLessonNoteColor(this.value)">
+            <select aria-label="Veľkosť písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
+            <input type="color" aria-label="Farba textu" value="#121316" onchange="changeLessonNoteColor(this.value)">
           </div>
         </div>
-        <div id="lesson-note-editor" class="notes-editor" contenteditable="true" oninput="saveLessonNote()"></div>
+        <div id="lesson-note-editor" class="notes-editor" contenteditable="true" oninput="saveLessonNote()" style="color: #121316; background: #ffffff;"></div>
         <div class="notes-footer">
-          <span id="lesson-notes-status" class="notes-status">Poznámky sa ukladajú automaticky.</span>
+          <span id="lesson-notes-status" class="notes-status">Ukladá sa automaticky.</span>
           <div class="notes-footer-group"><button class="notes-export" onclick="exportLessonNoteToWord()">📄 Export Word</button><button class="notes-delete" onclick="deleteLessonNote()">🗑 Odstrániť</button></div>
         </div>
       </section>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно для рисования (Холст с 16 цветами, текстом и картинками) -->
+<div class="modal-overlay" id="drawing-modal" onclick="if(event.target===this)closeModal('drawing-modal')">
+  <div class="modal notes-modal" role="dialog" aria-modal="true">
+    <div class="notes-modal-header">
+        <div class="modal-title">✏️ Редактор рисунка</div>
+        <button class="close-btn" onclick="closeModal('drawing-modal')">&times;</button>
+    </div>
+    <div style="padding: 10px 14px; background: var(--bg-card); display: flex; flex-direction: column; gap: 8px;">
+        <input type="text" id="drawing-title-input" class="form-control" placeholder="Название рисунка..." oninput="saveCurrentDrawingMeta()">
+        <div class="drawing-toolbar">
+            <div class="color-palette" id="color-palette-grid"></div>
+            <div style="display:flex; align-items:center; gap:6px; margin-left: auto;">
+                <label style="font-size:0.75rem; color:var(--text-secondary);">Кисть:</label>
+                <input type="range" id="brush-size-range" min="1" max="40" value="4" oninput="brushSize = this.value" style="width: 80px;">
+                <button type="button" class="cal-nav-btn" onclick="currentTool='brush'" style="background:var(--bg-input);">✏️ Кисть</button>
+                <button type="button" class="cal-nav-btn" onclick="currentTool='eraser'" style="background:var(--bg-input);">🧹 Ластик</button>
+                <button type="button" class="cal-nav-btn" onclick="addTextToCanvas()" style="background:var(--bg-input);">💬 Текст</button>
+                <button type="button" class="cal-nav-btn" onclick="addImageToCanvas()" style="background:var(--bg-input);">🖼️ Картинка</button>
+                <button type="button" class="cal-nav-btn" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#efca5a5;">🗑️ Очистить</button>
+            </div>
+        </div>
+    </div>
+    <div class="drawing-canvas-container" id="drawing-canvas-wrap">
+        <canvas id="drawing-canvas" width="900" height="600"></canvas>
+    </div>
+    <div class="notes-footer" style="background:var(--bg-card);">
+        <span id="drawing-status" class="notes-status">Рисунок сохраняется автоматически.</span>
+        <div class="notes-footer-group">
+            <button class="notes-export" onclick="exportDrawingAsImage()">📥 Скачать PNG</button>
+            <button class="notes-delete" onclick="deleteCurrentDrawing()">🗑 Удалить</button>
+        </div>
     </div>
   </div>
 </div>
@@ -2387,37 +2507,79 @@
         return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
     }
 
-    // --- ЛОГИКА ЗАМЕТОК ---
+    // --- ЛОГИКА ОБЩИХ ЗАМЕТОК, ВОРДОВ И РИСУНКОВ ---
     function getBasicNotes() {
         try { return JSON.parse(localStorage.getItem('uniflo_basic_notes')) || []; }
         catch (e) { return []; }
     }
     function setBasicNotes(notes) { 
         localStorage.setItem('uniflo_basic_notes', JSON.stringify(notes)); 
-        renderNotes(); 
+        renderUnifiedNotes(); 
     }
 
-    function renderNotes() {
-        const list = document.getElementById('basic-notes-list');
-        if (!list) return;
-        const notes = getBasicNotes();
-        list.innerHTML = '';
+    function getLessonNotesList() {
+        try { return JSON.parse(localStorage.getItem('uniflo_notes')) || []; }
+        catch (e) { return []; }
+    }
 
-        if (notes.length === 0) {
-            list.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:0.8rem;">Žiadne rýchle poznámky.</div>';
+    function getDrawingsList() {
+        try { return JSON.parse(localStorage.getItem('uniflo_drawings')) || []; }
+        catch (e) { return []; }
+    }
+    function setDrawingsList(drawings) {
+        localStorage.setItem('uniflo_drawings', JSON.stringify(drawings));
+        renderUnifiedNotes();
+    }
+
+    // Отрисовка объединенной ленты по скетчу под кнопками
+    function renderUnifiedNotes() {
+        const container = document.getElementById('unified-notes-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const basicNotes = getBasicNotes().map(n => ({ ...n, type: 'note', icon: '📖' }));
+        const wordNotes = getLessonNotesList().map(n => ({ ...n, type: 'word', icon: '📄' }));
+        const drawings = getDrawingsList().map(d => ({ ...d, type: 'drawing', icon: '✏️' }));
+
+        const allItems = [...basicNotes, ...wordNotes, ...drawings].sort((a, b) => (b.id || 0) - (a.id || 0));
+
+        if (allItems.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:0.8rem;">Zatiaľ žiadne poznámky, dokumenty ani kresby.</div>';
             return;
         }
 
-        notes.forEach(note => {
-            const item = document.createElement('div');
-            item.className = 'basic-note-card';
-            const title = document.createElement('strong');
-            title.textContent = note.title || 'Bez názvu';
-            const preview = document.createElement('span');
-            preview.textContent = (note.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'Prázdna poznámka';
-            item.append(title, preview);
-            item.onclick = () => openNoteModal(note.id);
-            list.appendChild(item);
+        allItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'unified-note-item';
+            
+            let previewText = '';
+            if (item.type === 'note') {
+                previewText = (item.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'Prázdna poznámka';
+            } else if (item.type === 'word') {
+                previewText = item.lesson ? `Predmet: ${item.lesson}` : 'Word dokument UniFlo';
+            } else if (item.type === 'drawing') {
+                previewText = 'Рисунок / Схема на холсте';
+            }
+
+            div.innerHTML = `
+                <div class="unified-note-icon">${item.icon}</div>
+                <div class="unified-note-info">
+                    <div class="unified-note-title">${escapeHtml(item.title || 'Bez názvu')}</div>
+                    <div class="unified-note-desc">${escapeHtml(previewText)}</div>
+                </div>
+            `;
+
+            div.onclick = () => {
+                if (item.type === 'note') openNoteModal(item.id);
+                else if (item.type === 'word') {
+                    openLessonNotes();
+                    openLessonNote(item.id);
+                } else if (item.type === 'drawing') {
+                    openDrawingModal(item.id);
+                }
+            };
+
+            container.appendChild(div);
         });
     }
 
@@ -2436,7 +2598,7 @@
         const notes = getBasicNotes();
         const id = document.getElementById('note-edit-id').value;
         const note = { 
-            id: id || Date.now().toString(), 
+            id: id || Date.now(), 
             title: document.getElementById('note-title-input').value.trim() || 'Bez názvu', 
             content: document.getElementById('note-text-content').value 
         };
@@ -2453,7 +2615,210 @@
         closeModal('note-modal');
     }
 
-    // --- Расширенный редактор UniFlo Notes (новые заметки) ---
+    // --- ЛОГИКА РЕДАКТОРА РИСУНКОВ (ХОЛСТА) ---
+    const BASIC_16_COLORS = [
+        '#000000', '#ffffff', '#ef4444', '#f97316',
+        '#facc15', '#22c55e', '#3b82f6', '#8b5cf6',
+        '#ec4899', '#78716c', '#991b1b', '#9a3412',
+        '#166534', '#1e40af', '#581c87', '#374151'
+    ];
+
+    let currentDrawingId = null;
+    let currentColor = '#000000';
+    let brushSize = 4;
+    let currentTool = 'brush'; // 'brush', 'eraser'
+    let isDrawing = false;
+    let canvasCtx = null;
+
+    function initColorPalette() {
+        const grid = document.getElementById('color-palette-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        BASIC_16_COLORS.forEach(color => {
+            const btn = document.createElement('div');
+            btn.className = 'color-btn' + (color === currentColor ? ' active' : '');
+            btn.style.backgroundColor = color;
+            btn.onclick = () => {
+                currentColor = color;
+                currentTool = 'brush';
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+            grid.appendChild(btn);
+        });
+    }
+
+    function openDrawingModal(id) {
+        document.getElementById('drawing-modal').classList.add('active');
+        initColorPalette();
+
+        const canvas = document.getElementById('drawing-canvas');
+        canvasCtx = canvas.getContext('2d');
+
+        const drawings = getDrawingsList();
+        let drawing = id ? drawings.find(d => String(d.id) === String(id)) : null;
+
+        if (drawing) {
+            currentDrawingId = drawing.id;
+            document.getElementById('drawing-title-input').value = drawing.title || 'Рисунок';
+            const img = new Image();
+            img.onload = () => {
+                canvasCtx.fillStyle = '#ffffff';
+                canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+                canvasCtx.drawImage(img, 0, 0);
+            };
+            img.src = drawing.dataUrl;
+        } else {
+            currentDrawingId = Date.now();
+            document.getElementById('drawing-title-input').value = 'Новый рисунок';
+            canvasCtx.fillStyle = '#ffffff';
+            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        setupCanvasListeners(canvas);
+    }
+
+    function setupCanvasListeners(canvas) {
+        const getPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        };
+
+        canvas.onmousedown = (e) => {
+            isDrawing = true;
+            const pos = getPos(e);
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(pos.x, pos.y);
+        };
+
+        canvas.onmousemove = (e) => {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            canvasCtx.lineWidth = brushSize;
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
+
+            if (currentTool === 'eraser') {
+                canvasCtx.strokeStyle = '#ffffff';
+            } else {
+                canvasCtx.strokeStyle = currentColor;
+            }
+
+            canvasCtx.lineTo(pos.x, pos.y);
+            canvasCtx.stroke();
+        };
+
+        canvas.onmouseup = canvas.onmouseleave = () => {
+            if (isDrawing) {
+                isDrawing = false;
+                saveCurrentDrawingMeta();
+            }
+        };
+
+        // Touch support
+        canvas.ontouchstart = (e) => {
+            isDrawing = true;
+            const pos = getPos(e);
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(pos.x, pos.y);
+            e.preventDefault();
+        };
+
+        canvas.ontouchmove = (e) => {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            canvasCtx.lineWidth = brushSize;
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
+
+            if (currentTool === 'eraser') canvasCtx.strokeStyle = '#ffffff';
+            else canvasCtx.strokeStyle = currentColor;
+
+            canvasCtx.lineTo(pos.x, pos.y);
+            canvasCtx.stroke();
+            e.preventDefault();
+        };
+
+        canvas.ontouchend = () => {
+            if (isDrawing) {
+                isDrawing = false;
+                saveCurrentDrawingMeta();
+            }
+        };
+    }
+
+    function clearCanvas() {
+        if (!canvasCtx) return;
+        const canvas = document.getElementById('drawing-canvas');
+        canvasCtx.fillStyle = '#ffffff';
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+        saveCurrentDrawingMeta();
+    }
+
+    function addTextToCanvas() {
+        const text = prompt("Введите текст для добавления на холст:");
+        if (!text) return;
+        const canvas = document.getElementById('drawing-canvas');
+        canvasCtx.font = 'bold 24px Inter, sans-serif';
+        canvasCtx.fillStyle = currentColor;
+        canvasCtx.fillText(text, 50, 80);
+        saveCurrentDrawingMeta();
+    }
+
+    function addImageToCanvas() {
+        const url = prompt("Введите прямую ссылку на картинку (URL):");
+        if (!url) return;
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            canvasCtx.drawImage(img, 50, 50, 250, 180);
+            saveCurrentDrawingMeta();
+        };
+        img.onerror = () => {
+            alert("Не удалось загрузить изображение по этой ссылке.");
+        };
+        img.src = url;
+    }
+
+    function saveCurrentDrawingMeta() {
+        const canvas = document.getElementById('drawing-canvas');
+        if (!canvas) return;
+        const title = document.getElementById('drawing-title-input').value.trim() || 'Рисунок';
+        const dataUrl = canvas.toDataURL('image/png');
+
+        let drawings = getDrawingsList();
+        const existingIdx = drawings.findIndex(d => String(d.id) === String(currentDrawingId));
+        const item = { id: currentDrawingId || Date.now(), title, dataUrl };
+
+        if (existingIdx >= 0) drawings[existingIdx] = item;
+        else drawings.unshift(item);
+
+        setDrawingsList(drawings);
+        document.getElementById('drawing-status').textContent = 'Успешно сохранено';
+    }
+
+    function deleteCurrentDrawing() {
+        if (!currentDrawingId || !confirm("Удалить этот рисунок?")) return;
+        let drawings = getDrawingsList().filter(d => String(d.id) !== String(currentDrawingId));
+        setDrawingsList(drawings);
+        closeModal('drawing-modal');
+    }
+
+    function exportDrawingAsImage() {
+        const canvas = document.getElementById('drawing-canvas');
+        if (!canvas) return;
+        const link = document.createElement('a');
+        link.download = 'uniflo-drawing.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // --- UniFlo Notes (Word) ---
     const LESSON_NOTE_SUBJECTS = [
         'MPI - Prednáška','MPI - Cvičenie','API - Prednáška','API - Cvičenie',
         'MAT1 - Prednáška','MAT1 - Cvičenie','PZA - Prednáška','PZA - Laboratórne',
@@ -2466,30 +2831,32 @@
         try { lessonNotes = JSON.parse(localStorage.getItem('uniflo_notes')) || []; }
         catch (e) { lessonNotes = []; }
         const select = document.getElementById('lesson-note-subject');
-        if (select) {
+        if (select && select.options.length <= 1) {
             LESSON_NOTE_SUBJECTS.forEach(subject => {
                 const option = document.createElement('option'); option.value = subject; option.textContent = subject; select.appendChild(option);
             });
         }
-        renderLessonNotes();
+        renderLessonNotesListModal();
     }
-    function persistLessonNotes() { localStorage.setItem('uniflo_notes', JSON.stringify(lessonNotes)); }
+    function persistLessonNotes() { 
+        localStorage.setItem('uniflo_notes', JSON.stringify(lessonNotes)); 
+        renderUnifiedNotes();
+    }
 
     function openLessonNotes() {
+        loadLessonNotes();
         document.getElementById('lesson-notes-modal').classList.add('active');
-        renderLessonNotes();
         if (!currentLessonNoteId && lessonNotes.length) openLessonNote(lessonNotes[0].id);
         else if (!currentLessonNoteId) createLessonNote();
-        setTimeout(() => { const map = document.getElementById('map-container'); if (leafletMap && map) leafletMap.invalidateSize(); }, 100);
     }
 
     function createLessonNote() {
-        const note = { id: Date.now().toString() + Math.random().toString(16).slice(2), title: 'Nová poznámka', lesson: '', content: '' };
+        const note = { id: Date.now(), title: 'Nový dokument', lesson: '', content: '' };
         lessonNotes.unshift(note); currentLessonNoteId = note.id; persistLessonNotes(); openLessonNote(note.id);
         document.getElementById('lesson-note-title').focus();
     }
 
-    function renderLessonNotes() {
+    function renderLessonNotesListModal() {
         const list = document.getElementById('lesson-notes-list'); if (!list) return;
         list.innerHTML = '';
         lessonNotes.forEach(note => {
@@ -2502,13 +2869,13 @@
     }
 
     function openLessonNote(id) {
+        currentLessonNoteId = id;
         const note = lessonNotes.find(n => String(n.id) === String(id)); if (!note) return;
-        currentLessonNoteId = note.id;
         document.getElementById('lesson-note-title').value = note.title || '';
         document.getElementById('lesson-note-subject').value = note.lesson || '';
         document.getElementById('lesson-note-editor').innerHTML = note.content || '';
-        document.getElementById('lesson-notes-status').textContent = 'Poznámka uložená v tomto prehliadači';
-        renderLessonNotes();
+        document.getElementById('lesson-notes-status').textContent = 'Dokument uložený';
+        renderLessonNotesListModal();
     }
 
     function saveLessonNote() {
@@ -2517,17 +2884,16 @@
         note.title = document.getElementById('lesson-note-title').value || 'Bez názvu';
         note.lesson = document.getElementById('lesson-note-subject').value;
         note.content = document.getElementById('lesson-note-editor').innerHTML;
-        persistLessonNotes(); renderLessonNotes();
-        document.getElementById('lesson-notes-status').textContent = 'Automaticky uložené';
+        persistLessonNotes(); renderLessonNotesListModal();
     }
 
     function deleteLessonNote() {
         if (!currentLessonNoteId) return;
-        if (!confirm('Naozaj odstrániť poznámku?')) return;
+        if (!confirm('Naozaj odstrániť tento dokument?')) return;
         lessonNotes = lessonNotes.filter(n => String(n.id) !== String(currentLessonNoteId));
-        currentLessonNoteId = null; persistLessonNotes(); renderLessonNotes();
+        currentLessonNoteId = null; persistLessonNotes(); renderLessonNotesListModal();
         if (lessonNotes.length) openLessonNote(lessonNotes[0].id);
-        else { document.getElementById('lesson-note-title').value = ''; document.getElementById('lesson-note-subject').value = ''; document.getElementById('lesson-note-editor').innerHTML = ''; document.getElementById('lesson-notes-status').textContent = 'Vytvor novú poznámku.'; }
+        else { document.getElementById('lesson-note-title').value = ''; document.getElementById('lesson-note-subject').value = ''; document.getElementById('lesson-note-editor').innerHTML = ''; }
     }
 
     function formatLessonNote(command) { document.getElementById('lesson-note-editor').focus(); document.execCommand(command, false, null); saveLessonNote(); }
@@ -2536,8 +2902,8 @@
     function changeLessonNoteColor(color) { document.getElementById('lesson-note-editor').focus(); document.execCommand('foreColor', false, color); saveLessonNote(); }
 
     function exportLessonNoteToWord() {
-        const note = lessonNotes.find(n => String(n.id) === String(currentLessonNoteId)); if (!note) { alert('Najprv vytvor alebo vyber poznámku.'); return; }
-        const safeTitle = (note.title || 'poznamka').replace(/[\\/:*?"<>|]/g, '_');
+        const note = lessonNotes.find(n => String(n.id) === String(currentLessonNoteId)); if (!note) { alert('Najprv vytvor alebo vyber dokument.'); return; }
+        const safeTitle = (note.title || 'dokument').replace(/[\\/:*?"<>|]/g, '_');
         const escapeText = value => String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><h1>' + escapeText(note.title) + '</h1><h3>' + escapeText(note.lesson) + '</h3>' + (note.content || '') + '</body></html>';
         const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
@@ -2934,7 +3300,6 @@
         renderCompactCalendar();
     }
 
-    // ЛОГИКА ТАЙМЛАЙНА ГРАФИКА РАБОТЫ МЕСТ UNIZA
     const unizaPlacesData = [
         { name: "🍽️ Nová Menza (Obedy)", start: 7.0, end: 18.0, label: "07:00 – 18:00" },
         { name: "☕ Bufet Nová Menza", start: 7.0, end: 14.0, label: "07:00 – 14:00" },
@@ -2965,7 +3330,7 @@
                 </div>
                 <div class="timeline-bar-container">
                     <div class="timeline-work-range" style="left: ${startPercent}%; width: ${widthPercent}%;"></div>
-                    <div class="timeline-now-indicator" style="left: ${nowPercent}%;" title="Текущее время: ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}"></div>
+                    <div class="timeline-now-indicator" style="left: ${nowPercent}%;"></div>
                 </div>
                 <div class="timeline-scale-labels">
                     <span>00:00</span>
@@ -2984,7 +3349,6 @@
         document.getElementById('opening-hours-modal').classList.add('active');
     }
 
-    // ПОГОДА: Комбинированная логика
     let hourlyWeatherData = [];
 
     async function fetchWeather() {
@@ -3017,7 +3381,6 @@
                 }
             }
         } catch (e) {
-            console.warn('Open-Meteo failed, generating fallback...', e);
             generateFallbackWeatherData();
             if (btn) btn.innerText = `14°C`;
         }
@@ -3047,69 +3410,61 @@
         return '☀️';
     }
 
-    // Отрисовка погоды в одном общем блоке (для ПК)
-function drawWeatherCards() {
-    if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
-        generateFallbackWeatherData();
-    }
-
-    const track = document.getElementById('weather-flex-track');
-    if (!track) return;
-    track.innerHTML = '';
-
-    // Стилизуем сам трек как один большой единый контейнер
-    track.style.cssText = `
-        display: flex;
-        gap: 12px;
-        min-width: max-content;
-        align-items: stretch;
-        background: var(--bg-main);
-        border: 1px solid var(--border-color);
-        border-radius: 14px;
-        padding: 16px 14px;
-    `;
-
-    const temps = hourlyWeatherData.map(d => d.temp);
-    const minTemp = Math.min(...temps);
-    const maxTemp = Math.max(...temps);
-    const tempRange = maxTemp - minTemp || 1;
-
-    hourlyWeatherData.forEach(item => {
-        const heightPercent = Math.max(20, Math.round(((item.temp - minTemp) / tempRange) * 60 + 25));
-        const icon = getWeatherIcon(item.code);
-
-        const col = document.createElement('div');
-        // Прозрачные колонки внутри общего блока
-        col.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            width: 52px;
-            height: 140px;
-            flex-shrink: 0;
-        `;
-
-        col.innerHTML = `
-            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">${item.temp}°</span>
-            <div style="font-size: 1.3rem; margin: 4px 0;">${icon}</div>
-            <div style="width: 8px; height: ${heightPercent}%; background: linear-gradient(to top, var(--accent-orange), #fde047); border-radius: 4px; margin: 4px 0;"></div>
-            <span style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">${item.timeStr}</span>
-        `;
-        track.appendChild(col);
-    });
-}
-
-    // Отрисовка Canvas графика для мобильных устройств
-    function drawWeatherGraph() {
+    function drawWeatherCards() {
         if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
             generateFallbackWeatherData();
         }
 
+        const track = document.getElementById('weather-flex-track');
+        if (!track) return;
+        track.innerHTML = '';
+
+        track.style.cssText = `
+            display: flex;
+            gap: 12px;
+            min-width: max-content;
+            align-items: stretch;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px 14px;
+        `;
+
+        const temps = hourlyWeatherData.map(d => d.temp);
+        const minTemp = Math.min(...temps);
+        const maxTemp = Math.max(...temps);
+        const tempRange = maxTemp - minTemp || 1;
+
+        hourlyWeatherData.forEach(item => {
+            const heightPercent = Math.max(20, Math.round(((item.temp - minTemp) / tempRange) * 60 + 25));
+            const icon = getWeatherIcon(item.code);
+
+            const col = document.createElement('div');
+            col.style.cssText = `
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+                width: 52px;
+                height: 140px;
+                flex-shrink: 0;
+            `;
+
+            col.innerHTML = `
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">${item.temp}°</span>
+                <div style="font-size: 1.3rem; margin: 4px 0;">${icon}</div>
+                <div style="width: 8px; height: ${heightPercent}%; background: linear-gradient(to top, var(--accent-orange), #fde047); border-radius: 4px; margin: 4px 0;"></div>
+                <span style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">${item.timeStr}</span>
+            `;
+            track.appendChild(col);
+        });
+    }
+
+    function drawWeatherGraph() {
+        if (!hourlyWeatherData || hourlyWeatherData.length === 0) generateFallbackWeatherData();
         const canvas = document.getElementById('weather-canvas');
         const wrapper = document.getElementById('weather-canvas-wrapper');
         if (!canvas || !wrapper) return;
-
         const ctx = canvas.getContext('2d');
         const count = hourlyWeatherData.length;
         const colWidth = 60;
@@ -3142,94 +3497,31 @@ function drawWeatherCards() {
             return { x, y, ...item };
         });
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-        ctx.lineWidth = 1;
-        points.forEach(p => {
-            ctx.beginPath();
-            ctx.setLineDash([4, 4]);
-            ctx.moveTo(p.x, 20);
-            ctx.lineTo(p.x, canvasHeight - bottomMargin + 10);
-            ctx.stroke();
-            ctx.setLineDash([]);
-        });
-
-        const gradient = ctx.createLinearGradient(0, topMargin, 0, canvasHeight - bottomMargin);
-        gradient.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
-        gradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, canvasHeight - bottomMargin);
-        ctx.lineTo(points[0].x, points[0].y);
-
-        for (let i = 0; i < points.length - 1; i++) {
-            const xc = (points[i].x + points[i + 1].x) / 2;
-            const yc = (points[i].y + points[i + 1].y) / 2;
-            ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
-        }
-        const last = points[points.length - 1];
-        ctx.lineTo(last.x, last.y);
-        ctx.lineTo(last.x, canvasHeight - bottomMargin);
-        ctx.closePath();
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let i = 0; i < points.length - 1; i++) {
-            const xc = (points[i].x + points[i + 1].x) / 2;
-            const yc = (points[i].y + points[i + 1].y) / 2;
-            ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
-        }
-        ctx.lineTo(last.x, last.y);
-        ctx.strokeStyle = '#f97316';
-        ctx.lineWidth = 3;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-
         points.forEach((p) => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
-            ctx.shadowColor = '#f97316';
-            ctx.shadowBlur = 8;
             ctx.fill();
-            ctx.shadowBlur = 0;
 
             ctx.font = '600 12px Inter, sans-serif';
             ctx.fillStyle = '#f0f2f5';
             ctx.textAlign = 'center';
             ctx.fillText(`${p.temp}°`, p.x, p.y - 10);
-
-            const icon = getWeatherIcon(p.code);
-            ctx.font = '15px Inter, sans-serif';
-            ctx.fillText(icon, p.x, canvasHeight - bottomMargin + 20);
-
-            ctx.font = '500 11px Inter, sans-serif';
-            ctx.fillStyle = '#9aa0a6';
+            ctx.fillText(getWeatherIcon(p.code), p.x, canvasHeight - bottomMargin + 20);
             ctx.fillText(p.timeStr, p.x, canvasHeight - 8);
         });
     }
 
     function openWeatherModal() {
-        const modal = document.getElementById('weather-modal');
-        modal.classList.add('active');
-        
+        document.getElementById('weather-modal').classList.add('active');
         drawWeatherCards();
-        setTimeout(() => {
-            drawWeatherGraph();
-        }, 80);
+        setTimeout(drawWeatherGraph, 80);
     }
 
     function initMap() {
         if (leafletMap) return;
-
         leafletMap = L.map('map-container').setView([49.2065, 18.7580], 15);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap & UNIZA'
-        }).addTo(leafletMap);
-
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
         leafletMap.on('contextmenu', function(e) {
             document.getElementById('map-point-id').value = '';
             document.getElementById('map-lat').value = e.latlng.lat;
@@ -3237,10 +3529,8 @@ function drawWeatherCards() {
             document.getElementById('map-point-title').value = '';
             document.getElementById('map-is-admin-check').checked = false;
             document.getElementById('admin-checkbox-wrapper').style.display = 'block';
-            document.getElementById('map-point-modal-title').innerText = translations[currentLang].modal_map_title;
             document.getElementById('map-point-modal').classList.add('active');
         });
-
         renderCustomMapPoints();
         setTimeout(() => { leafletMap.invalidateSize(); }, 300);
     }
@@ -3258,37 +3548,14 @@ function drawWeatherCards() {
         if (id) {
             const existing = customMapPoints.find(p => p.id === id);
             isAdmin = existing ? existing.isAdmin : false;
-        } else {
-            if (isAdminRequested) {
-                const pass = prompt("Zadajte heslo pre vytvorenie Admin bodu:");
-                if (pass === "454") {
-                    isAdmin = true;
-                } else {
-                    alert("Nesprávne heslo!");
-                    return;
-                }
-            }
+        } else if (isAdminRequested) {
+            if (prompt("Zadajte heslo pre admin bod:") === "454") isAdmin = true;
+            else { alert("Nesprávne heslo!"); return; }
         }
 
-        const pointData = {
-            title,
-            cat,
-            lat,
-            lng,
-            isAdmin,
-            timestamp: Date.now()
-        };
-
-        if (id) {
-            db.ref('mapPoints/' + id).set(pointData).catch((error) => {
-                alert("Chyba pri aktualizácii bodu: " + error.message);
-            });
-        } else {
-            db.ref('mapPoints').push(pointData).catch((error) => {
-                alert("Chyba pri ukladaní bodu: " + error.message);
-            });
-        }
-
+        const pointData = { title, cat, lat, lng, isAdmin, timestamp: Date.now() };
+        if (id) db.ref('mapPoints/' + id).set(pointData);
+        else db.ref('mapPoints').push(pointData);
         closeModal('map-point-modal');
         document.getElementById('map-point-form').reset();
     }
@@ -3325,7 +3592,6 @@ function drawWeatherCards() {
         const titleEl = document.getElementById('points-modal-title');
         if (!container || !titleEl) return;
         container.innerHTML = '';
-
         const t = translations[currentLang];
         const isAdminMode = (currentModalType === 'admin');
         titleEl.innerText = isAdminMode ? t.modal_admin_title : t.modal_student_title;
@@ -3333,8 +3599,7 @@ function drawWeatherCards() {
         categoryKeys.forEach(catObj => {
             const catLocalizedName = t[catObj.key] || catObj.defaultName;
             const btn = document.createElement('button');
-            const hasItems = customMapPoints.some(p => !!p.isAdmin === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName || p.cat.includes(catObj.defaultName.split(' ')[1])));
-            
+            const hasItems = customMapPoints.some(p => !!p.isAdmin === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName));
             btn.className = 'chip-modal-btn' + (hasItems ? ' has-items' : '');
             btn.innerHTML = `<span>${catLocalizedName}</span>`;
             btn.onclick = () => renderPointsViewForCategory(catObj);
@@ -3346,173 +3611,59 @@ function drawWeatherCards() {
         const container = document.getElementById('points-select-container');
         const titleEl = document.getElementById('points-modal-title');
         container.innerHTML = '';
-
         const t = translations[currentLang];
         const catLocalizedName = t[catObj.key] || catObj.defaultName;
         const isAdminMode = (currentModalType === 'admin');
-
         titleEl.innerHTML = `<button onclick="renderCategoriesView()" style="background:none; border:none; color:var(--accent-orange); cursor:pointer; font-weight:700; margin-right:8px;">${t.back_btn}</button> ${escapeHtml(catLocalizedName)}`;
 
-        const filteredPoints = customMapPoints.filter(p => !!p.isAdmin === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName || p.cat.includes(catObj.defaultName.split(' ')[1])));
-        filteredPoints.sort((a, b) => a.title.localeCompare(b.title, currentLang));
-
-        if (filteredPoints.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem; width:100%;">${t.no_places}</div>`;
-        } else {
-            filteredPoints.forEach(p => {
-                const btn = document.createElement('button');
-                btn.className = 'chip-modal-btn';
-                
-                let icon = '📍';
-                if (p.cat.includes('Kaviareň') || p.cat.includes('Cafe') || p.cat.includes('Кафе')) icon = '☕';
-                else if (p.cat.includes('Štúdium') || p.cat.includes('Study') || p.cat.includes('Учеба') || p.cat.includes('Навчання')) icon = '📚';
-                else if (p.cat.includes('Zábava') || p.cat.includes('Fun') || p.cat.includes('Развлечения') || p.cat.includes('Розваги')) icon = '🎉';
-                else if (p.cat.includes('Fakulty') || p.cat.includes('Faculties') || p.cat.includes('Факультеты') || p.cat.includes('Факультети')) icon = '🏛️';
-                else if (p.cat.includes('Menza') || p.cat.includes('Canteen') || p.cat.includes('Столовая') || p.cat.includes('Їдальня')) icon = '🍽️';
-                else if (p.cat.includes('Tlač') || p.cat.includes('Print') || p.cat.includes('Печать') || p.cat.includes('Друк')) icon = '🖨️';
-                else if (p.cat.includes('Bar')) icon = '🍻';
-                else if (p.cat.includes('Šport') || p.cat.includes('Sport') || p.cat.includes('Спорт')) icon = '🏋️‍♂️';
-                else if (p.cat.includes('Internáty') || p.cat.includes('Dorm') || p.cat.includes('Общежития') || p.cat.includes('Гуртожитки')) icon = '🛏️';
-                else if (p.cat.includes('Potraviny') || p.cat.includes('Groceries') || p.cat.includes('Продукты') || p.cat.includes('Продукти')) icon = '🛒';
-                else if (p.cat.includes('Parkovanie') || p.cat.includes('Parking') || p.cat.includes('Парковка')) icon = '🅿️';
-
-                btn.innerHTML = `<span>${icon} ${escapeHtml(p.title)}</span>`;
-                btn.onclick = () => {
-                    focusBuilding(p.lat, p.lng);
-                    closeModal('map-points-select-modal');
-                };
-                container.appendChild(btn);
-            });
-        }
+        const filteredPoints = customMapPoints.filter(p => !!p.isAdmin === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName));
+        filteredPoints.forEach(p => {
+            const btn = document.createElement('button');
+            btn.className = 'chip-modal-btn';
+            btn.innerHTML = `<span>📍 ${escapeHtml(p.title)}</span>`;
+            btn.onclick = () => { focusBuilding(p.lat, p.lng); closeModal('map-points-select-modal'); };
+            container.appendChild(btn);
+        });
     }
 
     function renderSinglePointOnMap(p) {
         if (!leafletMap) return;
-
-        let marker;
         const t = translations[currentLang];
+        let marker = p.isAdmin ? L.marker([p.lat, p.lng], { icon: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }) }).addTo(leafletMap) : L.marker([p.lat, p.lng]).addTo(leafletMap);
 
-        if (p.isAdmin) {
-            const redIcon = L.icon({
-                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
-            marker = L.marker([p.lat, p.lng], { icon: redIcon }).addTo(leafletMap);
-        } else {
-            marker = L.marker([p.lat, p.lng]).addTo(leafletMap);
-        }
-
-        const popupButtonsHtml = `
-            <div style="margin-top:8px; display:flex; gap:6px;">
-                <button onclick="editCustomPoint('${p.id}')" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer; font-weight:600;">${t.edit_btn}</button>
-                <button onclick="deleteCustomPoint('${p.id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer; font-weight:600;">${t.delete_btn}</button>
-            </div>
-        `;
-
-        let icon = '📍';
-        if (p.cat.includes('Kaviareň') || p.cat.includes('Cafe') || p.cat.includes('Кафе')) icon = '☕';
-        else if (p.cat.includes('Štúdium') || p.cat.includes('Study') || p.cat.includes('Учеба') || p.cat.includes('Навчання')) icon = '📚';
-        else if (p.cat.includes('Zábava') || p.cat.includes('Fun') || p.cat.includes('Развлечения') || p.cat.includes('Розваги')) icon = '🎉';
-        else if (p.cat.includes('Fakulty') || p.cat.includes('Faculties') || p.cat.includes('Факультеты') || p.cat.includes('Факультети')) icon = '🏛️';
-        else if (p.cat.includes('Menza') || p.cat.includes('Canteen') || p.cat.includes('Столовая') || p.cat.includes('Їдальня')) icon = '🍽️';
-        else if (p.cat.includes('Tlač') || p.cat.includes('Print') || p.cat.includes('Печать') || p.cat.includes('Друк')) icon = '🖨️';
-        else if (p.cat.includes('Bar')) icon = '🍻';
-        else if (p.cat.includes('Šport') || p.cat.includes('Sport') || p.cat.includes('Спорт')) icon = '🏋️‍♂️';
-        else if (p.cat.includes('Internáty') || p.cat.includes('Dorm') || p.cat.includes('Общежития') || p.cat.includes('Гуртожитки')) icon = '🛏️';
-        else if (p.cat.includes('Potraviny') || p.cat.includes('Groceries') || p.cat.includes('Продукты') || p.cat.includes('Продукти')) icon = '🛒';
-        else if (p.cat.includes('Parkovanie') || p.cat.includes('Parking') || p.cat.includes('Парковка')) icon = '🅿️';
-
-        marker.bindPopup(`<b>${icon} ${escapeHtml(p.cat)}</b><br><span style="font-size:0.9rem; font-weight:700;">${escapeHtml(p.title)}</span> ${popupButtonsHtml}`);
+        marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br><b>${escapeHtml(p.title)}</b><div style="margin-top:6px; display:flex; gap:6px;"><button onclick="editCustomPoint('${p.id}')" style="background:#3b82f6; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;">${t.edit_btn}</button><button onclick="deleteCustomPoint('${p.id}')" style="background:#ef4444; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;">${t.delete_btn}</button></div>`);
         mapMarkers.push(marker);
     }
 
     window.editCustomPoint = function(id) {
         const point = customMapPoints.find(p => p.id === id);
         if (!point) return;
-
-        if (point.isAdmin) {
-            const pass = prompt("Zadajte heslo pre úpravu Admin bodu:");
-            if (pass !== "454") {
-                alert("Nesprávne heslo!");
-                return;
-            }
-        }
-
+        if (point.isAdmin && prompt("Heslo:") !== "454") { alert("Chyba!"); return; }
         document.getElementById('map-point-id').value = point.id;
         document.getElementById('map-lat').value = point.lat;
         document.getElementById('map-lng').value = point.lng;
         document.getElementById('map-point-title').value = point.title;
         document.getElementById('map-point-cat').value = point.cat;
         document.getElementById('admin-checkbox-wrapper').style.display = 'none';
-        document.getElementById('map-point-modal-title').innerText = translations[currentLang].modal_map_title;
         document.getElementById('map-point-modal').classList.add('active');
     };
 
     window.deleteCustomPoint = function(id) {
         const point = customMapPoints.find(p => p.id === id);
         if (!point) return;
-
-        if (point.isAdmin) {
-            const pass = prompt("Zadajte heslo 454:");
-            if (pass !== "454") {
-                alert("Nesprávne heslo!");
-                return;
-            }
-        } else {
-            if (!confirm("Vymazať bod?")) return;
-        }
-
-        db.ref('mapPoints/' + id).remove().catch((error) => {
-            alert("Chyba pri mazaní: " + error.message);
-        });
+        if (point.isAdmin && prompt("Heslo 454:") !== "454") { alert("Chyba!"); return; }
+        db.ref('mapPoints/' + id).remove();
     };
 
     function locateUser() {
         if (!leafletMap) initMap();
-        
-        if (!navigator.geolocation) {
-            alert("Geolocation error.");
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-
-                leafletMap.setView([lat, lng], 17);
-
-                if (userLocationMarker) leafletMap.removeLayer(userLocationMarker);
-                if (userPulseMarker) leafletMap.removeLayer(userPulseMarker);
-
-                const pulseIcon = L.divIcon({
-                    className: 'user-pulse-marker',
-                    iconSize: [40, 40],
-                    iconAnchor: [20, 20]
-                });
-
-                const dotIcon = L.divIcon({
-                    className: 'user-dot-marker',
-                    iconSize: [16, 16],
-                    iconAnchor: [8, 8]
-                });
-
-                userPulseMarker = L.marker([lat, lng], { icon: pulseIcon, interactive: false }).addTo(leafletMap);
-                userLocationMarker = L.marker([lat, lng], { icon: dotIcon }).addTo(leafletMap);
-            },
-            (error) => {
-                alert("GPS error / Nepodarilo sa zistiť polohu.");
-            },
-            { 
-                enableHighAccuracy: false,
-                timeout: 7000,
-                maximumAge: 10000
-            }
-        );
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const { latitude: lat, longitude: lng } = pos.coords;
+            leafletMap.setView([lat, lng], 17);
+            if (userLocationMarker) leafletMap.removeLayer(userLocationMarker);
+            userLocationMarker = L.marker([lat, lng], { icon: L.divIcon({ className: 'user-dot-marker', iconSize: [16, 16], iconAnchor: [8, 8] }) }).addTo(leafletMap);
+        });
     }
 
     function focusBuilding(lat, lng) {
@@ -3522,7 +3673,6 @@ function drawWeatherCards() {
 
     function openAddModal() {
         document.getElementById('edit-id').value = '';
-        document.getElementById('modal-title-text').innerText = translations[currentLang].modal_lesson_title;
         document.getElementById('lesson-form').reset();
         document.getElementById('btn-delete-lesson').style.display = 'none';
         document.getElementById('lesson-modal').classList.add('active');
@@ -3531,9 +3681,7 @@ function drawWeatherCards() {
     function openEditModal(id) {
         const item = schedule.find(l => l.id === id);
         if (!item) return;
-
         document.getElementById('edit-id').value = item.id;
-        document.getElementById('modal-title-text').innerText = translations[currentLang].modal_lesson_title;
         document.getElementById('form-day').value = item.day;
         document.getElementById('form-title').value = item.title;
         document.getElementById('form-type').value = item.type;
@@ -3541,14 +3689,11 @@ function drawWeatherCards() {
         document.getElementById('form-end').value = item.end;
         document.getElementById('form-teacher').value = item.teacher || '';
         document.getElementById('form-room').value = item.room || '';
-
         document.getElementById('btn-delete-lesson').style.display = 'block';
         document.getElementById('lesson-modal').classList.add('active');
     }
 
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
-    }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     function saveLesson(e) {
         e.preventDefault();
@@ -3557,84 +3702,7 @@ function drawWeatherCards() {
         const dayVal = parseInt(document.getElementById('form-day').value);
         const id = document.getElementById('edit-id').value;
 
-        if (startVal < "07:00" || endVal > "20:00" || startVal >= endVal) {
-            alert("Čas musí byť v rozmedzí 07:00 - 20:00 a začiatok musí byť skôr ako koniec!");
-            return;
-        }
-
-        const hasOverlap = schedule.some(l => {
-            if (id && l.id === id) return false;
-            if (l.day !== dayVal) return false;
-            return (startVal < l.end && l.start < endVal);
-        });
-
-        if (hasOverlap) {
-            alert("V tomto čase už máte inú hodinu! Vyberte iný čas.");
-            return;
-        }
+        if (startVal >= endVal) { alert("Začiatok musí byť skôr ako koniec!"); return; }
 
         const newLesson = {
             id: id || Date.now().toString(),
-            day: dayVal,
-            title: document.getElementById('form-title').value,
-            type: document.getElementById('form-type').value,
-            start: startVal,
-            end: endVal,
-            teacher: document.getElementById('form-teacher').value,
-            room: document.getElementById('form-room').value
-        };
-
-        if (id) {
-            const idx = schedule.findIndex(l => l.id === id);
-            schedule[idx] = newLesson;
-        } else {
-            schedule.push(newLesson);
-        }
-
-        localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
-        closeModal('lesson-modal');
-        renderAll();
-    }
-
-    function deleteLesson() {
-        const id = document.getElementById('edit-id').value;
-        if (!id) return;
-        schedule = schedule.filter(l => l.id !== id);
-        localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
-        closeModal('lesson-modal');
-        renderAll();
-    }
-
-    function renderAll() {
-        renderUpcomingDay();
-        renderWeekGrid();
-        renderCompactCalendar();
-        loadLessonNotes();
-        renderNotes();
-        fetchWeather();
-        initMap();
-        applyTranslations();
-    }
-
-    setInterval(() => {
-        const now = new Date();
-        const clockEl = document.getElementById('live-clock');
-        const dateEl = document.getElementById('live-date');
-        
-        if (clockEl) {
-            clockEl.innerText = now.toTimeString().split(' ')[0];
-        }
-        
-        if (dateEl) {
-            const t = translations[currentLang];
-            const daysArr = t.weekdays_clock;
-            const monthsArr = t.months;
-            dateEl.innerText = `${daysArr[now.getDay()]}, ${now.getDate()}. ${monthsArr[now.getMonth()]} ${now.getFullYear()}`;
-        }
-    }, 1000);
-
-    updateEvzdLink(currentGroup);
-    renderAll();
-</script>
-</body>
-</html>
