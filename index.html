@@ -3148,10 +3148,10 @@ function openWeatherModal() {
     const modal = document.getElementById('weather-modal');
     modal.classList.add('active');
     
-    // Даем браузеру 50-100мс на открытие модального окна и расчет стилей, затем рисуем график
+    // Даем больше времени на перерисовку DOM и отображение flex-контейнера
     setTimeout(() => {
         drawWeatherGraph();
-    }, 80);
+    }, 150);
 }
 
     function initMap() {
