@@ -772,6 +772,7 @@
         /* СТИЛИ ГРАФИКА ПОГОДЫ С СКРОЛЛОМ */
         .weather-graph-scroll-container {
             width: 100%;
+            max-width: 100%;
             overflow-x: auto;
             overflow-y: hidden;
             background: var(--bg-main);
@@ -789,11 +790,12 @@
             background: var(--border-color);
             border-radius: 3px;
         }
-        .weather-graph-canvas-wrapper {
-            position: relative;
-            height: 220px;
-            min-width: 1440px; /* Жесткая минимальная ширина на ПК, чтобы график не сжимался */
-        }
+       .weather-graph-canvas-wrapper {
+    position: relative;
+    height: 220px;
+    width: 1440px; /* Жестко задаем ширину для 24 часов (24 часа * 60px), чтобы скролл работал и на ПК */
+    flex-shrink: 0;
+}
 
         .notes-container {
             display: flex;
