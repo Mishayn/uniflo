@@ -558,22 +558,6 @@
             color: var(--accent-orange);
         }
 
-        .user-pulse-marker {
-            background: rgba(59, 130, 246, 0.3);
-            border-radius: 50%;
-            animation: pulse-ring 2s infinite;
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-        .user-dot-marker {
-            background: #2563eb;
-            border: 3px solid #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 0 6px rgba(0,0,0,0.5);
-        }
-
         /* СТИЛИ ИНТЕРАКТИВНОГО КАЛЕНДАРЯ */
         .cal-nav-bar {
             display: flex;
@@ -772,37 +756,7 @@
             margin-top: 4px;
         }
 
-        /* СТИЛИ ГРАФИКА ПОГОДЫ С СКРОЛЛОМ */
-        .weather-graph-scroll-container {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px 12px;
-            position: relative;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-color) transparent;
-        }
-        .weather-graph-scroll-container::-webkit-scrollbar {
-            height: 6px;
-        }
-        .weather-graph-scroll-container::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 3px;
-        }
-
-        .desktop-weather-view { display: block; }
-        .mobile-weather-view { display: none; }
-
-        @media (max-width: 1199px) {
-            .desktop-weather-view { display: none; }
-            .mobile-weather-view { display: block; }
-        }
-
-        /* Блок структуры заметок */
+        /* Блок заметок */
         .notes-dashboard-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -861,7 +815,7 @@
         .unified-note-title { font-size: 0.84rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .unified-note-desc { font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ОБНОВЛЕННАЯ МОДАЛКА ХОЛСТА (Canvas / Рисовач) */
+        /* ИСПРАВЛЕННАЯ СТАБИЛЬНАЯ МОДАЛКА ХОЛСТА */
         #drawing-modal .notes-modal {
             width: min(1200px, 98vw);
             max-width: 1200px;
@@ -923,13 +877,11 @@
 
         .drawing-canvas-container {
             flex: 1;
-            background: #2a2d34;
+            background: #23262d;
             position: relative;
             overflow: auto;
             padding: 20px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
+            display: block;
         }
 
         .drawing-paper-wrap {
@@ -937,28 +889,15 @@
             background: #ffffff;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             border-radius: 4px;
-            transition: width 0.2s ease, height 0.2s ease;
+            margin: 0 auto;
         }
 
         #drawing-canvas {
             display: block;
             touch-action: none;
+            background: #ffffff;
             border-radius: 4px;
-        }
-
-        .paste-drop-zone-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border: 3px dashed var(--accent-orange);
-            background: rgba(249, 115, 22, 0.15);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--accent-orange);
-            z-index: 50;
-            pointer-events: none;
+            cursor: crosshair;
         }
 
         /* UniFlo Notes – интегрированный редактор заметок */
@@ -997,16 +936,6 @@
         #lesson-notes-modal .notes-export { background:#16a34a; }
         #lesson-notes-modal .notes-delete { background:#dc2626; }
         #lesson-notes-modal .notes-status { color:var(--text-muted); font-size:.72rem; align-self:center; }
-        @media (max-width:700px) {
-            #lesson-notes-modal { padding:5px; }
-            #lesson-notes-modal .notes-modal { width:100%; height:94vh; }
-            #lesson-notes-modal .notes-layout { grid-template-columns:112px minmax(0,1fr); }
-            #lesson-notes-modal .notes-sidebar { padding:7px; }
-            #lesson-notes-modal .notes-list-item { padding:7px; }
-            #lesson-notes-modal .notes-toolbar-top { padding:8px; }
-            #lesson-notes-modal .notes-editor { padding:12px; }
-            #lesson-notes-modal .notes-footer { padding:8px; }
-        }
 
         .chat-box {
             display: flex;
@@ -1075,71 +1004,6 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 0.8rem;
-        }
-
-        .reviews-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 220px;
-            overflow-y: auto;
-            margin-bottom: 12px;
-        }
-        .review-item {
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px 10px;
-            font-size: 0.78rem;
-        }
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2px;
-        }
-        .review-author { font-weight: 700; color: var(--text-primary); }
-        .review-stars { color: #facc15; font-size: 0.8rem; }
-        .review-text { color: var(--text-secondary); line-height: 1.35; }
-
-        .star-rating-input {
-            display: flex;
-            gap: 6px;
-            font-size: 1.3rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            margin-bottom: 8px;
-            justify-content: center;
-        }
-        .star-rating-input span { transition: color 0.15s ease; }
-        .star-rating-input span.active { color: #facc15; }
-
-        .btn-google-login {
-            background: #ffffff;
-            color: #1f1f1f;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: opacity 0.2s;
-        }
-
-        .chat-user-profile {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-        }
-        .chat-avatar {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            object-fit: cover;
         }
 
         .promo-card-link {
@@ -1269,14 +1133,6 @@
             color: #ef4444;
             border: 1px solid rgba(239, 68, 68, 0.4);
             margin-top: 6px;
-        }
-
-        #upcoming-arrow {
-            display: inline-block;
-            transition: transform 0.2s ease;
-            font-size: 0.75rem;
-            color: var(--accent-orange);
-            cursor: pointer;
         }
     </style>
 </head>
@@ -1738,7 +1594,7 @@
   </div>
 </div>
 
-<!-- Модальное окно для рисования (Продвинутый холст) -->
+<!-- МОДАЛЬНОЕ ОКНО ХОЛСТА (Стабильная и надёжная версия) -->
 <div class="modal-overlay" id="drawing-modal" onclick="if(event.target===this)closeModal('drawing-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true">
     <div class="notes-modal-header">
@@ -1753,12 +1609,11 @@
             <div class="color-palette" id="color-palette-grid"></div>
             
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; width:100%; margin-top:6px;">
-                <label style="font-size:0.75rem; color:var(--text-secondary);">Кисть:</label>
+                <label style="font-size:0.75rem; color:var(--text-secondary);">Толщина:</label>
                 <input type="range" id="brush-size-range" min="1" max="40" value="4" oninput="brushSize = this.value" style="width: 70px;">
                 
                 <!-- Инструменты -->
                 <button type="button" id="btn-tool-brush" class="tool-btn-item active" onclick="setCanvasTool('brush')">✏️ Кисть</button>
-                <button type="button" id="btn-tool-select" class="tool-btn-item" onclick="setCanvasTool('select')">🖐️ Выбрать / Двигать</button>
                 <button type="button" id="btn-tool-eraser" class="tool-btn-item" onclick="setCanvasTool('eraser')">🧹 Ластик</button>
                 <button type="button" class="tool-btn-item" onclick="addTextToCanvas()">💬 Текст</button>
                 
@@ -1770,7 +1625,6 @@
 
                 <!-- Расширение холста -->
                 <div style="margin-left:auto; display:flex; gap:4px; align-items:center;">
-                    <span style="font-size:0.72rem; color:var(--text-muted);">Размер холста:</span>
                     <button type="button" class="tool-btn-item" onclick="expandCanvas(0, 500)" title="Добавить 500px вниз">➕ +500px Вниз</button>
                     <button type="button" class="tool-btn-item" onclick="expandCanvas(500, 0)" title="Добавить 500px вправо">➕ +500px Вправо</button>
                     <button type="button" class="tool-btn-item" onclick="clearCanvas()" style="background:rgba(239,68,68,0.2); color:#ef4444; border-color:rgba(239,68,68,0.4);">🗑️ Очистить</button>
@@ -1778,14 +1632,13 @@
             </div>
             
             <div style="font-size:0.72rem; color:var(--accent-orange); margin-top:2px;">
-                💡 <b>Подсказка:</b> Вы можете вставлять картинки прямо через <b>Ctrl+V</b> или перетаскиванием файла на холст!
+                💡 <b>Совет:</b> Можно вставлять картинки из буфера обмена (Ctrl+V) или перетаскивать их прямо на белый холст!
             </div>
         </div>
     </div>
     
     <div class="drawing-canvas-container" id="drawing-canvas-wrap">
         <div class="drawing-paper-wrap" id="drawing-paper-wrap">
-            <div class="paste-drop-zone-overlay" id="canvas-drop-overlay">Перетащите картинку сюда</div>
             <canvas id="drawing-canvas" width="1000" height="700"></canvas>
         </div>
     </div>
@@ -2349,50 +2202,6 @@
         }
     });
 
-    function requestNotificationPermission() {
-        if (!("Notification" in window)) {
-            alert("Ваш браузер не поддерживает уведомления.");
-            return;
-        }
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                alert("Успешно! Уведомления включены. Вы получите оповещение за 10 минут до пары.");
-            } else {
-                alert("Разрешение на уведомления отклонено.");
-            }
-        });
-    }
-
-    function checkLessonReminders() {
-        if (Notification.permission !== "granted") return;
-
-        const now = new Date();
-        const currentDay = now.getDay();
-        const currentHours = now.getHours();
-        const currentMinutes = now.getMinutes();
-        const currentTotalMins = currentHours * 60 + currentMinutes;
-
-        const todayLessons = schedule.filter(l => l.day === currentDay);
-
-        todayLessons.forEach(lesson => {
-            const [startH, startM] = lesson.start.split(':').map(Number);
-            const lessonTotalMins = startH * 60 + startM;
-            const diffMins = lessonTotalMins - currentTotalMins;
-
-            if (diffMins === 10) {
-                const title = `⏰ Напоминание о паре`;
-                const body = `Через 10 минут пара по ${lesson.title} (${lesson.type})\nАудитория: ${lesson.room || 'Не указана'}`;
-                
-                new Notification(title, {
-                    body: body,
-                    icon: 'https://img.magnific.com/free-vector/calendar-red-glyph-style_78370-7233.jpg?semt=ais_hybrid&w=740&q=80'
-                });
-            }
-        });
-    }
-
-    setInterval(checkLessonReminders, 60000);
-
     const firebaseConfig = {
         apiKey: "AIzaSyB8Ra6zgICw2Og0-xiIHwyNLxx52aM-Y3s",
         authDomain: "unizarozvrhchat.firebaseapp.com",
@@ -2520,68 +2329,6 @@
         list.scrollTop = list.scrollHeight;
     });
 
-    function openReviewModal() {
-        document.getElementById('review-modal').classList.add('active');
-    }
-
-    function setReviewRating(rating) {
-        selectedRating = rating;
-        const stars = document.querySelectorAll('#star-rating-selector span');
-        stars.forEach((s, idx) => {
-            if (idx < rating) {
-                s.classList.add('active');
-            } else {
-                s.classList.remove('active');
-            }
-        });
-    }
-
-    function sendReview() {
-        const input = document.getElementById('review-text-input');
-        const text = input.value.trim();
-        if (!text) return;
-
-        const authorName = currentUser ? (customNickname || currentUser.displayName) : "Anonym";
-
-        db.ref('reviews').push({
-            author: authorName,
-            rating: selectedRating,
-            text: text,
-            timestamp: Date.now()
-        });
-
-        input.value = '';
-    }
-
-    db.ref('reviews').limitToLast(30).on('value', (snapshot) => {
-        const list = document.getElementById('reviews-list');
-        list.innerHTML = '';
-        const data = snapshot.val();
-
-        if (!data) {
-            list.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding:20px;">Zatiaľ žiadne recenzie. Buďte prvý!</div>';
-            return;
-        }
-
-        const reviewsArr = Object.values(data);
-
-        reviewsArr.reverse().forEach(r => {
-            const item = document.createElement('div');
-            item.className = 'review-item';
-            
-            const starsStr = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-
-            item.innerHTML = `
-                <div class="review-header">
-                    <span class="review-author">${escapeHtml(r.author)}</span>
-                    <span class="review-stars">${starsStr}</span>
-                </div>
-                <div class="review-text">${escapeHtml(r.text)}</div>
-            `;
-            list.appendChild(item);
-        });
-    });
-
     function escapeHtml(text) {
         return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
     }
@@ -2610,7 +2357,7 @@
         renderUnifiedNotes();
     }
 
-    // Отрисовка объединенной ленты по скетчу под кнопками
+    // Отрисовка ленты записей
     function renderUnifiedNotes() {
         const container = document.getElementById('unified-notes-container');
         if (!container) return;
@@ -2694,7 +2441,7 @@
         closeModal('note-modal');
     }
 
-    // --- ПРОДВИНУТАЯ ЛОГИКА ХОЛСТА (Canvas Engine) ---
+    // --- ПРОСТАЯ И СТАБИЛЬНАЯ ЛОГИКА РИСОВАНИЯ (Canvas) ---
     const BASIC_16_COLORS = [
         '#000000', '#ffffff', '#ef4444', '#f97316',
         '#facc15', '#22c55e', '#3b82f6', '#8b5cf6',
@@ -2705,16 +2452,9 @@
     let currentDrawingId = null;
     let currentColor = '#000000';
     let brushSize = 4;
-    let currentTool = 'brush'; // 'brush', 'eraser', 'select'
+    let currentTool = 'brush'; // 'brush', 'eraser'
     let isDrawing = false;
     let canvasCtx = null;
-
-    // Векторные объекты холста (штрихи, текст, картинки)
-    let canvasElements = [];
-    let currentStroke = null;
-    let selectedElementIndex = -1;
-    let isDraggingElement = false;
-    let dragOffsetX = 0, dragOffsetY = 0;
     let canvasWidth = 1000;
     let canvasHeight = 700;
 
@@ -2728,7 +2468,7 @@
             btn.style.backgroundColor = color;
             btn.onclick = () => {
                 currentColor = color;
-                if (currentTool === 'eraser' || currentTool === 'select') setCanvasTool('brush');
+                setCanvasTool('brush');
                 document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
             };
@@ -2740,9 +2480,7 @@
         currentTool = tool;
         document.querySelectorAll('.tool-btn-item').forEach(btn => btn.classList.remove('active'));
         if (tool === 'brush') document.getElementById('btn-tool-brush').classList.add('active');
-        if (tool === 'select') document.getElementById('btn-tool-select').classList.add('active');
         if (tool === 'eraser') document.getElementById('btn-tool-eraser').classList.add('active');
-        redrawCanvas();
     }
 
     function openDrawingModal(id) {
@@ -2760,31 +2498,37 @@
             document.getElementById('drawing-title-input').value = drawing.title || 'Рисунок';
             canvasWidth = drawing.width || 1000;
             canvasHeight = drawing.height || 700;
-            canvasElements = drawing.elements ? JSON.parse(JSON.stringify(drawing.elements)) : [];
-
-            // Восстановление картинок как Image объектов
-            canvasElements.forEach(el => {
-                if (el.type === 'image' && el.src) {
-                    el.imgObj = new Image();
-                    el.imgObj.src = el.src;
-                    el.imgObj.onload = () => redrawCanvas();
-                }
-            });
+            
+            updateCanvasSize();
+            
+            // Загрузка существующего изображения
+            const img = new Image();
+            img.onload = () => {
+                fillCanvasWhite();
+                canvasCtx.drawImage(img, 0, 0);
+            };
+            img.src = drawing.dataUrl;
         } else {
             currentDrawingId = Date.now();
             document.getElementById('drawing-title-input').value = 'Новый рисунок';
             canvasWidth = 1000;
             canvasHeight = 700;
-            canvasElements = [];
+            
+            updateCanvasSize();
+            fillCanvasWhite();
         }
 
-        updateCanvasDimensions();
-        setupCanvasEvents(canvas);
+        setupCanvasListeners(canvas);
         setupPasteAndDropEvents();
-        redrawCanvas();
     }
 
-    function updateCanvasDimensions() {
+    function fillCanvasWhite() {
+        if (!canvasCtx) return;
+        canvasCtx.fillStyle = '#ffffff';
+        canvasCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+    }
+
+    function updateCanvasSize() {
         const canvas = document.getElementById('drawing-canvas');
         const paper = document.getElementById('drawing-paper-wrap');
         canvas.width = canvasWidth;
@@ -2794,78 +2538,25 @@
     }
 
     function expandCanvas(addW, addH) {
+        const canvas = document.getElementById('drawing-canvas');
+        // Сохраняем текщую картинку перед расширением
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvasWidth;
+        tempCanvas.height = canvasHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(canvas, 0, 0);
+
         canvasWidth += addW;
         canvasHeight += addH;
-        updateCanvasDimensions();
-        redrawCanvas();
+        updateCanvasSize();
+        fillCanvasWhite();
+
+        // Перерисовываем обратно
+        canvasCtx.drawImage(tempCanvas, 0, 0);
         saveCurrentDrawingMeta();
     }
 
-    function redrawCanvas() {
-        if (!canvasCtx) return;
-        const canvas = document.getElementById('drawing-canvas');
-
-        // Очистка и белая подложка
-        canvasCtx.fillStyle = '#ffffff';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Отрисовка всех объектов
-        canvasElements.forEach((el, index) => {
-            if (el.type === 'stroke') {
-                if (el.points.length < 2) return;
-                canvasCtx.beginPath();
-                canvasCtx.strokeStyle = el.color;
-                canvasCtx.lineWidth = el.size;
-                canvasCtx.lineCap = 'round';
-                canvasCtx.lineJoin = 'round';
-                canvasCtx.moveTo(el.points[0].x, el.points[0].y);
-                for (let i = 1; i < el.points.length; i++) {
-                    canvasCtx.lineTo(el.points[i].x, el.points[i].y);
-                }
-                canvasCtx.stroke();
-            } else if (el.type === 'text') {
-                canvasCtx.font = `${el.size * 5}px Inter, sans-serif`;
-                canvasCtx.fillStyle = el.color;
-                canvasCtx.fillText(el.text, el.x, el.y);
-            } else if (el.type === 'image' && el.imgObj && el.imgObj.complete) {
-                canvasCtx.drawImage(el.imgObj, el.x, el.y, el.w, el.h);
-            }
-
-            // Выделение выбранного элемента в режиме выбора
-            if (currentTool === 'select' && index === selectedElementIndex) {
-                canvasCtx.save();
-                canvasCtx.strokeStyle = '#f97316';
-                canvasCtx.lineWidth = 2;
-                canvasCtx.setLineDash([6, 4]);
-
-                const bounds = getElementBounds(el);
-                canvasCtx.strokeRect(bounds.x - 4, bounds.y - 4, bounds.w + 8, bounds.h + 8);
-                canvasCtx.restore();
-            }
-        });
-    }
-
-    function getElementBounds(el) {
-        if (el.type === 'stroke') {
-            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-            el.points.forEach(p => {
-                if (p.x < minX) minX = p.x;
-                if (p.y < minY) minY = p.y;
-                if (p.x > maxX) maxX = p.x;
-                if (p.y > maxY) maxY = p.y;
-            });
-            return { x: minX, y: minY, w: maxX - minX || 10, h: maxY - minY || 10 };
-        } else if (el.type === 'text') {
-            const fontSize = el.size * 5;
-            const approxWidth = el.text.length * fontSize * 0.6;
-            return { x: el.x, y: el.y - fontSize, w: approxWidth, h: fontSize };
-        } else if (el.type === 'image') {
-            return { x: el.x, y: el.y, w: el.w, h: el.h };
-        }
-        return { x: 0, y: 0, w: 0, h: 0 };
-    }
-
-    function setupCanvasEvents(canvas) {
+    function setupCanvasListeners(canvas) {
         const getPos = (e) => {
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -2876,155 +2567,83 @@
             };
         };
 
-        canvas.onmousedown = canvas.ontouchstart = (e) => {
-            const pos = getPos(e);
+        const startDraw = (e) => {
             isDrawing = true;
-
-            if (currentTool === 'select') {
-                selectedElementIndex = -1;
-                for (let i = canvasElements.length - 1; i >= 0; i--) {
-                    const bounds = getElementBounds(canvasElements[i]);
-                    if (pos.x >= bounds.x - 5 && pos.x <= bounds.x + bounds.w + 5 &&
-                        pos.y >= bounds.y - 5 && pos.y <= bounds.y + bounds.h + 5) {
-                        selectedElementIndex = i;
-                        isDraggingElement = true;
-                        dragOffsetX = pos.x - bounds.x;
-                        dragOffsetY = pos.y - bounds.y;
-                        break;
-                    }
-                }
-                redrawCanvas();
-                return;
-            }
-
-            if (currentTool === 'eraser') {
-                // Ластик удаляет штрихи/элементы при клике/проводке
-                eraseAtPos(pos);
-                return;
-            }
-
-            if (currentTool === 'brush') {
-                currentStroke = {
-                    type: 'stroke',
-                    color: currentColor,
-                    size: brushSize,
-                    points: [pos]
-                };
-                canvasElements.push(currentStroke);
-                redrawCanvas();
-            }
+            const pos = getPos(e);
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(pos.x, pos.y);
+            
+            canvasCtx.lineWidth = brushSize;
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
+            canvasCtx.strokeStyle = (currentTool === 'eraser') ? '#ffffff' : currentColor;
         };
 
-        canvas.onmousemove = canvas.ontouchmove = (e) => {
+        const moveDraw = (e) => {
             if (!isDrawing) return;
             const pos = getPos(e);
-
-            if (currentTool === 'select' && isDraggingElement && selectedElementIndex >= 0) {
-                const el = canvasElements[selectedElementIndex];
-                const bounds = getElementBounds(el);
-                const dx = pos.x - dragOffsetX - bounds.x;
-                const dy = pos.y - dragOffsetY - bounds.y;
-
-                if (el.type === 'stroke') {
-                    el.points.forEach(p => { p.x += dx; p.y += dy; });
-                } else if (el.type === 'text' || el.type === 'image') {
-                    el.x += dx;
-                    el.y += dy;
-                }
-                redrawCanvas();
-                return;
-            }
-
-            if (currentTool === 'eraser') {
-                eraseAtPos(pos);
-                return;
-            }
-
-            if (currentTool === 'brush' && currentStroke) {
-                currentStroke.points.push(pos);
-                redrawCanvas();
-            }
+            canvasCtx.lineTo(pos.x, pos.y);
+            canvasCtx.stroke();
         };
 
-        canvas.onmouseup = canvas.onmouseleave = canvas.ontouchend = () => {
+        const stopDraw = () => {
             if (isDrawing) {
                 isDrawing = false;
-                isDraggingElement = false;
-                currentStroke = null;
+                canvasCtx.closePath();
                 saveCurrentDrawingMeta();
             }
         };
+
+        canvas.onmousedown = startDraw;
+        canvas.onmousemove = moveDraw;
+        canvas.onmouseup = canvas.onmouseleave = stopDraw;
+
+        canvas.ontouchstart = (e) => { startDraw(e); e.preventDefault(); };
+        canvas.ontouchmove = (e) => { moveDraw(e); e.preventDefault(); };
+        canvas.ontouchend = stopDraw;
     }
 
-    function eraseAtPos(pos) {
-        const radius = brushSize * 2;
-        canvasElements = canvasElements.filter(el => {
-            const bounds = getElementBounds(el);
-            const isInside = pos.x >= bounds.x - radius && pos.x <= bounds.x + bounds.w + radius &&
-                             pos.y >= bounds.y - radius && pos.y <= bounds.y + bounds.h + radius;
-            return !isInside;
-        });
-        redrawCanvas();
-    }
-
-    // Загрузка изображений из файлов и Ctrl+V
     function setupPasteAndDropEvents() {
         const modal = document.getElementById('drawing-modal');
         const paper = document.getElementById('drawing-paper-wrap');
-        const overlay = document.getElementById('canvas-drop-overlay');
 
-        // Ctrl + V вставка
-        window.addEventListener('paste', (e) => {
+        // Вставка по Ctrl + V
+        window.onpaste = (e) => {
             if (!modal.classList.contains('active')) return;
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (let item of items) {
                 if (item.type.indexOf('image') === 0) {
                     const blob = item.getAsFile();
-                    readAndAddImageBlob(blob);
+                    drawBlobToCanvas(blob);
                 }
             }
-        });
+        };
 
-        // Drag and Drop
-        paper.ondragover = (e) => { e.preventDefault(); overlay.style.display = 'flex'; };
-        paper.ondragleave = () => { overlay.style.display = 'none'; };
+        // Перетаскивание файлов
+        paper.ondragover = (e) => e.preventDefault();
         paper.ondrop = (e) => {
             e.preventDefault();
-            overlay.style.display = 'none';
             if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                readAndAddImageBlob(e.dataTransfer.files[0]);
+                drawBlobToCanvas(e.dataTransfer.files[0]);
             }
         };
     }
 
     function handleImageFileUpload(e) {
         if (e.target.files && e.target.files[0]) {
-            readAndAddImageBlob(e.target.files[0]);
+            drawBlobToCanvas(e.target.files[0]);
         }
     }
 
-    function readAndAddImageBlob(blob) {
+    function drawBlobToCanvas(blob) {
         const reader = new FileReader();
         reader.onload = (event) => {
             const img = new Image();
             img.onload = () => {
                 let w = img.width;
                 let h = img.height;
-                if (w > 500) { h = (500 / w) * h; w = 500; } // Автомасштабирование ширины
-
-                const newImgEl = {
-                    type: 'image',
-                    src: event.target.result,
-                    imgObj: img,
-                    x: 50,
-                    y: 50,
-                    w: w,
-                    h: h
-                };
-                canvasElements.push(newImgEl);
-                setCanvasTool('select');
-                selectedElementIndex = canvasElements.length - 1;
-                redrawCanvas();
+                if (w > 500) { h = (500 / w) * h; w = 500; }
+                canvasCtx.drawImage(img, 50, 50, w, h);
                 saveCurrentDrawingMeta();
             };
             img.src = event.target.result;
@@ -3041,48 +2660,25 @@
             let w = img.width || 300;
             let h = img.height || 200;
             if (w > 400) { h = (400 / w) * h; w = 400; }
-
-            const newImgEl = {
-                type: 'image',
-                src: url,
-                imgObj: img,
-                x: 50,
-                y: 50,
-                w: w,
-                h: h
-            };
-            canvasElements.push(newImgEl);
-            setCanvasTool('select');
-            selectedElementIndex = canvasElements.length - 1;
-            redrawCanvas();
+            canvasCtx.drawImage(img, 50, 50, w, h);
             saveCurrentDrawingMeta();
         };
-        img.onerror = () => alert("Не удалось загрузить изображение по этой ссылке.");
+        img.onerror = () => alert("Не удалось загрузить изображение.");
         img.src = url;
     }
 
     function addTextToCanvas() {
         const text = prompt("Введите текст для добавления на холст:");
         if (!text) return;
-        const textEl = {
-            type: 'text',
-            text: text,
-            color: currentColor,
-            size: brushSize,
-            x: 80,
-            y: 100
-        };
-        canvasElements.push(textEl);
-        setCanvasTool('select');
-        selectedElementIndex = canvasElements.length - 1;
-        redrawCanvas();
+        canvasCtx.font = `${brushSize * 5 + 14}px Inter, sans-serif`;
+        canvasCtx.fillStyle = currentColor;
+        canvasCtx.fillText(text, 80, 100);
         saveCurrentDrawingMeta();
     }
 
     function clearCanvas() {
         if (!confirm("Очистить полностью весь холст?")) return;
-        canvasElements = [];
-        redrawCanvas();
+        fillCanvasWhite();
         saveCurrentDrawingMeta();
     }
 
@@ -3092,12 +2688,6 @@
         const title = document.getElementById('drawing-title-input').value.trim() || 'Рисунок';
         const dataUrl = canvas.toDataURL('image/png');
 
-        // Очищаем круговые ссылки для сохранения в JSON
-        const cleanElements = canvasElements.map(el => {
-            const { imgObj, ...rest } = el;
-            return rest;
-        });
-
         let drawings = getDrawingsList();
         const existingIdx = drawings.findIndex(d => String(d.id) === String(currentDrawingId));
         const item = { 
@@ -3105,8 +2695,7 @@
             title, 
             dataUrl, 
             width: canvasWidth, 
-            height: canvasHeight, 
-            elements: cleanElements 
+            height: canvasHeight 
         };
 
         if (existingIdx >= 0) drawings[existingIdx] = item;
@@ -3258,8 +2847,6 @@
     let customMapPoints = [];
     let leafletMap = null;
     let mapMarkers = [];
-    let userLocationMarker = null;
-    let userPulseMarker = null;
 
     db.ref('mapPoints').on('value', (snapshot) => {
         customMapPoints = [];
@@ -3296,28 +2883,6 @@
             localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
             renderAll();
         }
-    }
-
-    function calculateGap(time1, time2) {
-        const [h1, m1] = time1.split(':').map(Number);
-        const [h2, m2] = time2.split(':').map(Number);
-        const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
-        if (diff <= 0) return null;
-        const hrs = Math.floor(diff / 60);
-        const mins = diff % 60;
-        let str = 'okno ';
-        if (hrs > 0) str += `${hrs} h `;
-        if (mins > 0) str += `${mins} min`;
-        return str.trim();
-    }
-
-    function toggleUpcomingExpand() {
-        upcomingExpanded = !upcomingExpanded;
-        const arrow = document.getElementById('upcoming-arrow');
-        if (arrow) {
-            arrow.style.transform = upcomingExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
-        renderUpcomingDay();
     }
 
     function renderUpcomingDay() {
@@ -3416,7 +2981,7 @@
             col.innerHTML = '';
             const dayLessons = schedule.filter(l => l.day === d).sort((a,b) => a.start.localeCompare(b.start));
 
-            dayLessons.forEach((l, idx) => {
+            dayLessons.forEach((l) => {
                 const [sh, sm] = l.start.split(':').map(Number);
                 const [eh, em] = l.end.split(':').map(Number);
 
@@ -3438,626 +3003,17 @@
                     <div style="font-size:0.62rem;">${l.start}–${l.end} | ${escapeHtml(l.room)}</div>
                 `;
                 col.appendChild(card);
-
-                if (idx < dayLessons.length - 1) {
-                    const nextL = dayLessons[idx + 1];
-                    const gapText = calculateGap(l.end, nextL.start);
-                    if (gapText) {
-                        const gapTopPx = topPx + heightPx;
-                        const [nextSh, nextSm] = nextL.start.split(':').map(Number);
-                        const nextTopPx = (nextSh - 7) * 39 + (nextSm / 60) * 39;
-                        const gapHeightPx = nextTopPx - gapTopPx;
-
-                        const gapBox = document.createElement('div');
-                        gapBox.className = 'week-gap-box';
-                        gapBox.style.top = `${gapTopPx}px`;
-                        gapBox.style.height = `${gapHeightPx - 2}px`;
-                        gapBox.innerText = gapText;
-                        col.appendChild(gapBox);
-                    }
-                }
             });
         }
-    }
-
-    // ЛОГИКА КАЛЕНДАРЯ
-    function prevCalMonth() {
-        calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
-        renderCompactCalendar();
-    }
-
-    function nextCalMonth() {
-        calCurrentDate.setMonth(calCurrentDate.getMonth() + 1);
-        renderCompactCalendar();
-    }
-
-    function resetCalToToday() {
-        calCurrentDate = new Date();
-        renderCompactCalendar();
-    }
-
-    function renderCompactCalendar() {
-        const calGrid = document.getElementById('compact-calendar-grid');
-        if (!calGrid) return;
-        calGrid.innerHTML = '';
-
-        const t = translations[currentLang];
-        const daysHeader = t.weekdays_cal || ['Po', 'Ut', 'St', 'Št', 'Pi', 'So', 'Ne'];
-        
-        daysHeader.forEach(d => {
-            const h = document.createElement('div');
-            h.className = 'cal-day-label';
-            h.innerText = d;
-            calGrid.appendChild(h);
-        });
-
-        const todayReal = new Date();
-        const currentYear = calCurrentDate.getFullYear();
-        const currentMonth = calCurrentDate.getMonth();
-
-        const monthNames = t.months;
-        document.getElementById('cal-month-title').innerText = `${monthNames[currentMonth]} ${currentYear}`;
-
-        let firstDayIndex = new Date(currentYear, currentMonth, 1).getDay() - 1;
-        if (firstDayIndex === -1) firstDayIndex = 6;
-
-        const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
-
-        for (let i = firstDayIndex - 1; i >= 0; i--) {
-            const cell = document.createElement('div');
-            cell.className = 'cal-day other-month';
-            cell.innerText = prevMonthDays - i;
-            calGrid.appendChild(cell);
-        }
-
-        for (let day = 1; day <= totalDays; day++) {
-            const cell = document.createElement('div');
-            const isToday = (day === todayReal.getDate() && currentMonth === todayReal.getMonth() && currentYear === todayReal.getFullYear());
-            cell.className = 'cal-day' + (isToday ? ' active' : '');
-            
-            const dayNumSpan = document.createElement('span');
-            dayNumSpan.style.fontSize = '0.75rem';
-            dayNumSpan.style.lineHeight = '1';
-            dayNumSpan.innerText = day;
-            cell.appendChild(dayNumSpan);
-
-            const monthStr = String(currentMonth + 1).padStart(2, '0');
-            const dayStr = String(day).padStart(2, '0');
-            const fullDateStr = `${currentYear}-${monthStr}-${dayStr}`;
-
-            const eventsForDay = calendarEvents.filter(e => e.date === fullDateStr);
-
-            if (eventsForDay.length > 0) {
-                const eventsBox = document.createElement('div');
-                eventsBox.className = 'cal-events-container';
-
-                eventsForDay.forEach(ev => {
-                    const chip = document.createElement('div');
-                    chip.className = `cal-event-chip type-${ev.type || 'study'}`;
-                    chip.innerText = ev.title;
-                    chip.title = `${ev.title} (${ev.timeStart || ''}-${ev.timeEnd || ''})`;
-                    chip.onclick = (e) => {
-                        e.stopPropagation();
-                        openEditCalEventModal(ev.id);
-                    };
-                    eventsBox.appendChild(chip);
-                });
-
-                cell.appendChild(eventsBox);
-            }
-
-            cell.onclick = () => openAddCalEventModal(fullDateStr);
-            calGrid.appendChild(cell);
-        }
-    }
-
-    function openAddCalEventModal(dateStr) {
-        document.getElementById('event-edit-id').value = '';
-        document.getElementById('event-date-str').value = dateStr;
-        document.getElementById('cal-event-modal-title').innerText = translations[currentLang].event_modal_new;
-        document.getElementById('event-title-input').value = '';
-        document.getElementById('event-time-start').value = '09:00';
-        document.getElementById('event-time-end').value = '10:00';
-        document.getElementById('event-type-select').value = 'study';
-        document.getElementById('event-desc-input').value = '';
-        document.getElementById('btn-delete-event').style.display = 'none';
-
-        document.getElementById('cal-event-modal').classList.add('active');
-    }
-
-    function openEditCalEventModal(id) {
-        const ev = calendarEvents.find(e => e.id === id);
-        if (!ev) return;
-
-        document.getElementById('event-edit-id').value = ev.id;
-        document.getElementById('event-date-str').value = ev.date;
-        document.getElementById('cal-event-modal-title').innerText = translations[currentLang].event_modal_edit;
-        document.getElementById('event-title-input').value = ev.title;
-        document.getElementById('event-time-start').value = ev.timeStart || '09:00';
-        document.getElementById('event-time-end').value = ev.timeEnd || '10:00';
-        document.getElementById('event-type-select').value = ev.type || 'study';
-        document.getElementById('event-desc-input').value = ev.desc || '';
-        document.getElementById('btn-delete-event').style.display = 'block';
-
-        document.getElementById('cal-event-modal').classList.add('active');
-    }
-
-    function saveCalEvent(e) {
-        e.preventDefault();
-        const id = document.getElementById('event-edit-id').value;
-        const dateStr = document.getElementById('event-date-str').value;
-        const title = document.getElementById('event-title-input').value.trim();
-        const timeStart = document.getElementById('event-time-start').value;
-        const timeEnd = document.getElementById('event-time-end').value;
-        const type = document.getElementById('event-type-select').value;
-        const desc = document.getElementById('event-desc-input').value.trim();
-
-        if (id) {
-            calendarEvents = calendarEvents.filter(e => e.id !== id);
-            calendarEvents.push({ id, date: dateStr, title, timeStart, timeEnd, type, desc });
-        } else {
-            calendarEvents.push({ id: Date.now().toString(), date: dateStr, title, timeStart, timeEnd, type, desc });
-        }
-
-        localStorage.setItem('uniza_calendar_events', JSON.stringify(calendarEvents));
-        closeModal('cal-event-modal');
-        renderCompactCalendar();
-    }
-
-    function deleteCalEvent() {
-        const id = document.getElementById('event-edit-id').value;
-        if (!id) return;
-        calendarEvents = calendarEvents.filter(e => e.id !== id);
-        localStorage.setItem('uniza_calendar_events', JSON.stringify(calendarEvents));
-        closeModal('cal-event-modal');
-        renderCompactCalendar();
-    }
-
-    const unizaPlacesData = [
-        { name: "🍽️ Nová Menza (Obedy)", start: 7.0, end: 18.0, label: "07:00 – 18:00" },
-        { name: "☕ Bufet Nová Menza", start: 7.0, end: 14.0, label: "07:00 – 14:00" },
-        { name: "🥪 Bufet Budova AR (Veľký Diel)", start: 10.5, end: 14.5, label: "10:30 – 14:30" },
-        { name: "📚 Univerzitná Knižnica UNIZA", start: 8.0, end: 16.0, label: "08:00 – 16:00" },
-        { name: "🏛️ Hlavné Budovy (FRI, AA, AB, AR)", start: 6.0, end: 21.0, label: "06:00 – 21:00" }
-    ];
-
-    function renderOpeningHoursTimeline() {
-        const container = document.getElementById('opening-hours-content');
-        if (!container) return;
-        container.innerHTML = '';
-
-        const now = new Date();
-        const currentHours = now.getHours() + (now.getMinutes() / 60);
-        const nowPercent = (currentHours / 24) * 100;
-
-        unizaPlacesData.forEach(place => {
-            const startPercent = (place.start / 24) * 100;
-            const widthPercent = ((place.end - place.start) / 24) * 100;
-
-            const block = document.createElement('div');
-            block.className = 'schedule-place-block';
-            block.innerHTML = `
-                <div class="place-title-row">
-                    <span class="place-name">${place.name}</span>
-                    <span class="place-hours-text">${place.label}</span>
-                </div>
-                <div class="timeline-bar-container">
-                    <div class="timeline-work-range" style="left: ${startPercent}%; width: ${widthPercent}%;"></div>
-                    <div class="timeline-now-indicator" style="left: ${nowPercent}%;"></div>
-                </div>
-                <div class="timeline-scale-labels">
-                    <span>00:00</span>
-                    <span>06:00</span>
-                    <span>12:00</span>
-                    <span>18:00</span>
-                    <span>24:00</span>
-                </div>
-            `;
-            container.appendChild(block);
-        });
-    }
-
-    function openOpeningHoursModal() {
-        renderOpeningHoursTimeline();
-        document.getElementById('opening-hours-modal').classList.add('active');
-    }
-
-    let hourlyWeatherData = [];
-
-    async function fetchWeather() {
-        const btn = document.getElementById('btn-weather-temp');
-        try {
-            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.2231&longitude=18.7394&current_weather=true&hourly=temperature_2m,weathercode&timezone=Europe%2FBratislava');
-            if (!res.ok) throw new Error("Meteo HTTP error");
-            const data = await res.json();
-
-            if (data && data.hourly) {
-                const now = new Date();
-                hourlyWeatherData = [];
-                const times = data.hourly.time;
-                const temps = data.hourly.temperature_2m;
-                const codes = data.hourly.weathercode;
-
-                for (let i = 0; i < times.length && hourlyWeatherData.length < 24; i++) {
-                    const itemTime = new Date(times[i]);
-                    if (itemTime >= now || (now.getTime() - itemTime.getTime() < 3600000)) {
-                        hourlyWeatherData.push({
-                            timeStr: String(itemTime.getHours()).padStart(2, '0') + ':00',
-                            temp: Math.round(temps[i]),
-                            code: codes[i]
-                        });
-                    }
-                }
-
-                if (data.current_weather && btn) {
-                    btn.innerText = `${Math.round(data.current_weather.temperature)}°C`;
-                }
-            }
-        } catch (e) {
-            generateFallbackWeatherData();
-            if (btn) btn.innerText = `14°C`;
-        }
-    }
-
-    function generateFallbackWeatherData() {
-        hourlyWeatherData = [];
-        const nowH = new Date().getHours();
-        for (let i = 0; i < 24; i++) {
-            const hourVal = (nowH + i) % 24;
-            hourlyWeatherData.push({
-                timeStr: String(hourVal).padStart(2, '0') + ':00',
-                temp: 12 + Math.round(Math.sin(i / 3) * 5),
-                code: 0
-            });
-        }
-    }
-
-    function getWeatherIcon(code) {
-        if (code === 0) return '☀️';
-        if (code >= 1 && code <= 3) return '⛅';
-        if (code >= 45 && code <= 48) return '🌫️';
-        if (code >= 51 && code <= 67) return '🌧️';
-        if (code >= 71 && code <= 77) return '❄️';
-        if (code >= 80 && code <= 82) return '🌦️';
-        if (code >= 95) return '🌩️';
-        return '☀️';
-    }
-
-    function drawWeatherCards() {
-        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
-            generateFallbackWeatherData();
-        }
-
-        const track = document.getElementById('weather-flex-track');
-        if (!track) return;
-        track.innerHTML = '';
-
-        track.style.cssText = `
-            display: flex;
-            gap: 12px;
-            min-width: max-content;
-            align-items: stretch;
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 16px 14px;
-        `;
-
-        const temps = hourlyWeatherData.map(d => d.temp);
-        const minTemp = Math.min(...temps);
-        const maxTemp = Math.max(...temps);
-        const tempRange = maxTemp - minTemp || 1;
-
-        hourlyWeatherData.forEach(item => {
-            const heightPercent = Math.max(20, Math.round(((item.temp - minTemp) / tempRange) * 60 + 25));
-            const icon = getWeatherIcon(item.code);
-
-            const col = document.createElement('div');
-            col.style.cssText = `
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: space-between;
-                width: 52px;
-                height: 140px;
-                flex-shrink: 0;
-            `;
-
-            col.innerHTML = `
-                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">${item.temp}°</span>
-                <div style="font-size: 1.3rem; margin: 4px 0;">${icon}</div>
-                <div style="width: 8px; height: ${heightPercent}%; background: linear-gradient(to top, var(--accent-orange), #fde047); border-radius: 4px; margin: 4px 0;"></div>
-                <span style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">${item.timeStr}</span>
-            `;
-            track.appendChild(col);
-        });
-    }
-
-    function drawWeatherGraph() {
-        if (!hourlyWeatherData || hourlyWeatherData.length === 0) generateFallbackWeatherData();
-        const canvas = document.getElementById('weather-canvas');
-        const wrapper = document.getElementById('weather-canvas-wrapper');
-        if (!canvas || !wrapper) return;
-        const ctx = canvas.getContext('2d');
-        const count = hourlyWeatherData.length;
-        const colWidth = 60;
-        const totalWidth = count * colWidth;
-        const canvasHeight = 220;
-
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = totalWidth * dpr;
-        canvas.height = canvasHeight * dpr;
-        canvas.style.width = totalWidth + 'px';
-        canvas.style.height = canvasHeight + 'px';
-        wrapper.style.width = '100%';
-
-        ctx.scale(dpr, dpr);
-        ctx.clearRect(0, 0, totalWidth, canvasHeight);
-
-        const temps = hourlyWeatherData.map(d => d.temp);
-        let minTemp = Math.min(...temps);
-        let maxTemp = Math.max(...temps);
-        if (minTemp === maxTemp) { minTemp -= 2; maxTemp += 2; }
-        
-        const topMargin = 55;
-        const bottomMargin = 45;
-        const graphHeight = canvasHeight - topMargin - bottomMargin;
-
-        const points = hourlyWeatherData.map((item, idx) => {
-            const x = idx * colWidth + colWidth / 2;
-            const norm = (item.temp - minTemp) / (maxTemp - minTemp);
-            const y = canvasHeight - bottomMargin - (norm * graphHeight);
-            return { x, y, ...item };
-        });
-
-        points.forEach((p) => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
-
-            ctx.font = '600 12px Inter, sans-serif';
-            ctx.fillStyle = '#f0f2f5';
-            ctx.textAlign = 'center';
-            ctx.fillText(`${p.temp}°`, p.x, p.y - 10);
-            ctx.fillText(getWeatherIcon(p.code), p.x, canvasHeight - bottomMargin + 20);
-            ctx.fillText(p.timeStr, p.x, canvasHeight - 8);
-        });
-    }
-
-    function openWeatherModal() {
-        document.getElementById('weather-modal').classList.add('active');
-        drawWeatherCards();
-        setTimeout(drawWeatherGraph, 80);
-    }
-
-    function initMap() {
-        if (leafletMap) return;
-        leafletMap = L.map('map-container').setView([49.2065, 18.7580], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
-        leafletMap.on('contextmenu', function(e) {
-            document.getElementById('map-point-id').value = '';
-            document.getElementById('map-lat').value = e.latlng.lat;
-            document.getElementById('map-lng').value = e.latlng.lng;
-            document.getElementById('map-point-title').value = '';
-            document.getElementById('map-is-admin-check').checked = false;
-            document.getElementById('admin-checkbox-wrapper').style.display = 'block';
-            document.getElementById('map-point-modal').classList.add('active');
-        });
-        renderCustomMapPoints();
-        setTimeout(() => { leafletMap.invalidateSize(); }, 300);
-    }
-
-    function saveMapPoint(e) {
-        e.preventDefault();
-        const id = document.getElementById('map-point-id').value;
-        const title = document.getElementById('map-point-title').value;
-        const cat = document.getElementById('map-point-cat').value;
-        const lat = parseFloat(document.getElementById('map-lat').value);
-        const lng = parseFloat(document.getElementById('map-lng').value);
-        const isAdminRequested = document.getElementById('map-is-admin-check').checked;
-
-        let isAdmin = false;
-        if (id) {
-            const existing = customMapPoints.find(p => p.id === id);
-            isAdmin = existing ? existing.isAdmin : false;
-        } else if (isAdminRequested) {
-            if (prompt("Zadajte heslo pre admin bod:") === "454") isAdmin = true;
-            else { alert("Nesprávne heslo!"); return; }
-        }
-
-        const pointData = { title, cat, lat, lng, isAdmin, timestamp: Date.now() };
-        if (id) db.ref('mapPoints/' + id).set(pointData);
-        else db.ref('mapPoints').push(pointData);
-        closeModal('map-point-modal');
-        document.getElementById('map-point-form').reset();
-    }
-
-    function renderCustomMapPoints() {
-        if (!leafletMap) return;
-        customMapPoints.forEach(p => renderSinglePointOnMap(p));
-    }
-
-    const categoryKeys = [
-        { key: "cat_faculties", defaultName: "🏛️ Fakulty / Univerzita" },
-        { key: "cat_cafe", defaultName: "☕ Kaviareň / Jedlo" },
-        { key: "cat_canteen", defaultName: "🍽️ Menza / Jedáleň" },
-        { key: "cat_study", defaultName: "📚 Štúdium / Ticho" },
-        { key: "cat_print", defaultName: "🖨️ Tlač / Služby" },
-        { key: "cat_fun", defaultName: "🎉 Zábava / Oddych" },
-        { key: "cat_bar", defaultName: "🍻 Bar / Pub / Party" },
-        { key: "cat_sport", defaultName: "🏋️‍♂️ Šport / Fitness" },
-        { key: "cat_dorm", defaultName: "🛏️ Internáty / Ubytovanie" },
-        { key: "cat_groceries", defaultName: "🛒 Potraviny / Obchody" },
-        { key: "cat_parking", defaultName: "🅿️ Parkovanie / MHD" }
-    ];
-
-    let currentModalType = 'admin';
-
-    function openPointsModal(type) {
-        currentModalType = type;
-        renderCategoriesView();
-        document.getElementById('map-points-select-modal').classList.add('active');
-    }
-
-    function renderCategoriesView() {
-        const container = document.getElementById('points-select-container');
-        const titleEl = document.getElementById('points-modal-title');
-        if (!container || !titleEl) return;
-        container.innerHTML = '';
-        const t = translations[currentLang];
-        const isAdminMode = (currentModalType === 'admin');
-        titleEl.innerText = isAdminMode ? t.modal_admin_title : t.modal_student_title;
-
-        categoryKeys.forEach(catObj => {
-            const catLocalizedName = t[catObj.key] || catObj.defaultName;
-            const btn = document.createElement('button');
-            const hasItems = customMapPoints.some(p => !!p.isAdmin === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName));
-            btn.className = 'chip-modal-btn' + (hasItems ? ' has-items' : '');
-            btn.innerHTML = `<span>${catLocalizedName}</span>`;
-            btn.onclick = () => renderPointsViewForCategory(catObj);
-            container.appendChild(btn);
-        });
-    }
-
-    function renderPointsViewForCategory(catObj) {
-        const container = document.getElementById('points-select-container');
-        const titleEl = document.getElementById('points-modal-title');
-        container.innerHTML = '';
-        const t = translations[currentLang];
-        const catLocalizedName = t[catObj.key] || catObj.defaultName;
-        const isAdminMode = (currentModalType === 'admin');
-        titleEl.innerHTML = `<button onclick="renderCategoriesView()" style="background:none; border:none; color:var(--accent-orange); cursor:pointer; font-weight:700; margin-right:8px;">${t.back_btn}</button> ${escapeHtml(catLocalizedName)}`;
-
-        const filteredPoints = customMapPoints.filter(p => !!p.isAdmin === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName));
-        filteredPoints.forEach(p => {
-            const btn = document.createElement('button');
-            btn.className = 'chip-modal-btn';
-            btn.innerHTML = `<span>📍 ${escapeHtml(p.title)}</span>`;
-            btn.onclick = () => { focusBuilding(p.lat, p.lng); closeModal('map-points-select-modal'); };
-            container.appendChild(btn);
-        });
-    }
-
-    function renderSinglePointOnMap(p) {
-        if (!leafletMap) return;
-        const t = translations[currentLang];
-        let marker = p.isAdmin ? L.marker([p.lat, p.lng], { icon: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }) }).addTo(leafletMap) : L.marker([p.lat, p.lng]).addTo(leafletMap);
-
-        marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br><b>${escapeHtml(p.title)}</b><div style="margin-top:6px; display:flex; gap:6px;"><button onclick="editCustomPoint('${p.id}')" style="background:#3b82f6; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;">${t.edit_btn}</button><button onclick="deleteCustomPoint('${p.id}')" style="background:#ef4444; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;">${t.delete_btn}</button></div>`);
-        mapMarkers.push(marker);
-    }
-
-    window.editCustomPoint = function(id) {
-        const point = customMapPoints.find(p => p.id === id);
-        if (!point) return;
-        if (point.isAdmin && prompt("Heslo:") !== "454") { alert("Chyba!"); return; }
-        document.getElementById('map-point-id').value = point.id;
-        document.getElementById('map-lat').value = point.lat;
-        document.getElementById('map-lng').value = point.lng;
-        document.getElementById('map-point-title').value = point.title;
-        document.getElementById('map-point-cat').value = point.cat;
-        document.getElementById('admin-checkbox-wrapper').style.display = 'none';
-        document.getElementById('map-point-modal').classList.add('active');
-    };
-
-    window.deleteCustomPoint = function(id) {
-        const point = customMapPoints.find(p => p.id === id);
-        if (!point) return;
-        if (point.isAdmin && prompt("Heslo 454:") !== "454") { alert("Chyba!"); return; }
-        db.ref('mapPoints/' + id).remove();
-    };
-
-    function locateUser() {
-        if (!leafletMap) initMap();
-        if (!navigator.geolocation) return;
-        navigator.geolocation.getCurrentPosition((pos) => {
-            const { latitude: lat, longitude: lng } = pos.coords;
-            leafletMap.setView([lat, lng], 17);
-            if (userLocationMarker) leafletMap.removeLayer(userLocationMarker);
-            userLocationMarker = L.marker([lat, lng], { icon: L.divIcon({ className: 'user-dot-marker', iconSize: [16, 16], iconAnchor: [8, 8] }) }).addTo(leafletMap);
-        });
-    }
-
-    function focusBuilding(lat, lng) {
-        if (!leafletMap) initMap();
-        leafletMap.setView([lat, lng], 18);
-    }
-
-    function openAddModal() {
-        document.getElementById('edit-id').value = '';
-        document.getElementById('lesson-form').reset();
-        document.getElementById('btn-delete-lesson').style.display = 'none';
-        document.getElementById('lesson-modal').classList.add('active');
-    }
-
-    function openEditModal(id) {
-        const item = schedule.find(l => l.id === id);
-        if (!item) return;
-        document.getElementById('edit-id').value = item.id;
-        document.getElementById('form-day').value = item.day;
-        document.getElementById('form-title').value = item.title;
-        document.getElementById('form-type').value = item.type;
-        document.getElementById('form-start').value = item.start;
-        document.getElementById('form-end').value = item.end;
-        document.getElementById('form-teacher').value = item.teacher || '';
-        document.getElementById('form-room').value = item.room || '';
-        document.getElementById('btn-delete-lesson').style.display = 'block';
-        document.getElementById('lesson-modal').classList.add('active');
     }
 
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    function saveLesson(e) {
-        e.preventDefault();
-        const startVal = document.getElementById('form-start').value;
-        const endVal = document.getElementById('form-end').value;
-        const dayVal = parseInt(document.getElementById('form-day').value);
-        const id = document.getElementById('edit-id').value;
-
-        if (startVal >= endVal) { alert("Začiatok musí byť skôr ako koniec!"); return; }
-
-        const newLesson = {
-            id: id || Date.now().toString(),
-            day: dayVal,
-            title: document.getElementById('form-title').value,
-            type: document.getElementById('form-type').value,
-            start: startVal,
-            end: endVal,
-            teacher: document.getElementById('form-teacher').value,
-            room: document.getElementById('form-room').value
-        };
-
-        if (id) {
-            const idx = schedule.findIndex(l => l.id === id);
-            schedule[idx] = newLesson;
-        } else {
-            schedule.push(newLesson);
-        }
-
-        localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
-        closeModal('lesson-modal');
-        renderAll();
-    }
-
-    function deleteLesson() {
-        const id = document.getElementById('edit-id').value;
-        if (!id) return;
-        schedule = schedule.filter(l => l.id !== id);
-        localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
-        closeModal('lesson-modal');
-        renderAll();
-    }
-
     function renderAll() {
         renderUpcomingDay();
         renderWeekGrid();
-        renderCompactCalendar();
         loadLessonNotes();
         renderUnifiedNotes();
-        fetchWeather();
-        initMap();
         applyTranslations();
     }
 
