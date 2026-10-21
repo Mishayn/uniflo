@@ -708,7 +708,7 @@
         .clock-time { font-size: 1.45rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .clock-date { font-size: 0.72rem; color: var(--text-secondary); }
 
-        /* СТИЛИ ДЛЯ ВИЗУАЛЬНОГО ТАЙМЛАЙНА ГРАФИКА РАБОТЫ */
+        /* СТИЛИ ВИЗУАЛЬНОГО ТАЙМЛАЙНА ГРАФИКА РАБОТЫ */
         .schedule-place-block {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
@@ -769,14 +769,35 @@
             margin-top: 4px;
         }
 
-        /* ЕДИНЫЙ КРАСИВЫЙ СТИЛЬ ДЛЯ CANVAS ГРАФИКА ПОГОДЫ */
-        .weather-scroll-box {
+        /* СТИЛИ ГРАФИКА ПОГОДЫ С СКРОЛЛОМ */
+        .weather-graph-scroll-container {
             width: 100%;
+            max-width: 100%;
             overflow-x: auto;
+            overflow-y: hidden;
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 12px;
+            padding: 16px 12px;
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+        .weather-graph-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        .weather-graph-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        /* Управление видимостью версий погоды для ПК и мобильных */
+        .desktop-weather-view { display: block; }
+        .mobile-weather-view { display: none; }
+
+        @media (max-width: 1199px) {
+            .desktop-weather-view { display: none; }
+            .mobile-weather-view { display: block; }
         }
 
         .notes-container {
@@ -1134,7 +1155,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
                     </svg>
                 </button>
                 <div class="lang-menu" id="lang-menu">
@@ -1278,7 +1299,7 @@
 
                 <div id="screen-kalendar" class="screen active" style="margin-top: 15px;">
                     <div class="dash-card">
-                        <!-- Шапка часов с кнопками -->
+                        <!-- Шапка с часами и двумя квадратными кнопками по бокам -->
                         <div class="clock-container">
                             <button class="clock-side-btn" onclick="openOpeningHoursModal()" title="Otváracie hodiny / График работы">⏰</button>
                             <div class="clock-box">
@@ -1288,7 +1309,7 @@
                             <button class="clock-side-btn" id="btn-weather-temp" onclick="openWeatherModal()" title="Predpoveď počasia / Прогноз погоды">--°</button>
                         </div>
                         
-                        <!-- Шапка календаря -->
+                        <!-- Шапка календаря с переключением месяцев -->
                         <div class="cal-nav-bar">
                             <div class="section-title" data-i18n="calendar">Kalendár</div>
                             <div class="cal-nav-btns">
@@ -1404,7 +1425,7 @@
     </nav>
 </div>
 
-<!-- Modal Opening Hours -->
+<!-- Modal Opening Hours (Визуальный таймлайн графика работы) -->
 <div class="modal-overlay" id="opening-hours-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1415,20 +1436,32 @@
     </div>
 </div>
 
-<!-- Modal Weather (Единое красивое модальное окно с Canvas графиком для ПК и телефонов) -->
+<!-- Modal Weather (Комбинированный: карточки для ПК, Canvas для мобильных) -->
 <div class="modal-overlay" id="weather-modal">
-    <div class="modal" style="max-width: 680px;">
+    <div class="modal" style="max-width: 650px;">
         <div class="modal-header">
             <div class="modal-title" data-i18n="weather_title">☀️ Počasie Žilina (24 hodín)</div>
             <button class="close-btn" onclick="closeModal('weather-modal')">&times;</button>
         </div>
         
-        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-align: right;" data-i18n="weather_scroll_hint">
-            ↔ Posúvajte pre zobrazenie celého dňa
+        <!-- Версия для ПК: карточки со скроллом -->
+        <div class="desktop-weather-view">
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-align: right;" data-i18n="weather_scroll_hint">
+                ↔ Posúvajte pre zobrazenie celého dňa
+            </div>
+            <div class="weather-graph-scroll-container">
+                <div id="weather-flex-track" style="display: flex; gap: 8px; min-width: max-content; align-items: stretch;"></div>
+            </div>
         </div>
 
-        <div class="weather-scroll-box" id="weather-canvas-wrapper">
-            <canvas id="weather-canvas"></canvas>
+        <!-- Версия для мобильных: Canvas график -->
+        <div class="mobile-weather-view">
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-align: right;" data-i18n="weather_scroll_hint">
+                ↔ Posúvajte pre zobrazenie celého dňa
+            </div>
+            <div class="weather-graph-scroll-container" id="weather-canvas-wrapper">
+                <canvas id="weather-canvas" style="display: block;"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -1513,7 +1546,7 @@
     </div>
 </div>
 
-<!-- Modal for Note Creation/Editing -->
+<!-- Modal for Note Creation/Editing (Обычные заметки) -->
 <div class="modal-overlay" id="note-modal">
     <div class="modal">
         <div class="modal-header">
@@ -1536,7 +1569,7 @@
     </div>
 </div>
 
-<!-- Integrovaný UniFlo Notes editor -->
+<!-- Integrovaný UniFlo Notes editor (Новые заметки) -->
 <div class="modal-overlay" id="lesson-notes-modal" onclick="if(event.target===this)closeModal('lesson-notes-modal')">
   <div class="modal notes-modal" role="dialog" aria-modal="true" aria-label="UniFlo Notes">
     <div class="notes-modal-header"><div class="modal-title">📝 UniFlo Notes</div><button class="close-btn" onclick="closeModal('lesson-notes-modal')" aria-label="Zavrieť">&times;</button></div>
@@ -1554,7 +1587,7 @@
             <button type="button" onclick="formatLessonNote('italic')" title="Kurzíva"><i>I</i></button>
             <button type="button" onclick="formatLessonNote('underline')" title="Podčiarknuté"><u>U</u></button>
             <select aria-label="Písmo" onchange="changeLessonNoteFont(this.value)"><option value="">Písmo</option><option>Arial</option><option>Verdana</option><option>Georgia</option><option>Courier New</option><option>Times New Roman</option></select>
-            <select aria-label="Veľkosť písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
+            <select aria-label="Veľkość písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
             <input type="color" aria-label="Farba textu" value="#f0f2f5" onchange="changeLessonNoteColor(this.value)">
           </div>
         </div>
@@ -1625,7 +1658,7 @@
     </div>
 </div>
 
-<!-- Modal for Map Point -->
+<!-- Modal for Map Point (Create / Edit) -->
 <div class="modal-overlay" id="map-point-modal">
     <div class="modal">
         <div class="modal-header">
@@ -2068,7 +2101,7 @@
             opening_hours_title: "⏰ Графік роботи UNIZA",
             weather_title: "☀️ Погода у Жилині (24 години)",
             weather_scroll_hint: "↔ Гортайте вбік для перегляду 24 годин",
-            months: ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудня"],
+            months: ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"],
             weekdays_clock: ["Неділя", "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота"],
             weekdays_cal: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"]
         }
@@ -2420,7 +2453,7 @@
         closeModal('note-modal');
     }
 
-    // --- Редактор UniFlo Notes ---
+    // --- Расширенный редактор UniFlo Notes (новые заметки) ---
     const LESSON_NOTE_SUBJECTS = [
         'MPI - Prednáška','MPI - Cvičenie','API - Prednáška','API - Cvičenie',
         'MAT1 - Prednáška','MAT1 - Cvičenie','PZA - Prednáška','PZA - Laboratórne',
@@ -2485,7 +2518,7 @@
         note.lesson = document.getElementById('lesson-note-subject').value;
         note.content = document.getElementById('lesson-note-editor').innerHTML;
         persistLessonNotes(); renderLessonNotes();
-        document.getElementById('lesson-notes-status').textContent = 'Automatically uložené';
+        document.getElementById('lesson-notes-status').textContent = 'Automaticky uložené';
     }
 
     function deleteLessonNote() {
@@ -2901,7 +2934,7 @@
         renderCompactCalendar();
     }
 
-    // ТАЙМЛАЙН ГРАФИКА РАБОТЫ МЕСТ UNIZA
+    // ЛОГИКА ТАЙМЛАЙНА ГРАФИКА РАБОТЫ МЕСТ UNIZA
     const unizaPlacesData = [
         { name: "🍽️ Nová Menza (Obedy)", start: 7.0, end: 18.0, label: "07:00 – 18:00" },
         { name: "☕ Bufet Nová Menza", start: 7.0, end: 14.0, label: "07:00 – 14:00" },
@@ -2951,7 +2984,7 @@
         document.getElementById('opening-hours-modal').classList.add('active');
     }
 
-    // ПОГОДА: ПОЛНОСТЬЮ КРАСИВЫЙ CANVAS-ГРАФИК С ТОЧНЫМИ ТЕМПЕРАТУРАМИ
+    // ПОГОДА: Комбинированная логика
     let hourlyWeatherData = [];
 
     async function fetchWeather() {
@@ -2986,7 +3019,7 @@
         } catch (e) {
             console.warn('Open-Meteo failed, generating fallback...', e);
             generateFallbackWeatherData();
-            if (btn) btn.innerText = `8°C`;
+            if (btn) btn.innerText = `14°C`;
         }
     }
 
@@ -2997,7 +3030,7 @@
             const hourVal = (nowH + i) % 24;
             hourlyWeatherData.push({
                 timeStr: String(hourVal).padStart(2, '0') + ':00',
-                temp: 6 + Math.round(Math.sin(i / 3) * 5),
+                temp: 12 + Math.round(Math.sin(i / 3) * 5),
                 code: 0
             });
         }
@@ -3014,19 +3047,63 @@
         return '☀️';
     }
 
-    // РИСОВАНИЕ ПЛАВНОГО КРАСИВОГО ГРАФИКА
-    function drawWeatherGraph() {
-        const canvas = document.getElementById('weather-canvas');
-        const wrapper = document.getElementById('weather-canvas-wrapper');
-        if (!canvas || !wrapper) return;
-
+    // Отрисовка HTML-карточек для ПК
+    function drawWeatherCards() {
         if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
             generateFallbackWeatherData();
         }
 
+        const track = document.getElementById('weather-flex-track');
+        if (!track) return;
+        track.innerHTML = '';
+
+        const temps = hourlyWeatherData.map(d => d.temp);
+        const minTemp = Math.min(...temps);
+        const maxTemp = Math.max(...temps);
+        const tempRange = maxTemp - minTemp || 1;
+
+        hourlyWeatherData.forEach(item => {
+            const heightPercent = Math.max(20, Math.round(((item.temp - minTemp) / tempRange) * 60 + 25));
+            const icon = getWeatherIcon(item.code);
+
+            const col = document.createElement('div');
+            col.style.cssText = `
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+                width: 58px;
+                height: 150px;
+                background: var(--bg-main);
+                border: 1px solid var(--border-color);
+                border-radius: 10px;
+                padding: 12px 4px;
+                flex-shrink: 0;
+            `;
+
+            col.innerHTML = `
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary);">${item.temp}°</span>
+                <div style="font-size: 1.3rem; margin: 4px 0;">${icon}</div>
+                <div style="width: 8px; height: ${heightPercent}%; background: linear-gradient(to top, var(--accent-orange), #fde047); border-radius: 4px; margin: 4px 0;"></div>
+                <span style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">${item.timeStr}</span>
+            `;
+            track.appendChild(col);
+        });
+    }
+
+    // Отрисовка Canvas графика для мобильных устройств
+    function drawWeatherGraph() {
+        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
+            generateFallbackWeatherData();
+        }
+
+        const canvas = document.getElementById('weather-canvas');
+        const wrapper = document.getElementById('weather-canvas-wrapper');
+        if (!canvas || !wrapper) return;
+
         const ctx = canvas.getContext('2d');
         const count = hourlyWeatherData.length;
-        const colWidth = 65;
+        const colWidth = 60;
         const totalWidth = count * colWidth;
         const canvasHeight = 220;
 
@@ -3035,6 +3112,7 @@
         canvas.height = canvasHeight * dpr;
         canvas.style.width = totalWidth + 'px';
         canvas.style.height = canvasHeight + 'px';
+        wrapper.style.width = '100%';
 
         ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, totalWidth, canvasHeight);
@@ -3042,17 +3120,9 @@
         const temps = hourlyWeatherData.map(d => d.temp);
         let minTemp = Math.min(...temps);
         let maxTemp = Math.max(...temps);
+        if (minTemp === maxTemp) { minTemp -= 2; maxTemp += 2; }
         
-        // Исправленный расчет: гарантируем точный диапазон независимо от высоты температур (даже ниже 10°)
-        if (minTemp === maxTemp) { 
-            minTemp -= 2; 
-            maxTemp += 2; 
-        } else {
-            minTemp -= 1;
-            maxTemp += 1;
-        }
-
-        const topMargin = 50;
+        const topMargin = 55;
         const bottomMargin = 45;
         const graphHeight = canvasHeight - topMargin - bottomMargin;
 
@@ -3063,19 +3133,17 @@
             return { x, y, ...item };
         });
 
-        // Вертикальные линии
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
         ctx.lineWidth = 1;
         points.forEach(p => {
             ctx.beginPath();
             ctx.setLineDash([4, 4]);
-            ctx.moveTo(p.x, 15);
-            ctx.lineTo(p.x, canvasHeight - bottomMargin + 8);
+            ctx.moveTo(p.x, 20);
+            ctx.lineTo(p.x, canvasHeight - bottomMargin + 10);
             ctx.stroke();
             ctx.setLineDash([]);
         });
 
-        // Плавный градиент под линией
         const gradient = ctx.createLinearGradient(0, topMargin, 0, canvasHeight - bottomMargin);
         gradient.addColorStop(0, 'rgba(249, 115, 22, 0.35)');
         gradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
@@ -3096,7 +3164,6 @@
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        // Оранжевая плавная линия
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
         for (let i = 0; i < points.length - 1; i++) {
@@ -3110,7 +3177,6 @@
         ctx.lineCap = 'round';
         ctx.stroke();
 
-        // Белые точки, значения температур, иконки и часы
         points.forEach((p) => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
@@ -3138,11 +3204,11 @@
     function openWeatherModal() {
         const modal = document.getElementById('weather-modal');
         modal.classList.add('active');
-
-        // Небольшая задержка, чтобы окно точно появилось на ПК перед отрисовкой
+        
+        drawWeatherCards();
         setTimeout(() => {
             drawWeatherGraph();
-        }, 50);
+        }, 80);
     }
 
     function initMap() {
