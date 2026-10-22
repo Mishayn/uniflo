@@ -26,9 +26,15 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Расчет времени: старт в часах, длительность в часах (каждый час = 60 минут)
+// Официальная сетка времени UNIZA (начало каждого часа с шагом в 1 час)
+// Каждое занятие начинается в ровный час (7:00, 8:00, 9:00 и т.д.)
 function calculateTimes(startHour, durationHours) {
+    // Начало пары
     const startMins = startHour * 60;
+    
+    // Длительность по вашей системе: 
+    // 1 час = 50 мин урока + 10 мин перемена = 60 мин общего времени на сетке
+    // 2 часа (1.5 часа чистых) = 90-100 мин -> занимает 1.5 - 2 деления сетки
     const totalDurationMins = Math.round(durationHours * 60);
     const endMins = startMins + totalDurationMins;
 
@@ -58,65 +64,86 @@ app.get('/api/schedule/:group', async (req, res) => {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
 
-        // Корректная кодировка для словацкой базы данных
+        // Корректная кодировка для словацкого сайта
         let htmlContent = iconv.decode(Buffer.from(response.data), 'win1250');
         const $ = cheerio.load(htmlContent);
         const result = [];
 
-        // Проходим по каждой строке дня недели
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
-            // Внутри каждой строки дня ячейки таблицы (td) идут строго по порядку часов с 7:00
-            let currentHour = 7;
+            $(this).find("span[class^='rozvrh_bloky']").each(function () {
+                const $block =$(this);
+                const styleAttr = $block.attr('style') || '';
+                const $td =$block.closest('td, th, div');
+                const parentStyle = $td.attr('style') || '';
+                const combinedStyle = styleAttr + ";" + parentStyle;
 
-            $(this).find("td").each(function () {
-                const $td =$(this);
-                const colspan = parseInt($td.attr('colspan') || '1', 10);
+                const links = $block.find("a");
                 
-                // Ищем блок занятия внутри этой ячейки
-                const $block =$td.find("span[class^='rozvrh_bloky']");
+                if (links.length >= 3) {
+                    const teacher = removeDiacritics($(links[0]).text().trim());
+                    const room = removeDiacritics($(links[1]).text().trim());
+                    const title = removeDiacritics($(links[2]).text().trim());
 
-                if ($block.length > 0) {
-                    const links = $block.find("a");
-                    
-                    if (links.length >= 3) {
-                        const teacher = removeDiacritics($(links[0]).text().trim());
-                        const room = removeDiacritics($(links[1]).text().trim());
-                        const title = removeDiacritics($(links[2]).text().trim());
+                    // Тип занятия (C, P, L)
+                    let type = "prednáška";
+                    const blockText = removeDiacritics($block.text().trim());
+                    const firstChar = blockText.charAt(0).toUpperCase();
 
-                        // Тип занятия (C, P, L)
-                        let type = "prednáška";
-                        const blockText = removeDiacritics($block.text().trim());
-                        const firstChar = blockText.charAt(0).toUpperCase();
-
-                        if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
-                            type = "cvičenie";
-                        } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
-                            type = "laboratórne";
-                        } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
-                            type = "prednáška";
-                        }
-
-                        // ВРЕМЯ ИЗ БАЗЫ: Начало = текущий час в строке, Длительность = colspan ячейки
-                        const timeSlot = calculateTimes(currentHour, colspan);
-
-                        result.push({
-                            id: Math.random().toString(36).substring(2, 11),
-                            day: dayNum,
-                            title: title,
-                            type: type,
-                            start: timeSlot.start,
-                            end: timeSlot.end,
-                            teacher: teacher,
-                            room: room
-                        });
+                    if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
+                        type = "cvičenie";
+                    } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
+                        type = "laboratórne";
+                    } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
+                        type = "prednáшка";
                     }
-                }
 
-                // Сдвигаем текущий часовой указатель на количество пройденных ячеек (часов)
-                currentHour += colspan;
+                    // Считаем час начала и длительность по пикселям сетки UNIZA
+                    // На UNIZA 1 час шкалы = примерно 50-60 пикселей отступа (left)
+                    let startHour = 7;
+                    let durationHours = 2; // По умолчанию пара идет 2 часа (например, 9:00 - 10:30)
+
+                    const leftMatch = combinedStyle.match(/left:\s*([-\d.]+)px/i);
+                    const widthMatch = combinedStyle.match(/width:\s*([-\d.]+)px/i);
+
+                    if (leftMatch && widthMatch) {
+                        const leftPx = parseFloat(leftMatch[1]);
+                        const widthPx = parseFloat(widthMatch[1]);
+
+                        // 1 колонка часов на сайте = 50px (или около того)
+                        const pxPerCell = 50; 
+                        startHour = 7 + Math.round(leftPx / pxPerCell);
+                        
+                        // Длительность в часах сетки
+                        durationHours = widthPx / pxPerCell;
+                    } else {
+                        // Запасной вариант по порядковому номеру ячейки
+                        const tdIndex = $td.index();
+                        if (tdIndex > 0) {
+                            startHour = 7 + (tdIndex - 1);
+                        }
+                    }
+
+                    // Корректируем длительность, если она выбивается из разумных пределов (от 1 до 4 часов)
+                    if (durationHours < 0.5 || durationHours > 5) {
+                        durationHours = 2; 
+                    }
+
+                    const timeSlot = calculateTimes(startHour, durationHours);
+
+                    result.push({
+                        id: Math.random().toString(36).substring(2, 11),
+                        day: dayNum,
+                        title: title,
+                        type: type,
+                        start: timeSlot.start,
+                        end: timeSlot.end,
+                        teacher: teacher,
+                        room: room
+                    });
+                }
             });
         });
 
