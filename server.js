@@ -26,15 +26,9 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Официальная сетка времени UNIZA (начало каждого часа с шагом в 1 час)
-// Каждое занятие начинается в ровный час (7:00, 8:00, 9:00 и т.д.)
+// Расчет времени по часам и длительности
 function calculateTimes(startHour, durationHours) {
-    // Начало пары
     const startMins = startHour * 60;
-    
-    // Длительность по вашей системе: 
-    // 1 час = 50 мин урока + 10 мин перемена = 60 мин общего времени на сетке
-    // 2 часа (1.5 часа чистых) = 90-100 мин -> занимает 1.5 - 2 деления сетки
     const totalDurationMins = Math.round(durationHours * 60);
     const endMins = startMins + totalDurationMins;
 
@@ -73,14 +67,21 @@ app.get('/api/schedule/:group', async (req, res) => {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
+            // Накопительный счетчик пикселей слева для этой строки дня. 
+            // Начинаем с 0 пикселей (что соответствует 7:00 утра).
+            let accumulatedLeftPx = 0;
+
             $(this).find("span[class^='rozvrh_bloky']").each(function () {
                 const $block =$(this);
-                const styleAttr = $block.attr('style') || '';
-                const $td =$block.closest('td, th, div');
-                const parentStyle = $td.attr('style') || '';
-                const combinedStyle = styleAttr + ";" + parentStyle;
-
+                const styleAttr = $block.attr('style'] \vert{}\vert{}$block.attr('style') || '';
                 const links = $block.find("a");
+
+                // Извлекаем ширину блока из стиля (например, "width: 61px;")
+                let blockWidthPx = 61; // по умолчанию 1 час
+                const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
+                if (widthMatch) {
+                    blockWidthPx = parseFloat(widthMatch[1]);
+                }
                 
                 if (links.length >= 3) {
                     const teacher = removeDiacritics($(links[0]).text().trim());
@@ -97,39 +98,19 @@ app.get('/api/schedule/:group', async (req, res) => {
                     } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
                         type = "laboratórne";
                     } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
-                        type = "prednáшка";
+                        type = "prednáška";
                     }
 
-                    // Считаем час начала и длительность по пикселям сетки UNIZA
-                    // На UNIZA 1 час шкалы = примерно 50-60 пикселей отступа (left)
-                    let startHour = 7;
-                    let durationHours = 2; // По умолчанию пара идет 2 часа (например, 9:00 - 10:30)
+                    // 1 колонка на сайте UNIZA = ровно 61 пиксель = 1 час
+                    const pxPerCell = 61;
 
-                    const leftMatch = combinedStyle.match(/left:\s*([-\d.]+)px/i);
-                    const widthMatch = combinedStyle.match(/width:\s*([-\d.]+)px/i);
+                    // Вычисляем час начала на основе того, сколько пикселей пройдено слева от начала дня
+                    let startHour = 7 + Math.round(accumulatedLeftPx / pxPerCell);
+                    let durationHours = blockWidthPx / pxPerCell;
 
-                    if (leftMatch && widthMatch) {
-                        const leftPx = parseFloat(leftMatch[1]);
-                        const widthPx = parseFloat(widthMatch[1]);
-
-                        // 1 колонка часов на сайте = 50px (или около того)
-                        const pxPerCell = 50; 
-                        startHour = 7 + Math.round(leftPx / pxPerCell);
-                        
-                        // Длительность в часах сетки
-                        durationHours = widthPx / pxPerCell;
-                    } else {
-                        // Запасной вариант по порядковому номеру ячейки
-                        const tdIndex = $td.index();
-                        if (tdIndex > 0) {
-                            startHour = 7 + (tdIndex - 1);
-                        }
-                    }
-
-                    // Корректируем длительность, если она выбивается из разумных пределов (от 1 до 4 часов)
-                    if (durationHours < 0.5 || durationHours > 5) {
-                        durationHours = 2; 
-                    }
+                    // Защита от багов
+                    if (isNaN(startHour) || startHour < 7 || startHour > 19) startHour = 7;
+                    if (isNaN(durationHours) || durationHours < 0.5 || durationHours > 6) durationHours = 2;
 
                     const timeSlot = calculateTimes(startHour, durationHours);
 
@@ -144,6 +125,10 @@ app.get('/api/schedule/:group', async (req, res) => {
                         room: room
                     });
                 }
+
+                // Сдвигаем накопленный отступ на ширину текущего элемента 
+                // (даже если это пустой промежуток или блок без ссылок, он учитывается в сетке)
+                accumulatedLeftPx += blockWidthPx;
             });
         });
 
