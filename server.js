@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const cheerio = require('cheerio');
+const cheerio =ريخ = require('cheerio'); // исправлено
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,20 +9,22 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Функция для очистки словацких спецсимволов (чтобы не было битых знаков )
+// Функция надежной очистки словацких символов без знаков вопроса
 function removeDiacritics(str) {
     if (!str) return '';
     return str
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .replace(/ä/g, 'a').replace(/Ä/g, 'A')
-        .replace(/ô/g, 'o').replace(/Ô/g, 'O')
+        .replace(/[čČ]/g, 'c').replace(/[šŠ]/g, 's').replace(/[žŽ]/g, 'z')
+        .replace(/[ťŤ]/g, 't').replace(/[ďĎ]/g, 'd').replace(/[ňŇ]/g, 'n')
+        .replace(/[áÁàÀâÂäÄ]/g, 'a').replace(/[éÉèÈêÊëË]/g, 'e')
+        .replace(/[íÍìÌîÎïÏ]/g, 'i').replace(/[óÓòÒôÔöÖ]/g, 'o')
+        .replace(/[úÚùÙûÛüÜ]/g, 'u').replace(/[ýÝýÝ]/g, 'y')
         .replace(/ľ/g, 'l').replace(/Ľ/g, 'L')
         .replace(/ĺ/g, 'l').replace(/Ĺ/g, 'L')
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Превращает минуты от начала суток в формат "HH:MM"
 function minutesToTime(totalMinutes) {
     const hours = Math.floor(totalMinutes / 60);
     const mins = Math.round(totalMinutes % 60);
@@ -30,11 +32,7 @@ function minutesToTime(totalMinutes) {
 }
 
 app.get('/api/status', (req, res) => {
-    res.json({ 
-        status: 'online', 
-        message: 'UniFlo Backend работает успешно!',
-        timestamp: new Date().toISOString()
-    });
+    res.json({ status: 'online', message: 'UniFlo Backend работает успешно!' });
 });
 
 app.get('/api/schedule/:group', async (req, res) => {
@@ -42,65 +40,98 @@ app.get('/api/schedule/:group', async (req, res) => {
         const group = req.params.group.toUpperCase();
         const url = `https://vzdelavanie.uniza.sk/vzdelavanie/rozvrh2.php?sq=2&id=${group}`;
 
+        // Запрашиваем страницу в правильной кодировке windows-1250 / utf-8
         const response = await axios.get(url, {
+            responseType: 'arraybuffer',
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
-        
-        const $ = cheerio.load(response.data);
+
+        // Декодируем буфер в текст (на сайте UNIZA используется windows-1250)
+        let htmlContent = '';
+        try {
+            const iconv = require('iconv-lite');
+            htmlContent = iconv.decode(Buffer.from(response.data), 'win1250');
+        } catch (e) {
+            htmlContent = Buffer.from(response.data).toString('utf8');
+        }
+
+        const $ = cheerio.load(htmlContent);
         const result = [];
 
-        // Каждый день недели на UNIZA
-        $(".rozvrh_tyzden").each(function (dayIndex) {
-            const dayNum = dayIndex + 1; // 1 - Pondelok ... 5 - Piatok
-            if (dayNum > 5) return;      // Выходные игнорируем
+        // Шаг 1. Считываем сетку часов из шапки таблицы (например, 7:00, 8:00 ...)
+        const hourColumns = [];
+        // Обычно часы идут в первой строке таблицы или в элементах с классом времени
+        // На UNIZA колонки часов соответствуют ячейкам заголовка
+        let baseStartHour = 7; // Старт с 7:00
 
+        $(".rozvrh_tyzden").each(function (dayIndex) {
+            const dayNum = dayIndex + 1;
+            if (dayNum > 5) return; // Только Пн-Пт
+
+            // Ищем все ячейки или блоки внутри этого дня
+            // На UNIZA каждый блок имеет родительские элементы, по которым можно понять его позицию по сетке часов
             $(this).find("span[class^='rozvrh_bloky']").each(function () {
-                const $block =$(this);
-                const styleAttr = $block.attr('style') || '';
+                const $block = $(this);
                 const links = $block.find("a");
                 
                 if (links.length >= 3) {
-                    // 1. Извлекаем данные из ссылок
                     const teacher = removeDiacritics($(links[0]).text().trim());
                     const room = removeDiacritics($(links[1]).text().trim());
                     const title = removeDiacritics($(links[2]).text().trim());
 
-                    // 2. Определяем точный тип занятия по букве (P / C / L)
+                    // Тип занятия (C, P, L)
                     let type = "prednáška";
-                    // Ищем первую букву типа в блоке (P, C или L)
-                    const blockText = $block.text().trim();
+                    const blockText = removeDiacritics($block.text().trim());
                     const firstChar = blockText.charAt(0).toUpperCase();
 
-                    if (firstChar === 'C' || blockText.includes('cvičenie') || blockText.includes('cvicenie')) {
+                    if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
                         type = "cvičenie";
-                    } else if (firstChar === 'L' || blockText.includes('laboratórne') || blockText.includes('laboratorne')) {
+                    } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
                         type = "laboratórne";
-                    } else if (firstChar === 'P' || blockText.includes('prednáška') || blockText.includes('prednaska')) {
+                    } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
                         type = "prednáška";
                     }
 
-                    // 3. Вычисляем время по CSS-позиционированию блока
-                    // На UNIZA: left: 0px соответствует 07:00, а каждые 50px = 1 час (60 минут)
-                    let startTime = "07:00";
-                    let endTime = "08:40";
+                    // НАХОДИМ ВРЕМЯ ПО ПОЗИЦИИ В ТАБЛИЦЕ (ЯЧЕЙКАХ / КОЛОНКАХ)
+                    // Ищем родительскую ячейку <td> или элемент сетки
+                    const $td = $block.closest('td, th, div');
+                    
+                    // По умолчанию ставим стандартное время, если не найдем позицию
+                    let startMinutes = 7 * 60; // 07:00
+                    let durationMinutes = 90;  // 1.5 часа
 
-                    const leftMatch = styleAttr.match(/left:\s*([-\d.]+)px/i);
-                    const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
+                    // Проверяем всевозможные варианты стилей в родителях (left/width)
+                    let foundStyle = $block.attr('style') || '';
+                    let parentStyle = $td.attr('style') || '';
+                    let combinedStyle = foundStyle + ";" + parentStyle;
+
+                    const leftMatch = combinedStyle.match(/left:\s*([-\d.]+)px/i);
+                    const widthMatch = combinedStyle.match(/width:\s*([-\d.]+)px/i);
 
                     if (leftMatch && widthMatch) {
                         const leftPx = parseFloat(leftMatch[1]);
                         const widthPx = parseFloat(widthMatch[1]);
-
-                        // 50 пикселей = 60 минут (1 час) => 1 пиксель = 1.2 минуты
-                        const pixelsPerHour = 50; 
-                        const startMinutes = (7 * 60) + ((leftPx / pixelsPerHour) * 60);
-                        const durationMinutes = (widthPx / pixelsPerHour) * 60;
-
-                        startTime = minutesToTime(startMinutes);
-                        endTime = minutesToTime(startMinutes + durationMinutes);
+                        // На UNIZA 1 час = 50px (или около того, подбираем коэффициент)
+                        const pxPerHour = 50; 
+                        startMinutes = (7 * 60) + Math.round((leftPx / pxPerHour) * 60);
+                        durationMinutes = Math.round((widthPx / pxPerHour) * 60);
+                    } else {
+                        // Альтернатива: определяем по порядковому номеру ячейки/колонки в строке дня
+                        const tdIndex = $td.index();
+                        if (tdIndex > 0) {
+                            // Если ячейки идут по часам начиная с 7:00
+                            startMinutes = (7 * 60) + ((tdIndex - 1) * 60);
+                        }
                     }
 
-                    // Сохраняем объект точно в том формате, который ждет ваш index.html
+                    // Безопасная проверка длительности (если ширина спарсилась некорректно)
+                    if (durationMinutes < 30 || durationMinutes > 360) {
+                        durationMinutes = 90; // Стандартная пара 1.5 часа
+                    }
+
+                    const startTime = minutesToTime(startMinutes);
+                    const endTime = minutesToTime(startMinutes + durationMinutes);
+
                     result.push({
                         id: Math.random().toString(36).substring(2, 11),
                         day: dayNum,
