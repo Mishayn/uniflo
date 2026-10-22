@@ -26,7 +26,7 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Расчет времени: 1 час сетки = 50 минут учебы
+// Расчет времени: 1 час сетки = 50 минут учебы (остальное перемена)
 function calculateTimes(startHour, durationHours) {
     const startMins = startHour * 60;
     const totalDurationMins = Math.round(durationHours * 50);
@@ -62,11 +62,12 @@ app.get('/api/schedule/:group', async (req, res) => {
         const $ = cheerio.load(htmlContent);
         const result = [];
 
+        // Проходим по каждой строке дня недели (Пн - Пт)
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
-            if (dayNum > 5) return; // Пн - Пт
+            if (dayNum > 5) return;
 
-            const $spans =$(this).children("span");
+            const $spans = $(this).children("span");
             let i = 0;
             let currentHour = 7; // День начинается в 7:00
 
@@ -74,29 +75,30 @@ app.get('/api/schedule/:group', async (req, res) => {
                 const $span = $($spans[i]);
                 let $targetSpan = null;
 
-                // 1. Проверяем, есть ли ссылки прямо в текущем спане (цельная пара)
+                // 1. Проверяем, есть ли полноценные ссылки прямо в текущем спане
                 if ($span.find("a").length >= 3) {
-                    $targetSpan =$span;
+                    $targetSpan = $span;
                 } else {
-                    // 2. Если это контейнер с разделением, ищем именно верхний блок с классом, содержащим "-v"
-                    const $vChild =$span.find("span[class*='-v']").first();
-                    if ($vChild.length > 0 &&$vChild.find("a").length >= 3) {
-                        $targetSpan =$vChild;
+                    // 2. Если это контейнер с разделением (содержит вложенные блоки), 
+                    // целенаправленно ищем верхний блок, содержащий "-v" в классе (например, rozvrh_bloky-v-color)
+                    const $vChild = $span.find("span[class*='-v']").first();
+                    if ($vChild.length > 0 && $vChild.find("a").length >= 3) {
+                        $targetSpan = $vChild;
                     } else {
-                        // Запасной вариант: берем просто первый дочерний элемент, если -v не найден явно
-                        const $firstChild =$span.find("span").first();
-                        if ($firstChild.length > 0 &&$firstChild.find("a").length >= 3) {
-                            $targetSpan =$firstChild;
+                        // Запасной вариант: если явного -v нет, берем первый попавшийся дочерний элемент
+                        const $firstChild = $span.find("span").first();
+                        if ($firstChild.length > 0 && $firstChild.find("a").length >= 3) {
+                            $targetSpan = $firstChild;
                         }
                     }
                 }
 
-                if ($targetSpan &&$targetSpan.find("a").length >= 3) {
+                if ($targetSpan && $targetSpan.find("a").length >= 3) {
                     const links = $targetSpan.find("a");
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // Считаем блоки-продолжения (-c)
+                    // Считаем следующие блоки-продолжения с суффиксом "-c"
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
@@ -143,6 +145,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     continue;
                 }
 
+                // Если это пустой слот (окно), просто сдвигаем текущий час дальше
                 currentHour += 1;
                 i++;
             }
