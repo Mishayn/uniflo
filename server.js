@@ -62,56 +62,31 @@ app.get('/api/schedule/:group', async (req, res) => {
         const $ = cheerio.load(htmlContent);
         const result = [];
 
-        // Проходим по каждому дню недели (строке)
+        // Проходим по каждой строке дня недели
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
-            const $spans =$(this).children("span");
-            let i = 0;
-            let currentHour = 7; // День всегда начинается в 7:00 (1-й час)
+            // Накопительный отступ в часах для текущего дня (начинаем с 7:00 утра)
+            let currentHour = 7;
+            const pxPerHour = 61; // 1 час = 61px по верстке UNIZA
 
-            while (i < $spans.length) {
-                const $span = $($spans[i]);
+            $(this).children("span").each(function () {
+                const $span =$(this);
                 const styleAttr = $span.attr('style') || '';
                 
+                // Узнаем ширину текущего блока в пикселях
                 let spanWidth = 61;
                 const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
                 if (widthMatch) {
                     spanWidth = parseFloat(widthMatch[1]);
                 }
-                const pxPerHour = 61;
-                let durationHours = spanWidth / pxPerHour;
 
+                const durationHours = spanWidth / pxPerHour;
                 const links = $span.find("a");
 
+                // Если это реальный предмет (есть ссылки на преподавателя, аудиторию и предмет)
                 if (links.length >= 3) {
-                    // Это полноценная пара! Проверяем, есть ли сразу за ней пустые блоки-продолжения (с суффиксом -c)
-                    let extraHours = 0;
-                    let nextIndex = i + 1;
-
-                    while (nextIndex < $spans.length) {
-                        const $nextSpan = $($spans[nextIndex]);
-                        const nextClass = $nextSpan.attr('class') || '';
-                        const nextText = $nextSpan.text().trim();
-
-                        // Если следующий спан содержит суффикс продолжения (-c) или пустой — это часть текущей пары
-                        if (nextClass.includes('-c') || nextText === '') {
-                            let nextWidth = 61;
-                            const nextStyle = $nextSpan.attr('style') || '';
-                            const nextWMatch = nextStyle.match(/width:\s*([-\d.]+)px/i);
-                            if (nextWMatch) nextWidth = parseFloat(nextWMatch[1]);
-
-                            extraHours += (nextWidth / pxPerHour);
-                            nextIndex++;
-                        } else {
-                            break;
-                        }
-                    }
-
-                    // Общая длительность пары = её ширина + все сцепленные блоки продолжения
-                    const totalDuration = durationHours + extraHours;
-
                     const teacher = removeDiacritics($(links[0]).text().trim());
                     const room = removeDiacritics($(links[1]).text().trim());
                     const title = removeDiacritics($(links[2]).text().trim());
@@ -128,7 +103,8 @@ app.get('/api/schedule/:group', async (req, res) => {
                         type = "prednáška";
                     }
 
-                    const timeSlot = calculateTimes(currentHour, totalDuration);
+                    // Время начала — текущий час в строке, длительность — ширина этого конкретного блока
+                    const timeSlot = calculateTimes(currentHour, durationHours);
 
                     result.push({
                         id: Math.random().toString(36).substring(2, 11),
@@ -140,17 +116,11 @@ app.get('/api/schedule/:group', async (req, res) => {
                         teacher: teacher,
                         room: room
                     });
-
-                    // Пропускаем в цикле те блоки продолжения, которые мы уже объединили в эту пару
-                    i = nextIndex;
-                    currentHour += totalDuration;
-                    continue;
                 }
 
-                // Если это пустой слот (окно), просто сдвигаем текущий час и идем дальше
+                // Сдвигаем текущий часовой указатель на ширину этого блока (даже если он пустой)
                 currentHour += durationHours;
-                i++;
-            }
+            });
         });
 
         res.json({ schedule: result });
