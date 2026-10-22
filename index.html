@@ -1302,6 +1302,11 @@
                 </div>
             </div>
 
+            <!-- Индикатор подключения к вашему серверu -->
+            <div id="server-status-badge" style="font-size: 0.72rem; padding: 4px 8px; border-radius: 6px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-muted); display:flex; align-items:center; gap:4px;" title="Статус сервера бэкенда">
+                <span>🔴</span> Сервер выключен
+            </div>
+
             <button class="btn-header-square desktop-only-btn" id="btn-notif-header" onclick="requestNotificationPermission()" title="Upozornenia / Уведомления">
                 🔔
             </button>
@@ -1902,6 +1907,34 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
 <script>
+    // ==========================================
+    // АДРЕС ВАШЕГО СЕРВЕРА НА RENDER
+    // ==========================================
+    const API_URL = 'https://uniflo.onrender.com'; 
+
+    async function checkServerConnection() {
+        const badge = document.getElementById('server-status-badge');
+        try {
+            const response = await fetch(`${API_URL}/api/status`);
+            if (response.ok) {
+                const data = await response.json();
+                badge.innerHTML = `<span>🟢</span> Сервер онлайн`;
+                badge.style.color = '#4ade80';
+                badge.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+            } else {
+                throw new Error();
+            }
+        } catch (error) {
+            badge.innerHTML = `<span>🔴</span> Нет связи с сервером`;
+            badge.style.color = '#ef4444';
+            badge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+        }
+    }
+    
+    // Проверяем соединение с сервером сразу при загрузке страницы и каждые 30 секунд
+    setInterval(checkServerConnection, 30000);
+    window.addEventListener('DOMContentLoaded', checkServerConnection);
+
     const translations = {
         sk: {
             group_label: "Skupina:",
@@ -2581,7 +2614,6 @@
         return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
     }
 
-    // --- ЛОГИКА ОБЩИХ ЗАМЕТОК, ВОРДОВ И РИСУНКОВ ---
     function getBasicNotes() {
         try { return JSON.parse(localStorage.getItem('uniflo_basic_notes')) || []; }
         catch (e) { return []; }
@@ -2688,7 +2720,6 @@
         closeModal('note-modal');
     }
 
-    // --- ПРОДВИНУТАЯ ЛОГИКА ХОЛСТА (Canvas Engine с точным и плавным Resize) ---
     const BASIC_16_COLORS = [
         '#000000', '#ffffff', '#ef4444', '#f97316',
         '#facc15', '#22c55e', '#3b82f6', '#8b5cf6',
@@ -2714,7 +2745,6 @@
     let boxSelectCurrent = { x: 0, y: 0 };
     let dragStartMouse = { x: 0, y: 0 };
     
-    // Структура для идеального вычисления изменений размеров
     let resizeInitialSnapshot = null;
 
     let canvasWidth = 1150;
@@ -2836,7 +2866,6 @@
             }
         });
 
-        // Отрисовка рамки выделения и маркеров Resize
         if (currentTool === 'select' && selectedElementIndices.length > 0) {
             const groupBounds = getGroupBounds(selectedElementIndices);
             canvasCtx.save();
@@ -2848,17 +2877,12 @@
 
             const handleSize = 8;
             canvasCtx.fillStyle = '#f97316';
-            // nw
             canvasCtx.fillRect(groupBounds.x - 4 - handleSize/2, groupBounds.y - 4 - handleSize/2, handleSize, handleSize);
-            // ne
             canvasCtx.fillRect(groupBounds.x + groupBounds.w + 4 - handleSize/2, groupBounds.y - 4 - handleSize/2, handleSize, handleSize);
-            // sw
             canvasCtx.fillRect(groupBounds.x - 4 - handleSize/2, groupBounds.y + groupBounds.h + 4 - handleSize/2, handleSize, handleSize);
-            // se
             canvasCtx.fillRect(groupBounds.x + groupBounds.w + 4 - handleSize/2, groupBounds.y + groupBounds.h + 4 - handleSize/2, handleSize, handleSize);
         }
 
-        // Рамка выделения через зажатие мыши (Box Selection)
         if (isBoxSelecting) {
             canvasCtx.save();
             canvasCtx.strokeStyle = '#3b82f6';
@@ -2943,7 +2967,6 @@
                         isResizingElements = true;
                         activeResizeHandle = handle;
                         
-                        // Запоминаем точный снимок всех выбранных элементов для идеального изменения размера
                         resizeInitialSnapshot = {
                             handle: handle,
                             groupBounds: { ...groupBounds },
@@ -3010,7 +3033,6 @@
             const pos = getPos(e);
 
             if (currentTool === 'select') {
-                // Точный плавно работающий Resize без дёрганий
                 if (isResizingElements && resizeInitialSnapshot) {
                     const snap = resizeInitialSnapshot;
                     const origG = snap.groupBounds;
@@ -3301,7 +3323,6 @@
         link.click();
     }
 
-    // --- UniFlo Notes (Word) ---
     const LESSON_NOTE_SUBJECTS = [
         'MPI - Prednáška','MPI - Cvičenie','API - Prednáška','API - Cvičenie',
         'MAT1 - Prednáška','MAT1 - Cvičenie','PZA - Prednáška','PZA - Laboratórne',
@@ -3629,7 +3650,6 @@
         }
     }
 
-    // ЛОГИКА КАЛЕНДАРЯ
     function prevCalMonth() {
         calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
         renderCompactCalendar();
