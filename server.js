@@ -26,11 +26,9 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Расчет времени: 1 час сетки = 50 минут учебы (остальное перемена)
+// Расчет времени: 1 час сетки = 50 минут учебы
 function calculateTimes(startHour, durationHours) {
     const startMins = startHour * 60;
-    
-    // Каждому часу сетки соответствует 50 минут пары (например, 2 часа сетки = 100 минут)
     const totalDurationMins = Math.round(durationHours * 50);
     const endMins = startMins + totalDurationMins;
 
@@ -74,19 +72,27 @@ app.get('/api/schedule/:group', async (req, res) => {
 
             while (i < $spans.length) {
                 const $span = $($spans[i]);
-                
-                let $targetSpan =$span;
-                let links = $span.find("a");
+                let $targetSpan = null;
 
-                if (links.length < 3) {
-                    const $firstChild =$span.find("span").first();
-                    if ($firstChild.length > 0 &&$firstChild.find("a").length >= 3) {
-                        $targetSpan =$firstChild;
-                        links = $targetSpan.find("a");
+                // 1. Проверяем, есть ли ссылки прямо в текущем спане (цельная пара)
+                if ($span.find("a").length >= 3) {
+                    $targetSpan =$span;
+                } else {
+                    // 2. Если это контейнер с разделением, ищем именно верхний блок с классом, содержащим "-v"
+                    const $vChild =$span.find("span[class*='-v']").first();
+                    if ($vChild.length > 0 &&$vChild.find("a").length >= 3) {
+                        $targetSpan =$vChild;
+                    } else {
+                        // Запасной вариант: берем просто первый дочерний элемент, если -v не найден явно
+                        const $firstChild =$span.find("span").first();
+                        if ($firstChild.length > 0 &&$firstChild.find("a").length >= 3) {
+                            $targetSpan =$firstChild;
+                        }
                     }
                 }
 
-                if (links.length >= 3) {
+                if ($targetSpan &&$targetSpan.find("a").length >= 3) {
+                    const links = $targetSpan.find("a");
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
@@ -119,7 +125,6 @@ app.get('/api/schedule/:group', async (req, res) => {
                         type = "prednáška";
                     }
 
-                    // Передаем часы в функцию, которая умножит их на 50 минут
                     const timeSlot = calculateTimes(currentHour, durationHours);
 
                     result.push({
