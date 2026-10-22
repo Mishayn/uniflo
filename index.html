@@ -3516,28 +3516,48 @@
 
     // НОВАЯ ФУНКЦИЯ ПЕРЕНОСА РАСПИСАНИЯ С СЕРВЕРА
     async function fetchScheduleFromServer() {
-        const confirmed = confirm("Точно ли вы хотите перенести расписание? Ваше нынешнее расписание будет удалено.");
-        if (!confirmed) return;
-
-        try {
-            const response = await fetch(`${API_URL}/api/schedule/${currentGroup}`);
-            if (!response.ok) throw new Error("Ошибка при запросе к серверу");
-            
-            const data = await response.json();
-            const newSched = data.schedule || data; 
-
-            if (Array.isArray(newSched)) {
-                schedule = newSched;
-                localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
-                renderAll();
-                alert(`Расписание для группы ${currentGroup} успешно обновлено с сервера!`);
-            } else {
-                alert("Сервер не вернул расписание в нужном формате.");
-            }
-        } catch (error) {
-            alert("Не удалось подключиться к серверу для загрузки расписания.");
-        }
+    // Создаем красивый элемент статуса загрузки, если его еще нет
+    let loaderBadge = document.getElementById('sched-loading-status');
+    if (!loaderBadge) {
+        loaderBadge = document.createElement('div');
+        loaderBadge.id = 'sched-loading-status';
+        loaderBadge.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--bg-card); border:1px solid var(--accent-orange); color:var(--text-primary); padding:10px 16px; border-radius:10px; z-index:9999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.5);";
+        document.body.appendChild(loaderBadge);
     }
+    
+    loaderBadge.innerHTML = "⏳ Загрузка расписания с сервера (сервер может просыпаться до 50 сек)...";
+    loaderBadge.style.display = "block";
+
+    try {
+        // Делаем запрос с таймаутом, чтобы дождаться пробуждения Render
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 секунд тайм-аут
+
+        const response = await fetch(`${API_URL}/api/schedule/${currentGroup}`, {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) throw new Error("Ошибка сервера");
+        
+        const data = await response.json();
+        const newSched = data.schedule || data; 
+
+        if (Array.isArray(newSched)) {
+            schedule = newSched;
+            localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+            renderAll();
+            loaderBadge.innerHTML = "✅ Расписание успешно обновлено!";
+            setTimeout(() => { loaderBadge.style.display = 'none'; }, 3000);
+        } else {
+            throw new Error("Неверный формат данных");
+        }
+    }.catch (error) {
+        console.error(error);
+        loaderBadge.innerHTML = "❌ Не удалось загрузить расписание. Сервер недоступен.";
+        setTimeout(() => { loaderBadge.style.display = 'none'; }, 4000);
+    }
+}
 
     function calculateGap(time1, time2) {
         const [h1, m1] = time1.split(':').map(Number);
