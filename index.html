@@ -1345,7 +1345,7 @@
                 <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
                 <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Skupina...">
                 
-                <!-- НОВАЯ КНОПКА ПЕРЕНОСА РАСПИСАНИЯ -->
+                <!-- Кнопка переноса расписания с уведомлением -->
                 <button class="btn-fetch-sched" onclick="fetchScheduleFromServer()" title="Перенести расписание с сервера">
                     📅 Preniesť rozvrh
                 </button>
@@ -1957,7 +1957,6 @@
         }
     }
     
-    // Проверяем соединение с сервером сразу при загрузке страницы и каждые 30 секунд
     setInterval(checkServerConnection, 30000);
     window.addEventListener('DOMContentLoaded', checkServerConnection);
 
@@ -3514,50 +3513,48 @@
         }
     }
 
-    // НОВАЯ ФУНКЦИЯ ПЕРЕНОСА РАСПИСАНИЯ С СЕРВЕРА
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПЕРЕНОСА РАСПИСАНИЯ С СЕРВЕРА
     async function fetchScheduleFromServer() {
-    // Создаем красивый элемент статуса загрузки, если его еще нет
-    let loaderBadge = document.getElementById('sched-loading-status');
-    if (!loaderBadge) {
-        loaderBadge = document.createElement('div');
-        loaderBadge.id = 'sched-loading-status';
-        loaderBadge.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--bg-card); border:1px solid var(--accent-orange); color:var(--text-primary); padding:10px 16px; border-radius:10px; z-index:9999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.5);";
-        document.body.appendChild(loaderBadge);
-    }
-    
-    loaderBadge.innerHTML = "⏳ Загрузка расписания с сервера (сервер может просыпаться до 50 сек)...";
-    loaderBadge.style.display = "block";
-
-    try {
-        // Делаем запрос с таймаутом, чтобы дождаться пробуждения Render
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 секунд тайм-аут
-
-        const response = await fetch(`${API_URL}/api/schedule/${currentGroup}`, {
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-
-        if (!response.ok) throw new Error("Ошибка сервера");
-        
-        const data = await response.json();
-        const newSched = data.schedule || data; 
-
-        if (Array.isArray(newSched)) {
-            schedule = newSched;
-            localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
-            renderAll();
-            loaderBadge.innerHTML = "✅ Расписание успешно обновлено!";
-            setTimeout(() => { loaderBadge.style.display = 'none'; }, 3000);
-        } else {
-            throw new Error("Неверный формат данных");
+        let loaderBadge = document.getElementById('sched-loading-status');
+        if (!loaderBadge) {
+            loaderBadge = document.createElement('div');
+            loaderBadge.id = 'sched-loading-status';
+            loaderBadge.style.cssText = "position:fixed; bottom:20px; right:20px; background:var(--bg-card); border:1px solid var(--accent-orange); color:var(--text-primary); padding:10px 16px; border-radius:10px; z-index:9999; font-size:0.85rem; box-shadow:0 4px 12px rgba(0,0,0,0.5);";
+            document.body.appendChild(loaderBadge);
         }
-    }.catch (error) {
-        console.error(error);
-        loaderBadge.innerHTML = "❌ Не удалось загрузить расписание. Сервер недоступен.";
-        setTimeout(() => { loaderBadge.style.display = 'none'; }, 4000);
+        
+        loaderBadge.innerHTML = "⏳ Загрузка расписания с сервера (сервер может просыпаться до 50 сек)...";
+        loaderBadge.style.display = "block";
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+            const response = await fetch(`${API_URL}/api/schedule/${currentGroup}`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) throw new Error("Ошибка сервера");
+            
+            const data = await response.json();
+            const newSched = data.schedule || data; 
+
+            if (Array.isArray(newSched)) {
+                schedule = newSched;
+                localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+                renderAll();
+                loaderBadge.innerHTML = "✅ Расписание успешно обновлено!";
+                setTimeout(() => { loaderBadge.style.display = 'none'; }, 3000);
+            } else {
+                throw new Error("Неверный формат данных");
+            }
+        } catch (error) {
+            console.error(error);
+            loaderBadge.innerHTML = "❌ Не удалось загрузить расписание. Сервер недоступен.";
+            setTimeout(() => { loaderBadge.style.display = 'none'; }, 4000);
+        }
     }
-}
 
     function calculateGap(time1, time2) {
         const [h1, m1] = time1.split(':').map(Number);
