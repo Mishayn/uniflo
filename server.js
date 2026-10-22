@@ -26,7 +26,7 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Расчет времени: 1 час сетки = 50 минут учебы
+// Расчет времени: 1 час сетки = 50 минут учебы (остальное перемена)
 function calculateTimes(startHour, durationHours) {
     const startMins = startHour * 60;
     const totalDurationMins = Math.round(durationHours * 50);
@@ -62,55 +62,55 @@ app.get('/api/schedule/:group', async (req, res) => {
         const $ = cheerio.load(htmlContent);
         const result = [];
 
-        // Проходим по каждой строке дня недели (Пн-Пт)
+        // Проходим по каждой строке дня недели (Пн - Пт)
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return;
 
             const $spans = $(this).children("span");
-            let currentHour = 7; // Учебный день всегда начинается в 07:00
+            let i = 0;
+            let currentHour = 7; // День начинается в 7:00
 
-            $spans.each(function () {
-                const $span = $(this);
-                const styleAttr = $span.attr('style') || '';
-                
-                // Вычисляем ширину блока в часах (61px = 1 час сетки)
-                let spanWidthPx = 61;
-                const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
-                if (widthMatch) {
-                    spanWidthPx = parseFloat(widthMatch[1]);
-                }
-                const slotHours = spanWidthPx / 61;
-
-                // Если это блок-продолжение (-c), он просто сдвигает время и не содержит нового предмета
-                const className = $span.attr('class') || '';
-                if (className.includes('-c')) {
-                    currentHour += slotHours;
-                    return;
-                }
-
+            while (i < $spans.length) {
+                const $span = $($spans[i]);
                 let $targetSpan = null;
-                let links = $span.find("a");
 
-                // Если ссылок мало прямо в спане, ищем верхнюю подгруппу (-v) внутри разделенного блока
-                if (links.length < 3) {
+                // 1. Проверяем, есть ли полноценные ссылки прямо в текущем спане
+                if ($span.find("a").length >= 3) {
+                    $targetSpan = $span;
+                } else {
+                    // 2. Если это контейнер с разделением (содержит вложенные блоки), 
+                    // целенаправленно ищем верхний блок, содержащий "-v" в классе (например, rozvrh_bloky-v-color)
                     const $vChild = $span.find("span[class*='-v']").first();
                     if ($vChild.length > 0 && $vChild.find("a").length >= 3) {
                         $targetSpan = $vChild;
-                        links = $targetSpan.find("a");
                     } else {
+                        // Запасной вариант: если явного -v нет, берем первый попавшийся дочерний элемент
                         const $firstChild = $span.find("span").first();
                         if ($firstChild.length > 0 && $firstChild.find("a").length >= 3) {
                             $targetSpan = $firstChild;
-                            links = $targetSpan.find("a");
                         }
                     }
-                } else {
-                    $targetSpan = $span;
                 }
 
-                // Если нашли валидный предмет с преподавателем, аудиторией и названием
-                if (links.length >= 3) {
+                if ($targetSpan && $targetSpan.find("a").length >= 3) {
+                    const links = $targetSpan.find("a");
+                    let durationHours = 1;
+                    let nextIndex = i + 1;
+
+                    // Считаем следующие блоки-продолжения с суффиксом "-c"
+                    while (nextIndex < $spans.length) {
+                        const $nextSpan = $($spans[nextIndex]);
+                        const nextClass = $nextSpan.attr('class') || '';
+
+                        if (nextClass.includes('-c')) {
+                            durationHours += 1;
+                            nextIndex++;
+                        } else {
+                            break;
+                        }
+                    }
+
                     const teacher = removeDiacritics($(links[0]).text().trim());
                     const room = removeDiacritics($(links[1]).text().trim());
                     const title = removeDiacritics($(links[2]).text().trim());
@@ -127,7 +127,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                         type = "prednáška";
                     }
 
-                    const timeSlot = calculateTimes(currentHour, slotHours);
+                    const timeSlot = calculateTimes(currentHour, durationHours);
 
                     result.push({
                         id: Math.random().toString(36).substring(2, 11),
@@ -139,11 +139,16 @@ app.get('/api/schedule/:group', async (req, res) => {
                         teacher: teacher,
                         room: room
                     });
+
+                    i = nextIndex;
+                    currentHour += durationHours;
+                    continue;
                 }
 
-                // Сдвигаем текущий час на ширину этого блока
-                currentHour += slotHours;
-            });
+                // Если это пустой слот (окно), просто сдвигаем текущий час дальше
+                currentHour += 1;
+                i++;
+            }
         });
 
         res.json({ schedule: result });
