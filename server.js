@@ -26,9 +26,12 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Расчет времени: старт в часах, длительность в часах (61px = 1 час = 60 минут)
+// Расчет времени с учетом академических часов и перемен
 function calculateTimes(startHour, durationHours) {
     const startMins = startHour * 60;
+    
+    // Если пара длится 2 часа (по сетке), это обычно 1.5 часа чистых (90 минут) + перемена, 
+    // либо полные блоки. Судя по вашей системе: 1 блок = 60 мин (50 урок + 10 перемена).
     const totalDurationMins = Math.round(durationHours * 60);
     const endMins = startMins + totalDurationMins;
 
@@ -62,32 +65,27 @@ app.get('/api/schedule/:group', async (req, res) => {
         const $ = cheerio.load(htmlContent);
         const result = [];
 
-        // Проходим по каждой строке дня недели
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
-            // Накопительный отступ в пикселях от начала дня (7:00 = 0px)
             let accumulatedPixels = 0;
-            const pxPerHour = 61; // Как видно в коде сайта, 1 час = 61px
+            const pxPerHour = 61; // 1 час = 61px
 
-            // Перебираем ВСЕ элементы внутри строки дня строго слева направо (и пары, и пустые ячейки)
             $(this).children("span").each(function () {
                 const $span =$(this);
                 const styleAttr = $span.attr('style') || '';
                 
-                // Узнаем ширину текущего элемента из стиля (например, width: 61px или 122px)
                 let spanWidth = 61;
                 const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
                 if (widthMatch) {
                     spanWidth = parseFloat(widthMatch[1]);
                 }
 
-                // Вычисляем, какому часу соответствует текущая позиция слева
                 const startHour = 7 + (accumulatedPixels / pxPerHour);
+                // Длительность в часах теперь рассчитывается из реальной ширины блока (spanWidth)
                 const durationHours = spanWidth / pxPerHour;
 
-                // Проверяем, есть ли в этом спане реальный предмет (ссылки)
                 const links = $span.find("a");
                 if (links.length >= 3) {
                     const teacher = removeDiacritics($(links[0]).text().trim());
@@ -120,8 +118,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     });
                 }
 
-                // Обязательно сдвигаем накопительные пиксели на ширину текущего блока 
-                // (даже если он пустой, чтобы следующие пары не сместились по времени)
+                // Сдвигаем на ширину текущего блока
                 accumulatedPixels += spanWidth;
             });
         });
