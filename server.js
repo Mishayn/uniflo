@@ -26,12 +26,9 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Расчет времени с учетом академических часов и перемен
+// Расчет времени: старт в часах, длительность в часах
 function calculateTimes(startHour, durationHours) {
     const startMins = startHour * 60;
-    
-    // Если пара длится 2 часа (по сетке), это обычно 1.5 часа чистых (90 минут) + перемена, 
-    // либо полные блоки. Судя по вашей системе: 1 блок = 60 мин (50 урок + 10 перемена).
     const totalDurationMins = Math.round(durationHours * 60);
     const endMins = startMins + totalDurationMins;
 
@@ -65,15 +62,17 @@ app.get('/api/schedule/:group', async (req, res) => {
         const $ = cheerio.load(htmlContent);
         const result = [];
 
+        // Проходим по каждому дню недели (строке)
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
-            let accumulatedPixels = 0;
-            const pxPerHour = 61; // 1 час = 61px
+            const $spans =$(this).children("span");
+            let i = 0;
+            let currentHour = 7; // День всегда начинается в 7:00 (1-й час)
 
-            $(this).children("span").each(function () {
-                const $span =$(this);
+            while (i < $spans.length) {
+                const $span = $($spans[i]);
                 const styleAttr = $span.attr('style') || '';
                 
                 let spanWidth = 61;
@@ -81,13 +80,38 @@ app.get('/api/schedule/:group', async (req, res) => {
                 if (widthMatch) {
                     spanWidth = parseFloat(widthMatch[1]);
                 }
-
-                const startHour = 7 + (accumulatedPixels / pxPerHour);
-                // Длительность в часах теперь рассчитывается из реальной ширины блока (spanWidth)
-                const durationHours = spanWidth / pxPerHour;
+                const pxPerHour = 61;
+                let durationHours = spanWidth / pxPerHour;
 
                 const links = $span.find("a");
+
                 if (links.length >= 3) {
+                    // Это полноценная пара! Проверяем, есть ли сразу за ней пустые блоки-продолжения (с суффиксом -c)
+                    let extraHours = 0;
+                    let nextIndex = i + 1;
+
+                    while (nextIndex < $spans.length) {
+                        const $nextSpan = $($spans[nextIndex]);
+                        const nextClass = $nextSpan.attr('class') || '';
+                        const nextText = $nextSpan.text().trim();
+
+                        // Если следующий спан содержит суффикс продолжения (-c) или пустой — это часть текущей пары
+                        if (nextClass.includes('-c') || nextText === '') {
+                            let nextWidth = 61;
+                            const nextStyle = $nextSpan.attr('style') || '';
+                            const nextWMatch = nextStyle.match(/width:\s*([-\d.]+)px/i);
+                            if (nextWMatch) nextWidth = parseFloat(nextWMatch[1]);
+
+                            extraHours += (nextWidth / pxPerHour);
+                            nextIndex++;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // Общая длительность пары = её ширина + все сцепленные блоки продолжения
+                    const totalDuration = durationHours + extraHours;
+
                     const teacher = removeDiacritics($(links[0]).text().trim());
                     const room = removeDiacritics($(links[1]).text().trim());
                     const title = removeDiacritics($(links[2]).text().trim());
@@ -104,7 +128,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                         type = "prednáška";
                     }
 
-                    const timeSlot = calculateTimes(startHour, durationHours);
+                    const timeSlot = calculateTimes(currentHour, totalDuration);
 
                     result.push({
                         id: Math.random().toString(36).substring(2, 11),
@@ -116,11 +140,17 @@ app.get('/api/schedule/:group', async (req, res) => {
                         teacher: teacher,
                         room: room
                     });
+
+                    // Пропускаем в цикле те блоки продолжения, которые мы уже объединили в эту пару
+                    i = nextIndex;
+                    currentHour += totalDuration;
+                    continue;
                 }
 
-                // Сдвигаем на ширину текущего блока
-                accumulatedPixels += spanWidth;
-            });
+                // Если это пустой слот (окно), просто сдвигаем текущий час и идем дальше
+                currentHour += durationHours;
+                i++;
+            }
         });
 
         res.json({ schedule: result });
