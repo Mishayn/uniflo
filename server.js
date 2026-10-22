@@ -79,17 +79,12 @@ app.get('/api/schedule/:group', async (req, res) => {
                 if ($span.find("a").length >= 3) {
                     $targetSpan = $span;
                 } else {
-                    // 2. Если это контейнер с разделением (содержит вложенные блоки), 
-                    // целенаправленно ищем верхний блок, содержащий "-v" в классе (например, rozvrh_bloky-v-color)
-                    const $vChild = $span.find("span[class*='-v']").first();
-                    if ($vChild.length > 0 && $vChild.find("a").length >= 3) {
-                        $targetSpan = $vChild;
-                    } else {
-                        // Запасной вариант: если явного -v нет, берем первый попавшийся дочерний элемент
-                        const $firstChild = $span.find("span").first();
-                        if ($firstChild.length > 0 && $firstChild.find("a").length >= 3) {
-                            $targetSpan = $firstChild;
-                        }
+                    // 2. Если ссылок нет, значит это ячейка с разделением на подгруппы (вертикальная или горизонтальная).
+                    // В разметке UNIZA верхняя пара всегда идет Самой Первой дочерней нодой (`.first()`).
+                    // Берем первый дочерний span, который содержит контент/ссылки.
+                    const $firstChild = $span.children("span").first();
+                    if ($firstChild.length > 0 && $firstChild.find("a").length >= 3) {
+                        $targetSpan = $firstChild;
                     }
                 }
 
