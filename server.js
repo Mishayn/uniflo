@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Очистка диакритики без знаков вопроса
+// Исправление словацких символов без знаков вопроса
 function removeDiacritics(str) {
     if (!str) return '';
     return str
@@ -26,11 +26,28 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Перевод минут в формат HH:MM
-function minutesToTime(totalMins) {
-    const h = Math.floor(totalMins / 60) % 24;
-    const m = totalMins % 60;
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+// Официальная сетка времени UNIZA (начало каждого часа с шагом в 1 час)
+// Каждое занятие начинается в ровный час (7:00, 8:00, 9:00 и т.д.)
+function calculateTimes(startHour, durationHours) {
+    // Начало пары
+    const startMins = startHour * 60;
+    
+    // Длительность по вашей системе: 
+    // 1 час = 50 мин урока + 10 мин перемена = 60 мин общего времени на сетке
+    // 2 часа (1.5 часа чистых) = 90-100 мин -> занимает 1.5 - 2 деления сетки
+    const totalDurationMins = Math.round(durationHours * 60);
+    const endMins = startMins + totalDurationMins;
+
+    const format = (m) => {
+        const h = Math.floor(m / 60) % 24;
+        const min = m % 60;
+        return `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+    };
+
+    return {
+        start: format(startMins),
+        end: format(endMins)
+    };
 }
 
 app.get('/api/status', (req, res) => {
@@ -47,72 +64,86 @@ app.get('/api/schedule/:group', async (req, res) => {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
 
+        // Корректная кодировка для словацкого сайта
         let htmlContent = iconv.decode(Buffer.from(response.data), 'win1250');
         const $ = cheerio.load(htmlContent);
         const result = [];
 
-        // Проходим по каждому дню недели (строке таблицы)
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
-            if (dayNum > 5) return; // Берем только Пн-Пт (1-5)
+            if (dayNum > 5) return; // Пн - Пт
 
-            // Находим все ячейки (td) в строке этого дня
-            const $tds =$(this).find('td');
+            $(this).find("span[class^='rozvrh_bloky']").each(function () {
+                const $block =$(this);
+                const styleAttr = $block.attr('style') || '';
+                const $td =$block.closest('td, th, div');
+                const parentStyle = $td.attr('style') || '';
+                const combinedStyle = styleAttr + ";" + parentStyle;
 
-            $tds.each(function (tdIndex) {
-                const $td =$(this);
+                const links = $block.find("a");
                 
-                // Ищем блоки занятий внутри ячейки
-                $td.find("span[class^='rozvrh_bloky']").each(function () {
-                    const $block =$(this);
-                    const links = $block.find("a");
-                    
-                    if (links.length >= 3) {
-                        const teacher = removeDiacritics($(links[0]).text().trim());
-                        const room = removeDiacritics($(links[1]).text().trim());
-                        const title = removeDiacritics($(links[2]).text().trim());
+                if (links.length >= 3) {
+                    const teacher = removeDiacritics($(links[0]).text().trim());
+                    const room = removeDiacritics($(links[1]).text().trim());
+                    const title = removeDiacritics($(links[2]).text().trim());
 
-                        // Определяем тип занятия (P, C, L)
-                        let type = "prednáška";
-                        const blockText = removeDiacritics($block.text().trim());
-                        const firstChar = blockText.charAt(0).toUpperCase();
+                    // Тип занятия (C, P, L)
+                    let type = "prednáška";
+                    const blockText = removeDiacritics($block.text().trim());
+                    const firstChar = blockText.charAt(0).toUpperCase();
 
-                        if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
-                            type = "cvičenie";
-                        } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
-                            type = "laboratórne";
-                        } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
-                            type = "prednáška";
-                        }
-
-                        // РАСЧЕТ ВРЕМЕНИ ПО ПОЗИЦИИ ЯЧЕЙКИ (tdIndex)
-                        // На сайте UNIZA первая ячейка (tdIndex = 0) обычно содержит название дня недели.
-                        // Часы начинаются со следующей ячейки (tdIndex = 1 это 7:00, tdIndex = 2 это 8:00 и т.д.)
-                        // Проверяем colspan (если пара длится несколько часов, colspan > 1)
-                        const colspan = parseInt($td.attr('colspan') || '1', 10);
-                        
-                        // Смещение: если 0-я ячейка это день недели, то отсчет часов идет с (tdIndex - 1)
-                        // Если в строке нет ячейки с днем недели, то index напрямую соответствует часам.
-                        // Обычно на UNIZA структура такая: [День недели] [7:00] [8:00] [9:00] ...
-                        const hourOffset = 7;
-                        const startHour = hourOffset + Math.max(0, tdIndex - 1);
-                        const durationHours = colspan; // Длительность равна colspan (сколько ячеек занял блок)
-
-                        const startMins = startHour * 60;
-                        const endMins = startMins + (durationHours * 60);
-
-                        result.push({
-                            id: Math.random().toString(36).substring(2, 11),
-                            day: dayNum,
-                            title: title,
-                            type: type,
-                            start: minutesToTime(startMins),
-                            end: minutesToTime(endMins),
-                            teacher: teacher,
-                            room: room
-                        });
+                    if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
+                        type = "cvičenie";
+                    } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
+                        type = "laboratórne";
+                    } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
+                        type = "prednáшка";
                     }
-                });
+
+                    // Считаем час начала и длительность по пикселям сетки UNIZA
+                    // На UNIZA 1 час шкалы = примерно 50-60 пикселей отступа (left)
+                    let startHour = 7;
+                    let durationHours = 2; // По умолчанию пара идет 2 часа (например, 9:00 - 10:30)
+
+                    const leftMatch = combinedStyle.match(/left:\s*([-\d.]+)px/i);
+                    const widthMatch = combinedStyle.match(/width:\s*([-\d.]+)px/i);
+
+                    if (leftMatch && widthMatch) {
+                        const leftPx = parseFloat(leftMatch[1]);
+                        const widthPx = parseFloat(widthMatch[1]);
+
+                        // 1 колонка часов на сайте = 50px (или около того)
+                        const pxPerCell = 50; 
+                        startHour = 7 + Math.round(leftPx / pxPerCell);
+                        
+                        // Длительность в часах сетки
+                        durationHours = widthPx / pxPerCell;
+                    } else {
+                        // Запасной вариант по порядковому номеру ячейки
+                        const tdIndex = $td.index();
+                        if (tdIndex > 0) {
+                            startHour = 7 + (tdIndex - 1);
+                        }
+                    }
+
+                    // Корректируем длительность, если она выбивается из разумных пределов (от 1 до 4 часов)
+                    if (durationHours < 0.5 || durationHours > 5) {
+                        durationHours = 2; 
+                    }
+
+                    const timeSlot = calculateTimes(startHour, durationHours);
+
+                    result.push({
+                        id: Math.random().toString(36).substring(2, 11),
+                        day: dayNum,
+                        title: title,
+                        type: type,
+                        start: timeSlot.start,
+                        end: timeSlot.end,
+                        teacher: teacher,
+                        room: room
+                    });
+                }
             });
         });
 
