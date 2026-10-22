@@ -26,10 +26,10 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Перевод часов в формат "HH:MM"
-function getFormattedTime(startHour, durationHours) {
+// Перевод часов в формат HH:MM (1 час сетки = 60 минут: 50 мин пара + 10 мин перемена)
+function calculateTimes(startHour, durationHours) {
     const startMins = startHour * 60;
-    const totalDurationMins = durationHours * 60;
+    const totalDurationMins = Math.round(durationHours * 60);
     const endMins = startMins + totalDurationMins;
 
     const format = (m) => {
@@ -62,64 +62,86 @@ app.get('/api/schedule/:group', async (req, res) => {
         const $ = cheerio.load(htmlContent);
         const result = [];
 
-        // Проходим по каждому дню недели (строке)
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
-            // Проходим по каждой ячейке строки
-            $(this).find("td").each(function () {
-                const $td =$(this);
-                const colspan = parseInt($td.attr('colspan') || '1', 10);
+            // Возвращаем надежный поиск блоков расписания
+            $(this).find("span[class^='rozvrh_bloky']").each(function (blockIdx) {
+                const $block =$(this);
+                const $parent =$block.parent();
+                const $grandParent =$parent.parent();
 
-                // Ищем блок предмета внутри или рядом с ячейкой
-                $td.find("span[class^='rozvrh_bloky']").each(function () {
-                    const $block =$(this);
-                    const links = $block.find("a");
-                    
-                    if (links.length >= 3) {
-                        const teacher = removeDiacritics($(links[0]).text().trim());
-                        const room = removeDiacritics($(links[1]).text().trim());
-                        const title = removeDiacritics($(links[2]).text().trim());
+                // Собираем стили с самого блока и всех его родителей
+                const styleAttr = ($block.attr('style') || '') + ';' + 
+                                  ($parent.attr('style') || '') + ';' + 
+                                  ($grandParent.attr('style') || '');
 
-                        // Тип занятия (C, P, L)
-                        let type = "prednáška";
-                        const blockText = removeDiacritics($block.text().trim());
-                        const firstChar = blockText.charAt(0).toUpperCase();
+                const links = $block.find("a");
+                
+                if (links.length >= 3) {
+                    const teacher = removeDiacritics($(links[0]).text().trim());
+                    const room = removeDiacritics($(links[1]).text().trim());
+                    const title = removeDiacritics($(links[2]).text().trim());
 
-                        if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
-                            type = "cvičenie";
-                        } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
-                            type = "laboratórne";
-                        } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
-                            type = "prednáška";
+                    // Тип занятия (C - cvičenie, P - prednáška, L - laboratórne)
+                    let type = "prednáška";
+                    const blockText = removeDiacritics($block.text().trim());
+                    const firstChar = blockText.charAt(0).toUpperCase();
+
+                    if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
+                        type = "cvičenie";
+                    } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
+                        type = "laboratórne";
+                    } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
+                        type = "prednáška";
+                    }
+
+                    // 1. Проверяем, есть ли время прямо в тексте или всплывающих подсказках (title/alt/onmouseover)
+                    const fullText = $block.text() + " " + ($block.attr('title') \vert{}\vert{} '') + " " + ($parent.attr('title') || '');
+                    const timeMatch = fullText.match(/(\d{1,2})[:.](\d{2})\s*[-–]\s*(\d{1,2})[:.](\d{2})/);
+
+                    let startTime = "";
+                    let endTime = "";
+
+                    if (timeMatch) {
+                        startTime = `${String(timeMatch[1]).padStart(2, '0')}:${timeMatch[2]}`;
+                        endTime = `${String(timeMatch[3]).padStart(2, '0')}:${timeMatch[4]}`;
+                    } else {
+                        // 2. Если времени в тексте нет, ищем координаты left / width в стилях
+                        let startHour = 7 + (blockIdx * 2); // Смещение по порядку, чтобы блоки не накладывались
+                        let durationHours = 2;
+
+                        const leftMatch = styleAttr.match(/left:\s*([-\d.]+)px/i);
+                        const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
+
+                        if (leftMatch && widthMatch) {
+                            const leftPx = parseFloat(leftMatch[1]);
+                            const widthPx = parseFloat(widthMatch[1]);
+                            const pxPerCell = 50; // 1 час = ~50px
+                            startHour = 7 + Math.round(leftPx / pxPerCell);
+                            durationHours = widthPx / pxPerCell;
                         }
 
-                        // Узнаем порядковый номер ячейки (колонка часа) внутри строки дня
-                        const tdIndex = $td.index();
-                        // Первая ячейка (индекс 0) — это название дня (Пон, Вторник...). 
-                        // Часы начинаются с индекса 1 (что соответствует 7:00).
-                        let startHour = 7 + Math.max(0, tdIndex - 1);
-                        let durationHours = colspan;
+                        if (startHour < 7 || startHour > 19) startHour = 7 + (blockIdx * 2);
+                        if (durationHours < 0.5 || durationHours > 5) durationHours = 2;
 
-                        // Защита от некорректных значений
-                        if (startHour < 7 || startHour > 18) startHour = 8;
-                        if (durationHours < 1 || durationHours > 5) durationHours = 2;
-
-                        const timeSlot = getFormattedTime(startHour, durationHours);
-
-                        result.push({
-                            id: Math.random().toString(36).substring(2, 11),
-                            day: dayNum,
-                            title: title,
-                            type: type,
-                            start: timeSlot.start,
-                            end: timeSlot.end,
-                            teacher: teacher,
-                            room: room
-                        });
+                        const times = calculateTimes(startHour, durationHours);
+                        startTime = times.start;
+                        endTime = times.end;
                     }
-                });
+
+                    result.push({
+                        id: Math.random().toString(36).substring(2, 11),
+                        day: dayNum,
+                        title: title,
+                        type: type,
+                        start: startTime,
+                        end: endTime,
+                        teacher: teacher,
+                        room: room
+                    });
+                }
             });
         });
 
