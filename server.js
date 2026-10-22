@@ -67,26 +67,33 @@ app.get('/api/schedule/:group', async (req, res) => {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
-            // Накопительный отступ в часах для текущего дня (начинаем с 7:00 утра)
-            let currentHour = 7;
-            const pxPerHour = 61; // 1 час = 61px по верстке UNIZA
+            const $spans =$(this).children("span");
+            let i = 0;
+            let currentHour = 7; // День всегда начинается в 7:00
 
-            $(this).children("span").each(function () {
-                const $span =$(this);
-                const styleAttr = $span.attr('style') || '';
-                
-                // Узнаем ширину текущего блока в пикселях
-                let spanWidth = 61;
-                const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
-                if (widthMatch) {
-                    spanWidth = parseFloat(widthMatch[1]);
-                }
-
-                const durationHours = spanWidth / pxPerHour;
+            while (i < $spans.length) {
+                const $span = $($spans[i]);
+                const className = $span.attr('class') || '';
                 const links = $span.find("a");
 
-                // Если это реальный предмет (есть ссылки на преподавателя, аудиторию и предмет)
+                // Если это начало предмета
                 if (links.length >= 3) {
+                    let durationHours = 1; // Базово 1 час для самого первого блока
+                    let nextIndex = i + 1;
+
+                    // Считаем все идущие сразу за ним блоки с суффиксом "-c" как продолжение этой же пары
+                    while (nextIndex < $spans.length) {
+                        const $nextSpan = $($spans[nextIndex]);
+                        const nextClass = $nextSpan.attr('class') || '';
+
+                        if (nextClass.includes('-c')) {
+                            durationHours += 1; // Каждый блок с -c добавляет 1 час к длительности
+                            nextIndex++;
+                        } else {
+                            break;
+                        }
+                    }
+
                     const teacher = removeDiacritics($(links[0]).text().trim());
                     const room = removeDiacritics($(links[1]).text().trim());
                     const title = removeDiacritics($(links[2]).text().trim());
@@ -103,7 +110,6 @@ app.get('/api/schedule/:group', async (req, res) => {
                         type = "prednáška";
                     }
 
-                    // Время начала — текущий час в строке, длительность — ширина этого конкретного блока
                     const timeSlot = calculateTimes(currentHour, durationHours);
 
                     result.push({
@@ -116,11 +122,17 @@ app.get('/api/schedule/:group', async (req, res) => {
                         teacher: teacher,
                         room: room
                     });
+
+                    // Переходим в цикле за пределы этой пары (пропускаем соединенные -c блоки)
+                    i = nextIndex;
+                    currentHour += durationHours;
+                    continue;
                 }
 
-                // Сдвигаем текущий часовой указатель на ширину этого блока (даже если он пустой)
-                currentHour += durationHours;
-            });
+                // Если это обычный пустой слот или какой-то другой единичный блок без предмета
+                currentHour += 1;
+                i++;
+            }
         });
 
         res.json({ schedule: result });
