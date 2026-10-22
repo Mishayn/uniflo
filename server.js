@@ -26,7 +26,7 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Расчет времени по часам и длительности
+// Расчет времени: старт в часах, длительность в часах (61px = 1 час = 60 минут)
 function calculateTimes(startHour, durationHours) {
     const startMins = startHour * 60;
     const totalDurationMins = Math.round(durationHours * 60);
@@ -58,39 +58,44 @@ app.get('/api/schedule/:group', async (req, res) => {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
 
-        // Корректная кодировка для словацкого сайта
         let htmlContent = iconv.decode(Buffer.from(response.data), 'win1250');
         const $ = cheerio.load(htmlContent);
         const result = [];
 
+        // Проходим по каждой строке дня недели
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
-            // Накопительный счетчик пикселей слева для этой строки дня. 
-            // Начинаем с 0 пикселей (что соответствует 7:00 утра).
-            let accumulatedLeftPx = 0;
+            // Накопительный отступ в пикселях от начала дня (7:00 = 0px)
+            let accumulatedPixels = 0;
+            const pxPerHour = 61; // Как видно в коде сайта, 1 час = 61px
 
-            $(this).find("span[class^='rozvrh_bloky']").each(function () {
-                const $block =$(this);
-                const styleAttr = $block.attr('style'] \vert{}\vert{}$block.attr('style') || '';
-                const links = $block.find("a");
-
-                // Извлекаем ширину блока из стиля (например, "width: 61px;")
-                let blockWidthPx = 61; // по умолчанию 1 час
+            // Перебираем ВСЕ элементы внутри строки дня строго слева направо (и пары, и пустые ячейки)
+            $(this).children("span").each(function () {
+                const $span =$(this);
+                const styleAttr = $span.attr('style') || '';
+                
+                // Узнаем ширину текущего элемента из стиля (например, width: 61px или 122px)
+                let spanWidth = 61;
                 const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
                 if (widthMatch) {
-                    blockWidthPx = parseFloat(widthMatch[1]);
+                    spanWidth = parseFloat(widthMatch[1]);
                 }
-                
+
+                // Вычисляем, какому часу соответствует текущая позиция слева
+                const startHour = 7 + (accumulatedPixels / pxPerHour);
+                const durationHours = spanWidth / pxPerHour;
+
+                // Проверяем, есть ли в этом спане реальный предмет (ссылки)
+                const links = $span.find("a");
                 if (links.length >= 3) {
                     const teacher = removeDiacritics($(links[0]).text().trim());
                     const room = removeDiacritics($(links[1]).text().trim());
                     const title = removeDiacritics($(links[2]).text().trim());
 
-                    // Тип занятия (C, P, L)
                     let type = "prednáška";
-                    const blockText = removeDiacritics($block.text().trim());
+                    const blockText = removeDiacritics($span.text().trim());
                     const firstChar = blockText.charAt(0).toUpperCase();
 
                     if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
@@ -100,17 +105,6 @@ app.get('/api/schedule/:group', async (req, res) => {
                     } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
                         type = "prednáška";
                     }
-
-                    // 1 колонка на сайте UNIZA = ровно 61 пиксель = 1 час
-                    const pxPerCell = 61;
-
-                    // Вычисляем час начала на основе того, сколько пикселей пройдено слева от начала дня
-                    let startHour = 7 + Math.round(accumulatedLeftPx / pxPerCell);
-                    let durationHours = blockWidthPx / pxPerCell;
-
-                    // Защита от багов
-                    if (isNaN(startHour) || startHour < 7 || startHour > 19) startHour = 7;
-                    if (isNaN(durationHours) || durationHours < 0.5 || durationHours > 6) durationHours = 2;
 
                     const timeSlot = calculateTimes(startHour, durationHours);
 
@@ -126,9 +120,9 @@ app.get('/api/schedule/:group', async (req, res) => {
                     });
                 }
 
-                // Сдвигаем накопленный отступ на ширину текущего элемента 
-                // (даже если это пустой промежуток или блок без ссылок, он учитывается в сетке)
-                accumulatedLeftPx += blockWidthPx;
+                // Обязательно сдвигаем накопительные пиксели на ширину текущего блока 
+                // (даже если он пустой, чтобы следующие пары не сместились по времени)
+                accumulatedPixels += spanWidth;
             });
         });
 
