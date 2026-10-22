@@ -26,10 +26,12 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Расчет времени: старт в часах, длительность в часах
+// Расчет времени: 1 час сетки = 50 минут учебы (остальное перемена)
 function calculateTimes(startHour, durationHours) {
     const startMins = startHour * 60;
-    const totalDurationMins = Math.round(durationHours * 60);
+    
+    // Каждому часу сетки соответствует 50 минут пары (например, 2 часа сетки = 100 минут)
+    const totalDurationMins = Math.round(durationHours * 50);
     const endMins = startMins + totalDurationMins;
 
     const format = (m) => {
@@ -62,26 +64,21 @@ app.get('/api/schedule/:group', async (req, res) => {
         const $ = cheerio.load(htmlContent);
         const result = [];
 
-        // Проходим по каждой строке дня недели
         $(".rozvrh_tyzden").each(function (dayIndex) {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
             const $spans =$(this).children("span");
             let i = 0;
-            let currentHour = 7; // День всегда начинается в 7:00
+            let currentHour = 7; // День начинается в 7:00
 
             while (i < $spans.length) {
                 const $span = $($spans[i]);
-                const className = $span.attr('class') || '';
-
-                // Ищем ссылки: либо прямо внутри спана, либо берем верхний вложенный элемент (при наложении)
+                
                 let $targetSpan =$span;
                 let links = $span.find("a");
 
                 if (links.length < 3) {
-                    // Если в самом спане ссылок нет, возможно, это контейнер с наложением (как на скриншоте)
-                    // Берем первый попавшийся дочерний блок (верхний)
                     const $firstChild =$span.find("span").first();
                     if ($firstChild.length > 0 &&$firstChild.find("a").length >= 3) {
                         $targetSpan =$firstChild;
@@ -93,7 +90,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // Проверяем блоки-продолжения (-c) для этой пары
+                    // Считаем блоки-продолжения (-c)
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
@@ -122,6 +119,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                         type = "prednáška";
                     }
 
+                    // Передаем часы в функцию, которая умножит их на 50 минут
                     const timeSlot = calculateTimes(currentHour, durationHours);
 
                     result.push({
