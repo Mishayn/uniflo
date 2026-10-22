@@ -198,6 +198,26 @@
             border-color: var(--accent-orange);
         }
 
+        /* Кнопка переноса расписания */
+        .btn-fetch-sched {
+            background: var(--bg-input);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .btn-fetch-sched:hover {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: #4ade80;
+        }
+
         .schedule-actions-bar {
             display: flex;
             gap: 8px;
@@ -1302,7 +1322,7 @@
                 </div>
             </div>
 
-            <!-- Индикатор подключения к вашему серверu -->
+            <!-- Индикатор подключения к вашему серверу -->
             <div id="server-status-badge" style="font-size: 0.72rem; padding: 4px 8px; border-radius: 6px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-muted); display:flex; align-items:center; gap:4px;" title="Статус сервера бэкенда">
                 <span>🔴</span> Сервер выключен
             </div>
@@ -1324,6 +1344,12 @@
             <div class="group-selector-container">
                 <span style="font-size:0.82rem; color:var(--text-muted);" data-i18n="group_label">Skupina:</span>
                 <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" placeholder="Skupina...">
+                
+                <!-- НОВАЯ КНОПКА ПЕРЕНОСА РАСПИСАНИЯ -->
+                <button class="btn-fetch-sched" onclick="fetchScheduleFromServer()" title="Перенести расписание с сервера">
+                    📅 Preniesť rozvrh
+                </button>
+
                 <a href="#" id="evzd-link" target="_blank" class="btn-evzd">e-vzd ↗</a>
             </div>
         </div>
@@ -1720,7 +1746,7 @@
             <button type="button" onclick="formatLessonNote('italic')" title="Kurzíva"><i>I</i></button>
             <button type="button" onclick="formatLessonNote('underline')" title="Podčiarknuté"><u>U</u></button>
             <select aria-label="Písmo" onchange="changeLessonNoteFont(this.value)"><option value="">Písmo</option><option>Arial</option><option>Verdana</option><option>Georgia</option><option>Courier New</option><option>Times New Roman</option></select>
-            <select aria-label="Veľkosť písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
+            <select aria-label="Veľkość písma" onchange="changeLessonNoteSize(this.value)"><option value="">Veľkosť</option><option value="1">10 px</option><option value="2">13 px</option><option value="3">16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
             <input type="color" aria-label="Farba textu" value="#121316" onchange="changeLessonNoteColor(this.value)">
           </div>
         </div>
@@ -3485,6 +3511,31 @@
             schedule = [];
             localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
             renderAll();
+        }
+    }
+
+    // НОВАЯ ФУНКЦИЯ ПЕРЕНОСА РАСПИСАНИЯ С СЕРВЕРА
+    async function fetchScheduleFromServer() {
+        const confirmed = confirm("Точно ли вы хотите перенести расписание? Ваше нынешнее расписание будет удалено.");
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch(`${API_URL}/api/schedule/${currentGroup}`);
+            if (!response.ok) throw new Error("Ошибка при запросе к серверу");
+            
+            const data = await response.json();
+            const newSched = data.schedule || data; 
+
+            if (Array.isArray(newSched)) {
+                schedule = newSched;
+                localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+                renderAll();
+                alert(`Расписание для группы ${currentGroup} успешно обновлено с сервера!`);
+            } else {
+                alert("Сервер не вернул расписание в нужном формате.");
+            }
+        } catch (error) {
+            alert("Не удалось подключиться к серверу для загрузки расписания.");
         }
     }
 
