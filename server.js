@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Очистка словацких символов без знаков вопроса
+// Исправление словацких символов без знаков вопроса
 function removeDiacritics(str) {
     if (!str) return '';
     return str
@@ -26,8 +26,8 @@ function removeDiacritics(str) {
         .replace(/ŕ/g, 'r').replace(/Ŕ/g, 'R');
 }
 
-// Перевод часов в формат HH:MM (1 час сетки = 60 минут: 50 мин пара + 10 мин перемена)
-function calculateTimes(startHour, durationHours) {
+// Перевод часов/минут в формат HH:MM (учитывая ваши 50 мин урока + 10 мин перемена = 60 мин на один слот)
+function getFormattedTime(startHour, durationHours = 2) {
     const startMins = startHour * 60;
     const totalDurationMins = Math.round(durationHours * 60);
     const endMins = startMins + totalDurationMins;
@@ -58,6 +58,7 @@ app.get('/api/schedule/:group', async (req, res) => {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
 
+        // Корректная кодировка для словацкого сайта
         let htmlContent = iconv.decode(Buffer.from(response.data), 'win1250');
         const $ = cheerio.load(htmlContent);
         const result = [];
@@ -66,17 +67,12 @@ app.get('/api/schedule/:group', async (req, res) => {
             const dayNum = dayIndex + 1;
             if (dayNum > 5) return; // Пн - Пт
 
-            // Возвращаем надежный поиск блоков расписания
-            $(this).find("span[class^='rozvrh_bloky']").each(function (blockIdx) {
+            // Счетчик пар в этот день, чтобы если нет точных стилей, 
+            // они гарантированно распределялись по разному времени (например, 7:00, 9:00, 11:00...)
+            let dailyPairCounter = 0;
+
+            $(this).find("span[class^='rozvrh_bloky']").each(function () {
                 const $block =$(this);
-                const $parent =$block.parent();
-                const $grandParent =$parent.parent();
-
-                // Собираем стили с самого блока и всех его родителей
-                const styleAttr = ($block.attr('style') || '') + ';' + 
-                                  ($parent.attr('style') || '') + ';' + 
-                                  ($grandParent.attr('style') || '');
-
                 const links = $block.find("a");
                 
                 if (links.length >= 3) {
@@ -84,7 +80,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     const room = removeDiacritics($(links[1]).text().trim());
                     const title = removeDiacritics($(links[2]).text().trim());
 
-                    // Тип занятия (C - cvičenie, P - prednáška, L - laboratórne)
+                    // Тип занятия (C, P, L)
                     let type = "prednáška";
                     const blockText = removeDiacritics($block.text().trim());
                     const firstChar = blockText.charAt(0).toUpperCase();
@@ -97,47 +93,63 @@ app.get('/api/schedule/:group', async (req, res) => {
                         type = "prednáška";
                     }
 
-                    // 1. Проверяем, есть ли время прямо в тексте или всплывающих подсказках (title/alt/onmouseover)
-                    const fullText = $block.text() + " " + ($block.attr('title') \vert{}\vert{} '') + " " + ($parent.attr('title') || '');
-                    const timeMatch = fullText.match(/(\d{1,2})[:.](\d{2})\s*[-–]\s*(\d{1,2})[:.](\d{2})/);
+                    // Ищем реальное время через родителей или ячейку таблицы (td)
+                    let startHour = 7 + (dailyPairCounter * 2); // Каждая следующая пара сдвигается на 2 часа (например, 7:00, 9:00, 11:00)
+                    let durationHours = 2; // стандартная пара 2 часа сетки
 
-                    let startTime = "";
-                    let endTime = "";
-
-                    if (timeMatch) {
-                        startTime = `${String(timeMatch[1]).padStart(2, '0')}:${timeMatch[2]}`;
-                        endTime = `${String(timeMatch[3]).padStart(2, '0')}:${timeMatch[4]}`;
-                    } else {
-                        // 2. Если времени в тексте нет, ищем координаты left / width в стилях
-                        let startHour = 7 + (blockIdx * 2); // Смещение по порядку, чтобы блоки не накладывались
-                        let durationHours = 2;
-
-                        const leftMatch = styleAttr.match(/left:\s*([-\d.]+)px/i);
-                        const widthMatch = styleAttr.match(/width:\s*([-\d.]+)px/i);
-
-                        if (leftMatch && widthMatch) {
-                            const leftPx = parseFloat(leftMatch[1]);
-                            const widthPx = parseFloat(widthMatch[1]);
-                            const pxPerCell = 50; // 1 час = ~50px
-                            startHour = 7 + Math.round(leftPx / pxPerCell);
-                            durationHours = widthPx / pxPerCell;
+                    // Пытаемся найти ячейку таблицы `td`, в которой лежит этот блок, 
+                    // так как на UNIZA время зашито в порядковый номер ячейки `td`
+                    const $td =$block.closest('td');
+                    if ($td.length > 0) {
+                        const tdIndex = $td.index();
+                        const colspan = parseInt($td.attr('colspan') || '1', 10);
+                        
+                        if (tdIndex > 0) {
+                            // 0-я ячейка обычно день недели, значит часы начинаются с (tdIndex - 1) + 7
+                            startHour = 7 + (tdIndex - 1);
                         }
+                        if (colspan > 1) {
+                            durationHours = colspan;
+                        }
+                    } else {
+                        // Запасной вариант через поиск стилей у любых родителей вверх по дереву
+                        let foundLeft = false;
+                        $block.parents().each(function() {
+                            const parentStyle = $(this).attr('style') || '';
+                            const leftMatch = parentStyle.match(/left:\s*([-\d.]+)px/i);
+                            const widthMatch = parentStyle.match(/width:\s*([-\d.]+)px/i);
+                            if (leftMatch && widthMatch) {
+                                const leftPx = parseFloat(leftMatch[1]);
+                                const widthPx = parseFloat(widthMatch[1]);
+                                startHour = 7 + Math.round(leftPx / 50);
+                                durationHours = widthPx / 50;
+                                foundLeft = true;
+                                return false; // прерываем цикл поиска
+                            }
+                        });
 
-                        if (startHour < 7 || startHour > 19) startHour = 7 + (blockIdx * 2);
-                        if (durationHours < 0.5 || durationHours > 5) durationHours = 2;
-
-                        const times = calculateTimes(startHour, durationHours);
-                        startTime = times.start;
-                        endTime = times.end;
+                        if (!foundLeft) {
+                            dailyPairCounter++;
+                        }
                     }
+
+                    // Защита от вылетов за рамки расписания (7:00 - 19:00)
+                    if (isNaN(startHour) || startHour < 7 || startHour > 18) {
+                        startHour = 7 + ((dailyPairCounter - 1) * 2);
+                    }
+                    if (isNaN(durationHours) || durationHours < 0.5 || durationHours > 5) {
+                        durationHours = 2;
+                    }
+
+                    const timeSlot = getFormattedTime(startHour, durationHours);
 
                     result.push({
                         id: Math.random().toString(36).substring(2, 11),
                         day: dayNum,
                         title: title,
                         type: type,
-                        start: startTime,
-                        end: endTime,
+                        start: timeSlot.start,
+                        end: timeSlot.end,
                         teacher: teacher,
                         room: room
                     });
