@@ -74,20 +74,32 @@ app.get('/api/schedule/:group', async (req, res) => {
             while (i < $spans.length) {
                 const $span = $($spans[i]);
                 const className = $span.attr('class') || '';
-                const links = $span.find("a");
 
-                // Если это начало предмета
+                // Ищем ссылки: либо прямо внутри спана, либо берем верхний вложенный элемент (при наложении)
+                let $targetSpan =$span;
+                let links = $span.find("a");
+
+                if (links.length < 3) {
+                    // Если в самом спане ссылок нет, возможно, это контейнер с наложением (как на скриншоте)
+                    // Берем первый попавшийся дочерний блок (верхний)
+                    const $firstChild =$span.find("span").first();
+                    if ($firstChild.length > 0 &&$firstChild.find("a").length >= 3) {
+                        $targetSpan =$firstChild;
+                        links = $targetSpan.find("a");
+                    }
+                }
+
                 if (links.length >= 3) {
-                    let durationHours = 1; // Базово 1 час для самого первого блока
+                    let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // Считаем все идущие сразу за ним блоки с суффиксом "-c" как продолжение этой же пары
+                    // Проверяем блоки-продолжения (-c) для этой пары
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
 
                         if (nextClass.includes('-c')) {
-                            durationHours += 1; // Каждый блок с -c добавляет 1 час к длительности
+                            durationHours += 1;
                             nextIndex++;
                         } else {
                             break;
@@ -99,7 +111,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     const title = removeDiacritics($(links[2]).text().trim());
 
                     let type = "prednáška";
-                    const blockText = removeDiacritics($span.text().trim());
+                    const blockText = removeDiacritics($targetSpan.text().trim());
                     const firstChar = blockText.charAt(0).toUpperCase();
 
                     if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
@@ -123,13 +135,11 @@ app.get('/api/schedule/:group', async (req, res) => {
                         room: room
                     });
 
-                    // Переходим в цикле за пределы этой пары (пропускаем соединенные -c блоки)
                     i = nextIndex;
                     currentHour += durationHours;
                     continue;
                 }
 
-                // Если это обычный пустой слот или какой-то другой единичный блок без предмета
                 currentHour += 1;
                 i++;
             }
