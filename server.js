@@ -69,7 +69,7 @@ app.get('/api/schedule/:group', async (req, res) => {
 
             const $spans = $(this).children("span");
             let i = 0;
-            let currentHour = 7; // День начинается в 7:00
+            let currentHour = 7; // День всегда начинается в 7:00
 
             while (i < $spans.length) {
                 const $span = $($spans[i]);
@@ -79,12 +79,18 @@ app.get('/api/schedule/:group', async (req, res) => {
                 if ($span.find("a").length >= 3) {
                     $targetSpan = $span;
                 } else {
-                    // 2. Если ссылок нет, значит это ячейка с разделением на подгруппы (вертикальная или горизонтальная).
-                    // В разметке UNIZA верхняя пара всегда идет Самой Первой дочерней нодой (`.first()`).
-                    // Берем первый дочерний span, который содержит контент/ссылки.
-                    const $firstChild = $span.children("span").first();
-                    if ($firstChild.length > 0 && $firstChild.find("a").length >= 3) {
-                        $targetSpan = $firstChild;
+                    // 2. Ищем верхнюю пару: сначала фильтруем по наличию '-v' (исключая '-pv')
+                    let $vChild = $span.find("span").filter(function() {
+                        const cls = $(this).attr('class') || '';
+                        return cls.includes('-v') && !cls.includes('-pv');
+                    }).first();
+
+                    if ($vChild.length === 0 || $vChild.find("a").length < 3) {
+                        $vChild = $span.find("span").first();
+                    }
+
+                    if ($vChild.length > 0 && $vChild.find("a").length >= 3) {
+                        $targetSpan = $vChild;
                     }
                 }
 
