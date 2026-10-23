@@ -69,13 +69,13 @@ app.get('/api/schedule/:group', async (req, res) => {
 
             const $spans = $(this).children("span");
             let i = 0;
-            let currentHour = 7; // День начинается в 7:00
+            let currentHour = 7; // День всегда начинается в 7:00
 
             while (i < $spans.length) {
                 const $span = $($spans[i]);
                 const className = $span.attr('class') || '';
 
-                // Если это чистый блок-продолжение без предмета, просто сдвигаем час
+                // Пропускаем пустые блоки-продолжения (-c), которые не содержат контента сами по себе
                 if (className.includes('-c') && $span.find("a").length === 0 && $span.children().length === 0) {
                     currentHour += 1;
                     i++;
@@ -84,40 +84,29 @@ app.get('/api/schedule/:group', async (req, res) => {
 
                 let $targetSpan = null;
 
-                // 1. Проверяем, есть ли полноценные ссылки прямо в текущем спане
-                if ($span.find("a").length >= 3) {
-                    $targetSpan = $span;
+                // ВАЖНО: В структуре UNIZA верхняя пара всегда лежит Самой Первой внутри контейнера
+                const $firstChild = $span.children("span").first();
+                if ($firstChild.length > 0) {
+                    // Если есть вложенные блоки (разделение подгрупп), берем строго первый (верхний)
+                    $targetSpan = $firstChild;
                 } else {
-                    // 2. Ищем верхнюю пару в разделенных ячейках (исключая нижние -pv)
-                    let $vChild = $span.find("span").filter(function() {
-                        const cls = $(this).attr('class') || '';
-                        return (cls.includes('-v') || cls.includes('-v-color')) && !cls.includes('-pv');
-                    }).first();
-
-                    if ($vChild.length === 0 || $vChild.find("a").length < 3) {
-                        $vChild = $span.find("span").first();
-                    }
-
-                    if ($vChild.length > 0 && $vChild.find("a").length >= 3) {
-                        $targetSpan = $vChild;
-                    } else if ($span.find("a").length > 0) {
-                        // Если ссылок меньше 3, но они есть (например, в разделенных блоках только название предмета)
-                        $targetSpan = $span;
-                    }
+                    // Иначе это обычный цельный блок
+                    $targetSpan = $span;
                 }
 
-                const links = $targetSpan ? $targetSpan.find("a") : $span.find("a");
+                const links = $targetSpan.find("a");
 
                 if ($targetSpan && links.length > 0) {
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // Считаем следующие блоки-продолжения с суффиксом "-c" для объединения длительности пары
+                    // Считаем следующие блоки как продолжение, если они имеют суффикс -c или пустые
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
+                        const nextLinks = $nextSpan.find("a").length;
 
-                        if (nextClass.includes('-c')) {
+                        if (nextClass.includes('-c') || (nextLinks === 0 && $nextSpan.text().trim() === '')) {
                             durationHours += 1;
                             nextIndex++;
                         } else {
@@ -170,7 +159,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     continue;
                 }
 
-                // Если это пустой слот (окно)
+                // Пустой слот (окно)
                 currentHour += 1;
                 i++;
             }
