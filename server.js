@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Исправление словацких символов
+// Исправление словацких символов без знаков вопроса
 function removeDiacritics(str) {
     if (!str) return '';
     return str
@@ -69,13 +69,13 @@ app.get('/api/schedule/:group', async (req, res) => {
 
             const $spans = $(this).children("span");
             let i = 0;
-            let currentHour = 7; // День начинается в 7:00
+            let currentHour = 7; // День всегда начинается в 7:00
 
             while (i < $spans.length) {
                 const $span = $($spans[i]);
                 const className = $span.attr('class') || '';
 
-                // Если это пустой блок-продолжение (-c), пропускаем его
+                // Если это пустой блок-продолжение (-c), просто сдвигаем час
                 if (className.includes('-c') && $span.find("a").length === 0 && $span.children().length === 0) {
                     currentHour += 1;
                     i++;
@@ -84,7 +84,7 @@ app.get('/api/schedule/:group', async (req, res) => {
 
                 let $targetSpan = null;
 
-                // 1. Ищем верхушку split-блоков (-v-color или просто верхний дочерний span)
+                // Проверяем разделенные ячейки: берем строго верхний блок (v-color или первый дочерний)
                 const $vChild = $span.children("span").filter(function() {
                     const cls = $(this).attr('class') || '';
                     return cls.includes('-v-color') || (cls.includes('-v') && !cls.includes('-pv'));
@@ -98,13 +98,14 @@ app.get('/api/schedule/:group', async (req, res) => {
                     $targetSpan = $span;
                 }
 
+                // Ищем ссылки строго ВНУТРИ целевого блока, а не по всей странице
                 const links = $targetSpan.find("a");
 
-                if (links.length > 0) {
+                if ($targetSpan && links.length > 0) {
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // Склеиваем блоки, если у следующих есть '-c'
+                    // Считаем следующие блоки-продолжения с суффиксом "-c"
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
@@ -121,29 +122,26 @@ app.get('/api/schedule/:group', async (req, res) => {
                     let room = '';
                     let title = '';
 
-                    // Парсим ссылки: в стандартном блоке идет Преподаватель -> Кабинет -> Предмет -> Группа
                     if (links.length >= 3) {
                         teacher = removeDiacritics($(links[0]).text().trim());
                         room = removeDiacritics($(links[1]).text().trim());
                         title = removeDiacritics($(links[2]).text().trim());
                     } else if (links.length === 2) {
-                        room = removeDiacritics($(links[0]).text().trim());
+                        teacher = removeDiacritics($(links[0]).text().trim());
                         title = removeDiacritics($(links[1]).text().trim());
                     } else if (links.length === 1) {
                         title = removeDiacritics($(links[0]).text().trim());
                     }
 
-                    // Определение типа пары
                     let type = "prednáška";
-                    const boldText = removeDiacritics($targetSpan.find(".SRH_bold").text().trim());
-                    const fullText = removeDiacritics($targetSpan.text().trim());
-                    const firstChar = (boldText || fullText).charAt(0).toUpperCase();
+                    const blockText = removeDiacritics($targetSpan.text().trim());
+                    const firstChar = blockText.charAt(0).toUpperCase();
 
-                    if (firstChar === 'C' || fullText.toLowerCase().includes('cvicenie')) {
+                    if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
                         type = "cvičenie";
-                    } else if (firstChar === 'L' || fullText.toLowerCase().includes('laboratorne')) {
+                    } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
                         type = "laboratórne";
-                    } else if (firstChar === 'P' || fullText.toLowerCase().includes('prednaska')) {
+                    } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
                         type = "prednáška";
                     }
 
@@ -165,7 +163,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     continue;
                 }
 
-                // Пустой час (окно)
+                // Если это пустой слот (окно)
                 currentHour += 1;
                 i++;
             }
