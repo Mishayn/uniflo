@@ -84,31 +84,19 @@ app.get('/api/schedule/:group', async (req, res) => {
 
                 let $targetSpan = null;
 
-                // 1. Проверяем, есть ли полноценные ссылки прямо в текущем спане
-                if ($span.find("a").length >= 3) {
-                    $targetSpan = $span;
+                // Проверяем структуру: если внутри есть вложенные спаны (разделение ячейки), 
+                // то верхняя пара всегда идет самой первой (.first()). Игнорируем нижнюю.
+                const $childrenSpans = $span.children("span");
+                if ($childrenSpans.length > 0) {
+                    $targetSpan = $childrenSpans.first();
                 } else {
-                    // 2. Ищем верхнюю пару в разделенных ячейках (исключая нижние -pv)
-                    let $vChild = $span.find("span").filter(function() {
-                        const cls = $(this).attr('class') || '';
-                        return (cls.includes('-v') || cls.includes('-v-color')) && !cls.includes('-pv');
-                    }).first();
-
-                    if ($vChild.length === 0 || $vChild.find("a").length < 3) {
-                        $vChild = $span.find("span").first();
-                    }
-
-                    if ($vChild.length > 0 && $vChild.find("a").length >= 3) {
-                        $targetSpan = $vChild;
-                    } else if ($span.find("a").length > 0) {
-                        // Если ссылок меньше 3, но они есть (например, в разделенных блоках только название предмета)
-                        $targetSpan = $span;
-                    }
+                    $targetSpan = $span;
                 }
 
-                const links = $targetSpan ? $targetSpan.find("a") : $span.find("a");
+                const links = $targetSpan.find("a");
+                const spanText = $targetSpan.text().trim();
 
-                if ($targetSpan && links.length > 0) {
+                if ($targetSpan && (links.length > 0 || spanText.length > 0)) {
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
@@ -136,8 +124,10 @@ app.get('/api/schedule/:group', async (req, res) => {
                     } else if (links.length === 2) {
                         teacher = removeDiacritics($(links[0]).text().trim());
                         title = removeDiacritics($(links[1]).text().trim());
-                    } else {
+                    } else if (links.length === 1) {
                         title = removeDiacritics($(links[0]).text().trim());
+                    } else {
+                        title = removeDiacritics(spanText);
                     }
 
                     let type = "prednáška";
