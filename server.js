@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Исправление словацких символов без знаков вопроса
+// Исправление словацких символов
 function removeDiacritics(str) {
     if (!str) return '';
     return str
@@ -69,13 +69,13 @@ app.get('/api/schedule/:group', async (req, res) => {
 
             const $spans = $(this).children("span");
             let i = 0;
-            let currentHour = 7; // День всегда начинается в 7:00
+            let currentHour = 7; // День начинается в 7:00
 
             while (i < $spans.length) {
                 const $span = $($spans[i]);
                 const className = $span.attr('class') || '';
 
-                // Если это чистый блок-продолжение (-c) без контента, мы его пропускаем, так как он учтется в цикле пары
+                // Если это пустой блок-продолжение (-c), пропускаем его
                 if (className.includes('-c') && $span.find("a").length === 0 && $span.children().length === 0) {
                     currentHour += 1;
                     i++;
@@ -84,13 +84,13 @@ app.get('/api/schedule/:group', async (req, res) => {
 
                 let $targetSpan = null;
 
-                // Выбираем верхний блок в разделенных ячейках (v-color) или цельный блок (-p / обычный)
+                // 1. Ищем верхушку split-блоков (-v-color или просто верхний дочерний span)
                 const $vChild = $span.children("span").filter(function() {
                     const cls = $(this).attr('class') || '';
                     return cls.includes('-v-color') || (cls.includes('-v') && !cls.includes('-pv'));
                 }).first();
 
-                if ($vChild.length > 0 && ($vChild.find("a").length > 0 || $vChild.text().trim().length > 0)) {
+                if ($vChild.length > 0) {
                     $targetSpan = $vChild;
                 } else if ($span.children("span").length > 0) {
                     $targetSpan = $span.children("span").first();
@@ -99,14 +99,12 @@ app.get('/api/schedule/:group', async (req, res) => {
                 }
 
                 const links = $targetSpan.find("a");
-                const spanText = $targetSpan.text().trim();
 
-                if ($targetSpan && (links.length > 0 || spanText.length > 0)) {
+                if (links.length > 0) {
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // СТРОГОЕ ОБЪЕДИНЕНИЕ: смотрим следующие блоки. 
-                    // Склеиваем ТОЛЬКО если у следующего блока в классе есть '-c' (продолжение)
+                    // Склеиваем блоки, если у следующих есть '-c'
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
@@ -123,28 +121,29 @@ app.get('/api/schedule/:group', async (req, res) => {
                     let room = '';
                     let title = '';
 
+                    // Парсим ссылки: в стандартном блоке идет Преподаватель -> Кабинет -> Предмет -> Группа
                     if (links.length >= 3) {
                         teacher = removeDiacritics($(links[0]).text().trim());
                         room = removeDiacritics($(links[1]).text().trim());
                         title = removeDiacritics($(links[2]).text().trim());
                     } else if (links.length === 2) {
-                        teacher = removeDiacritics($(links[0]).text().trim());
-                        title = removeDiacritics($(links.L1 || links[1]).text().trim());
+                        room = removeDiacritics($(links[0]).text().trim());
+                        title = removeDiacritics($(links[1]).text().trim());
                     } else if (links.length === 1) {
                         title = removeDiacritics($(links[0]).text().trim());
-                    } else {
-                        title = removeDiacritics(spanText);
                     }
 
+                    // Определение типа пары
                     let type = "prednáška";
-                    const blockText = removeDiacritics($targetSpan.text().trim());
-                    const firstChar = blockText.charAt(0).toUpperCase();
+                    const boldText = removeDiacritics($targetSpan.find(".SRH_bold").text().trim());
+                    const fullText = removeDiacritics($targetSpan.text().trim());
+                    const firstChar = (boldText || fullText).charAt(0).toUpperCase();
 
-                    if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
+                    if (firstChar === 'C' || fullText.toLowerCase().includes('cvicenie')) {
                         type = "cvičenie";
-                    } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
+                    } else if (firstChar === 'L' || fullText.toLowerCase().includes('laboratorne')) {
                         type = "laboratórne";
-                    } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
+                    } else if (firstChar === 'P' || fullText.toLowerCase().includes('prednaska')) {
                         type = "prednáška";
                     }
 
@@ -161,13 +160,12 @@ app.get('/api/schedule/:group', async (req, res) => {
                         room: room
                     });
 
-                    // Переходим в цикле за пределы всех соединенных блоков продолжения
                     i = nextIndex;
                     currentHour += durationHours;
                     continue;
                 }
 
-                // Пустой слот (окно)
+                // Пустой час (окно)
                 currentHour += 1;
                 i++;
             }
