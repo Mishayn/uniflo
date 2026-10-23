@@ -75,7 +75,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                 const $span = $($spans[i]);
                 const className = $span.attr('class') || '';
 
-                // Пропускаем чистые блоки-продолжения без контента
+                // Если это чистый блок-продолжение (-c) без контента, мы его пропускаем, так как он учтется в цикле пары
                 if (className.includes('-c') && $span.find("a").length === 0 && $span.children().length === 0) {
                     currentHour += 1;
                     i++;
@@ -84,35 +84,34 @@ app.get('/api/schedule/:group', async (req, res) => {
 
                 let $targetSpan = null;
 
-                // Проверяем, есть ли разделенные подгруппы (вертикальное разделение на 2 пары)
+                // Выбираем верхний блок в разделенных ячейках (v-color) или цельный блок (-p / обычный)
                 const $vChild = $span.children("span").filter(function() {
                     const cls = $(this).attr('class') || '';
                     return cls.includes('-v-color') || (cls.includes('-v') && !cls.includes('-pv'));
                 }).first();
 
-                if ($vChild.length > 0 && $vChild.find("a").length > 0) {
+                if ($vChild.length > 0 && ($vChild.find("a").length > 0 || $vChild.text().trim().length > 0)) {
                     $targetSpan = $vChild;
-                } else if ($span.children("span").length > 0 && $span.children("span").first().find("a").length > 0) {
-                    // Берем первый дочерний элемент, если он содержит ссылки
+                } else if ($span.children("span").length > 0) {
                     $targetSpan = $span.children("span").first();
                 } else {
-                    // Обычный блок (например, с классом -p или обычный rozvrh_bloky)
                     $targetSpan = $span;
                 }
 
                 const links = $targetSpan.find("a");
+                const spanText = $targetSpan.text().trim();
 
-                if ($targetSpan && links.length > 0) {
+                if ($targetSpan && (links.length > 0 || spanText.length > 0)) {
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // Считаем следующие блоки как продолжение (-c или пустые слоты)
+                    // СТРОГОЕ ОБЪЕДИНЕНИЕ: смотрим следующие блоки. 
+                    // Склеиваем ТОЛЬКО если у следующего блока в классе есть '-c' (продолжение)
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
-                        const nextLinks = $nextSpan.find("a").length;
 
-                        if (nextClass.includes('-c') || (nextLinks === 0 && $nextSpan.text().trim() === '')) {
+                        if (nextClass.includes('-c')) {
                             durationHours += 1;
                             nextIndex++;
                         } else {
@@ -130,9 +129,11 @@ app.get('/api/schedule/:group', async (req, res) => {
                         title = removeDiacritics($(links[2]).text().trim());
                     } else if (links.length === 2) {
                         teacher = removeDiacritics($(links[0]).text().trim());
-                        title = removeDiacritics($(links[1]).text().trim());
-                    } else {
+                        title = removeDiacritics($(links.L1 || links[1]).text().trim());
+                    } else if (links.length === 1) {
                         title = removeDiacritics($(links[0]).text().trim());
+                    } else {
+                        title = removeDiacritics(spanText);
                     }
 
                     let type = "prednáška";
@@ -160,6 +161,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                         room: room
                     });
 
+                    // Переходим в цикле за пределы всех соединенных блоков продолжения
                     i = nextIndex;
                     currentHour += durationHours;
                     continue;
