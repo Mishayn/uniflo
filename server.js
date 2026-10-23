@@ -75,7 +75,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                 const $span = $($spans[i]);
                 const className = $span.attr('class') || '';
 
-                // Если это пустой блок-продолжение (-c), просто сдвигаем час
+                // Пропускаем пустые блоки-продолжения (-c), которые не содержат контента сами по себе
                 if (className.includes('-c') && $span.find("a").length === 0 && $span.children().length === 0) {
                     currentHour += 1;
                     i++;
@@ -84,33 +84,29 @@ app.get('/api/schedule/:group', async (req, res) => {
 
                 let $targetSpan = null;
 
-                // Проверяем разделенные ячейки: берем строго верхний блок (v-color или первый дочерний)
-                const $vChild = $span.children("span").filter(function() {
-                    const cls = $(this).attr('class') || '';
-                    return cls.includes('-v-color') || (cls.includes('-v') && !cls.includes('-pv'));
-                }).first();
-
-                if ($vChild.length > 0) {
-                    $targetSpan = $vChild;
-                } else if ($span.children("span").length > 0) {
-                    $targetSpan = $span.children("span").first();
+                // ВАЖНО: В структуре UNIZA верхняя пара всегда лежит Самой Первой внутри контейнера
+                const $firstChild = $span.children("span").first();
+                if ($firstChild.length > 0) {
+                    // Если есть вложенные блоки (разделение подгрупп), берем строго первый (верхний)
+                    $targetSpan = $firstChild;
                 } else {
+                    // Иначе это обычный цельный блок
                     $targetSpan = $span;
                 }
 
-                // Ищем ссылки строго ВНУТРИ целевого блока, а не по всей странице
                 const links = $targetSpan.find("a");
 
                 if ($targetSpan && links.length > 0) {
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // Считаем следующие блоки-продолжения с суффиксом "-c"
+                    // Считаем следующие блоки как продолжение, если они имеют суффикс -c или пустые
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
+                        const nextLinks = $nextSpan.find("a").length;
 
-                        if (nextClass.includes('-c')) {
+                        if (nextClass.includes('-c') || (nextLinks === 0 && $nextSpan.text().trim() === '')) {
                             durationHours += 1;
                             nextIndex++;
                         } else {
@@ -129,7 +125,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     } else if (links.length === 2) {
                         teacher = removeDiacritics($(links[0]).text().trim());
                         title = removeDiacritics($(links[1]).text().trim());
-                    } else if (links.length === 1) {
+                    } else {
                         title = removeDiacritics($(links[0]).text().trim());
                     }
 
@@ -163,7 +159,7 @@ app.get('/api/schedule/:group', async (req, res) => {
                     continue;
                 }
 
-                // Если это пустой слот (окно)
+                // Пустой слот (окно)
                 currentHour += 1;
                 i++;
             }
