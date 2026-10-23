@@ -84,17 +84,21 @@ app.get('/api/schedule/:group', async (req, res) => {
 
                 let $targetSpan = null;
 
-                // Проверяем структуру: если внутри есть вложенные спаны (разделение ячейки), 
-                // то верхняя пара всегда идет самой первой (.first()). Игнорируем нижнюю.
-                const $childrenSpans = $span.children("span");
-                if ($childrenSpans.length > 0) {
-                    $targetSpan = $childrenSpans.first();
-                } else {
+                // 1. Проверяем, есть ли полноценные ссылки прямо в текущем спане
+                if ($span.find("a").length >= 3) {
                     $targetSpan = $span;
+                } else {
+                    // 2. Если это разделенная ячейка, берем строго самый первый дочерний спан (верхний: v-color)
+                    const $childrenSpans = $span.children("span");
+                    if ($childrenSpans.length > 0) {
+                        $targetSpan = $childrenSpans.first();
+                    } else if ($span.find("a").length > 0) {
+                        $targetSpan = $span;
+                    }
                 }
 
-                const links = $targetSpan.find("a");
-                const spanText = $targetSpan.text().trim();
+                const links = $targetSpan ? $targetSpan.find("a") : $span.find("a");
+                const spanText = $targetSpan ? $targetSpan.text().trim() : $span.text().trim();
 
                 if ($targetSpan && (links.length > 0 || spanText.length > 0)) {
                     let durationHours = 1;
