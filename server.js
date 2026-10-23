@@ -73,33 +73,42 @@ app.get('/api/schedule/:group', async (req, res) => {
 
             while (i < $spans.length) {
                 const $span = $($spans[i]);
-                let $targetSpan = null;
+                const className = $span.attr('class') || '';
 
-                // 1. Проверяем, есть ли полноценные ссылки прямо в текущем спане
-                if ($span.find("a").length >= 3) {
-                    $targetSpan = $span;
-                } else {
-                    // 2. Ищем верхнюю пару: сначала фильтруем по наличию '-v' (исключая '-pv')
-                    let $vChild = $span.find("span").filter(function() {
-                        const cls = $(this).attr('class') || '';
-                        return cls.includes('-v') && !cls.includes('-pv');
-                    }).first();
-
-                    if ($vChild.length === 0 || $vChild.find("a").length < 3) {
-                        $vChild = $span.find("span").first();
-                    }
-
-                    if ($vChild.length > 0 && $vChild.find("a").length >= 3) {
-                        $targetSpan = $vChild;
-                    }
+                // Если это блок-продолжение (-c), пропускаем как отдельный предмет, просто сдвигаем час
+                if (className.includes('-c')) {
+                    currentHour += 1;
+                    i++;
+                    continue;
                 }
 
-                if ($targetSpan && $targetSpan.find("a").length >= 3) {
-                    const links = $targetSpan.find("a");
+                let $targetSpan = null;
+
+                // Проверяем, есть ли разделенные подгруппы внутри ячейки (берем верхнюю: -v-color)
+                const $vChild = $span.children("span").filter(function() {
+                    const cls = $(this).attr('class') || '';
+                    return cls.includes('-v-color') || (cls.includes('-v') && !cls.includes('-pv'));
+                }).first();
+
+                if ($vChild.length > 0) {
+                    $targetSpan = $vChild;
+                } else if ($span.children("span").length > 0) {
+                    // Если нет явного -v, но есть дочерние спаны, берем первый (верхний)
+                    $targetSpan = $span.children("span").first();
+                } else {
+                    // Иначе это обычный цельный блок
+                    $targetSpan = $span;
+                }
+
+                const links = $targetSpan.find("a");
+                const spanText = $targetSpan.text().trim();
+
+                // Если внутри есть ссылки или текст — это занятие
+                if (links.length > 0 || spanText.length > 0) {
                     let durationHours = 1;
                     let nextIndex = i + 1;
 
-                    // Считаем следующие блоки-продолжения с суффиксом "-c"
+                    // Считаем следующие блоки-продолжения с суффиксом "-c" для объединения длительности
                     while (nextIndex < $spans.length) {
                         const $nextSpan = $($spans[nextIndex]);
                         const nextClass = $nextSpan.attr('class') || '';
@@ -112,41 +121,56 @@ app.get('/api/schedule/:group', async (req, res) => {
                         }
                     }
 
-                    const teacher = removeDiacritics($(links[0]).text().trim());
-                    const room = removeDiacritics($(links[1]).text().trim());
-                    const title = removeDiacritics($(links[2]).text().trim());
+                    let title = '';
+                    let teacher = '';
+                    let room = '';
 
-                    let type = "prednáška";
-                    const blockText = removeDiacritics($targetSpan.text().trim());
-                    const firstChar = blockText.charAt(0).toUpperCase();
-
-                    if (firstChar === 'C' || blockText.toLowerCase().includes('cvicenie')) {
-                        type = "cvičenie";
-                    } else if (firstChar === 'L' || blockText.toLowerCase().includes('laboratorne')) {
-                        type = "laboratórne";
-                    } else if (firstChar === 'P' || blockText.toLowerCase().includes('prednaska')) {
-                        type = "prednáška";
+                    if (links.length >= 3) {
+                        teacher = removeDiacritics($(links[0]).text().trim());
+                        room = removeDiacritics($(links[1]).text().trim());
+                        title = removeDiacritics($(links[2]).text().trim());
+                    } else if (links.length === 1) {
+                        // В разделенных блоках обычно только одна ссылка на предмет
+                        title = removeDiacritics($(links[0]).text().trim());
+                    } else if (links.length === 2) {
+                        teacher = removeDiacritics($(links[0]).text().trim());
+                        title = removeDiacritics($(links[1]).text().trim());
+                    } else {
+                        title = removeDiacritics(spanText);
                     }
 
-                    const timeSlot = calculateTimes(currentHour, durationHours);
+                    if (title) {
+                        let type = "prednáška";
+                        const boldChar = removeDiacritics($targetSpan.find(".SRH_bold").text().trim()).charAt(0).toUpperCase();
 
-                    result.push({
-                        id: Math.random().toString(36).substring(2, 11),
-                        day: dayNum,
-                        title: title,
-                        type: type,
-                        start: timeSlot.start,
-                        end: timeSlot.end,
-                        teacher: teacher,
-                        room: room
-                    });
+                        if (boldChar === 'C' || spanText.toLowerCase().includes('cvicenie')) {
+                            type = "cvičenie";
+                        } else if (boldChar === 'L' || spanText.toLowerCase().includes('laboratorne')) {
+                            type = "laboratórne";
+                        } else if (boldChar === 'P' || spanText.toLowerCase().includes('prednaska')) {
+                            type = "prednáška";
+                        }
+
+                        const timeSlot = calculateTimes(currentHour, durationHours);
+
+                        result.push({
+                            id: Math.random().toString(36).substring(2, 11),
+                            day: dayNum,
+                            title: title,
+                            type: type,
+                            start: timeSlot.start,
+                            end: timeSlot.end,
+                            teacher: teacher,
+                            room: room
+                        });
+                    }
 
                     i = nextIndex;
                     currentHour += durationHours;
                     continue;
                 }
 
-                // Если это пустой слот (окно), просто сдвигаем текущий час дальше
+                // Пустой слот (окно)
                 currentHour += 1;
                 i++;
             }
