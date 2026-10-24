@@ -1986,6 +1986,9 @@
         sk: {
             group_label: "Skupina:",
             fetch_schedule: "📅 Preniesť rozvrh",
+            sched_loading: "⏳ Načítavam rozvrh zo servera...",
+            sched_success: "✅ Rozvrh bol úspešne aktualizovaný!",
+            sched_error: "❌ Nepodarilo sa načítať rozvrh.",
             add_lesson: "+ Pridať hodinu",
             reset_title: "Reset rozvrhu",
             weekly_schedule: "📅 Týždenný rozvrh",
@@ -2086,6 +2089,9 @@
         en: {
             group_label: "Group:",
             fetch_schedule: "📅 Transfer schedule",
+            sched_loading: "⏳ Loading schedule from server...",
+            sched_success: "✅ Schedule successfully updated!",
+            sched_error: "❌ Failed to load schedule.",
             add_lesson: "+ Add Lesson",
             reset_title: "Reset schedule",
             weekly_schedule: "📅 Weekly Schedule",
@@ -2186,6 +2192,9 @@
         ru: {
             group_label: "Группа:",
             fetch_schedule: "📅 Перенести расписание",
+            sched_loading: "⏳ Загрузка расписания с сервера...",
+            sched_success: "✅ Расписание успешно обновлено!",
+            sched_error: "❌ Не удалось загрузить расписание.",
             add_lesson: "+ Добавить пару",
             reset_title: "Сбросить расписание",
             weekly_schedule: "📅 Расписание на неделю",
@@ -2286,6 +2295,9 @@
         uk: {
             group_label: "Група:",
             fetch_schedule: "📅 Перенести розклад",
+            sched_loading: "⏳ Завантаження розкладу з сервера...",
+            sched_success: "✅ Розклад успішно оновлено!",
+            sched_error: "❌ Не вдалося завантажити розклад.",
             add_lesson: "+ Додати пару",
             reset_title: "Скинути розклад",
             weekly_schedule: "📅 Тижневий розклад",
@@ -3506,7 +3518,12 @@
         const data = snapshot.val();
         if (data) {
             Object.keys(data).forEach(key => {
-                customMapPoints.push({ id: key, ...data[key] });
+                const item = data[key];
+                customMapPoints.push({ 
+                    id: key, 
+                    ...item,
+                    isAdmin: Boolean(item.isAdmin)
+                });
             });
         }
         if (leafletMap) {
@@ -3547,7 +3564,8 @@
             document.body.appendChild(loaderBadge);
         }
         
-        loaderBadge.innerHTML = "⏳ Načítavam rozvrh zo servera...";
+        const t = translations[currentLang] || translations['sk'];
+        loaderBadge.innerHTML = t.sched_loading || "⏳ Načítavam rozvrh zo servera...";
         loaderBadge.style.display = "block";
 
         try {
@@ -3568,14 +3586,14 @@
                 schedule = newSched;
                 localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
                 renderAll();
-                loaderBadge.innerHTML = "✅ Rozvrh bol úspešne aktualizovaný!";
+                loaderBadge.innerHTML = t.sched_success || "✅ Rozvrh bol úspešne aktualizovaný!";
                 setTimeout(() => { loaderBadge.style.display = 'none'; }, 3000);
             } else {
                 throw new Error("Неверный формат данных");
             }
         } catch (error) {
             console.error(error);
-            loaderBadge.innerHTML = "❌ Nepodarilo sa načítať rozvrh.";
+            loaderBadge.innerHTML = t.sched_error || "❌ Nepodarilo sa načítať rozvrh.";
             setTimeout(() => { loaderBadge.style.display = 'none'; }, 4000);
         }
     }
@@ -4089,13 +4107,13 @@
         let isAdmin = false;
         if (id) {
             const existing = customMapPoints.find(p => p.id === id);
-            isAdmin = existing ? existing.isAdmin : false;
+            isAdmin = existing ? Boolean(existing.isAdmin) : false;
         } else if (isAdminRequested) {
             if (prompt("Zadajte heslo pre admin bod:") === "454") isAdmin = true;
             else { alert("Nesprávne heslo!"); return; }
         }
 
-        const pointData = { title, cat, lat, lng, isAdmin, timestamp: Date.now() };
+        const pointData = { title, cat, lat, lng, isAdmin: Boolean(isAdmin), timestamp: Date.now() };
         if (id) db.ref('mapPoints/' + id).set(pointData);
         else db.ref('mapPoints').push(pointData);
         closeModal('map-point-modal');
@@ -4141,7 +4159,7 @@
         categoryKeys.forEach(catObj => {
             const catLocalizedName = t[catObj.key] || catObj.defaultName;
             const btn = document.createElement('button');
-            const hasItems = customMapPoints.some(p => !!p.isAdmin === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName));
+            const hasItems = customMapPoints.some(p => Boolean(p.isAdmin) === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName));
             btn.className = 'chip-modal-btn' + (hasItems ? ' has-items' : '');
             btn.innerHTML = `<span>${catLocalizedName}</span>`;
             btn.onclick = () => renderPointsViewForCategory(catObj);
@@ -4158,7 +4176,13 @@
         const isAdminMode = (currentModalType === 'admin');
         titleEl.innerHTML = `<button onclick="renderCategoriesView()" style="background:none; border:none; color:var(--accent-orange); cursor:pointer; font-weight:700; margin-right:8px;">${t.back_btn}</button> ${escapeHtml(catLocalizedName)}`;
 
-        const filteredPoints = customMapPoints.filter(p => !!p.isAdmin === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName));
+        const filteredPoints = customMapPoints.filter(p => Boolean(p.isAdmin) === isAdminMode && (p.cat === catObj.defaultName || p.cat === catLocalizedName));
+        
+        if (filteredPoints.length === 0) {
+            container.innerHTML = `<div style="color:var(--text-muted); font-size:0.8rem; text-align:center; padding:12px; width:100%;">${t.no_places}</div>`;
+            return;
+        }
+
         filteredPoints.forEach(p => {
             const btn = document.createElement('button');
             btn.className = 'chip-modal-btn';
