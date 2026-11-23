@@ -1115,6 +1115,44 @@
             font-size: 0.8rem;
         }
 
+        /* ===== Чат: комнаты, пузыри, онлайн ===== */
+        .chat-card { display: flex; flex-direction: column; gap: 10px; }
+        .chat-head { display: flex; align-items: center; gap: 10px; }
+        .chat-head-icon { width: 38px; height: 38px; border-radius: 10px; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.35); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .chat-head-main { flex: 1; min-width: 0; }
+        .chat-head-title { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700; }
+        .chat-room-badge { font-size: 0.7rem; font-weight: 700; color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.45); background: rgba(34, 197, 94, 0.1); padding: 1px 7px; border-radius: 6px; white-space: nowrap; }
+        .chat-head-sub { font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+        .chat-head-sub b { color: var(--text-primary); font-weight: 700; }
+        .chat-link-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; padding: 0 2px; }
+        .chat-link-btn:hover { color: var(--accent-orange); }
+        .chat-online { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.08); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+        .chat-online-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+        .chat-tabs { display: flex; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 3px; gap: 3px; }
+        .chat-tab { flex: 1; background: transparent; border: 0; color: var(--text-secondary); font-size: 0.78rem; font-weight: 700; padding: 6px; border-radius: 8px; cursor: pointer; }
+        .chat-tab.active { background: var(--bg-card-hover); color: var(--text-primary); }
+        .chat-messages2 { height: 270px; overflow-y: auto; display: flex; flex-direction: column; padding: 2px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 6px 8px 10px; }
+        .chat-divider { display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 0.7rem; margin: 10px 0 4px; }
+        .chat-divider::before, .chat-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+        .chat-row { display: flex; align-items: flex-end; gap: 8px; margin-top: 8px; }
+        .chat-row.cont { margin-top: 3px; }
+        .chat-row.mine { flex-direction: row-reverse; }
+        .chat-ava { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: #ffffff; object-fit: cover; }
+        .chat-ava.spacer { visibility: hidden; }
+        .chat-col { display: flex; flex-direction: column; max-width: 78%; min-width: 0; }
+        .chat-row.mine .chat-col { align-items: flex-end; }
+        .chat-meta { font-size: 0.68rem; color: var(--text-muted); margin: 0 4px 3px; }
+        .chat-meta b { color: var(--accent-orange); font-weight: 700; margin-right: 4px; }
+        .chat-row.mine .chat-meta b { color: var(--text-secondary); }
+        .chat-bubble { background: var(--bg-card-hover); border: 1px solid var(--border-color); color: var(--text-primary); padding: 7px 11px; border-radius: 14px 14px 14px 4px; font-size: 0.84rem; line-height: 1.35; overflow-wrap: anywhere; white-space: pre-wrap; }
+        .chat-row.mine .chat-bubble { background: var(--accent-orange); border-color: var(--accent-orange); color: #ffffff; border-radius: 14px 14px 4px 14px; }
+        .chat-empty { margin: auto; color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 20px; }
+        .chat-input-area2 { display: flex; gap: 8px; }
+        .chat-input-area2 input { flex: 1; min-width: 0; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-size: 0.85rem; outline: none; }
+        .chat-input-area2 input:focus { border-color: var(--accent-orange); }
+        .chat-send2 { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-orange); color: #ffffff; border: 0; border-radius: 10px; padding: 0 14px; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
+        .chat-send2:disabled { opacity: 0.45; cursor: default; }
+
         .reviews-container {
             display: flex;
             flex-direction: column;
@@ -1578,30 +1616,30 @@
                     </div>
 
                     <!-- Онлайн Чат -->
-                    <div class="dash-card">
-                        <div class="section-header">
-                            <div class="section-title" data-i18n="online_chat">💬 Online Chat</div>
-                            <div id="chat-auth-container">
-                                <button class="btn-google-login" onclick="loginWithGoogle()">
-                                    <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-                                    <span>Google</span>
-                                </button>
+                    <div class="dash-card chat-card">
+                        <div class="chat-head">
+                            <div class="chat-head-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"></path></svg>
+                            </div>
+                            <div class="chat-head-main">
+                                <div class="chat-head-title"><span data-i18n="chat_title">Online chat</span><span class="chat-room-badge" id="chat-room-badge">—</span></div>
+                                <div class="chat-head-sub" id="chat-auth-container"></div>
+                            </div>
+                            <div class="chat-online" id="chat-online" title="Prihlásení ľudia v tejto miestnosti">
+                                <span class="chat-online-dot"></span><span id="chat-online-count">0</span>&nbsp;<span data-i18n="chat_online">online</span>
                             </div>
                         </div>
-                        
-                        <div class="chat-box">
-                            <div class="chat-messages" id="chat-messages-list">
-                                <div class="chat-msg">
-                                    <div class="chat-msg-header">
-                                        <span class="chat-msg-author" data-i18n="chat_system">Systém</span>
-                                    </div>
-                                    <div data-i18n="chat_welcome">Vitajte v online chate UniFlo!</div>
-                                </div>
-                            </div>
-                            <div class="chat-input-area">
-                                <input type="text" id="chat-input-msg" class="chat-input" data-i18n-placeholder="chat_placeholder_login" placeholder="Prihláste sa..." disabled onkeypress="handleChatKeyPress(event)">
-                                <button class="chat-send-btn" id="chat-send-btn" disabled onclick="sendChatMessage()" data-i18n="chat_send">Odoslať</button>
-                            </div>
+                        <div class="chat-tabs">
+                            <button type="button" class="chat-tab active" id="chat-tab-group" onclick="setChatTab('group')" data-i18n="chat_tab_group">Moja skupina</button>
+                            <button type="button" class="chat-tab" id="chat-tab-all" onclick="setChatTab('all')" data-i18n="chat_tab_all">Všetci</button>
+                        </div>
+                        <div class="chat-messages2" id="chat-messages-list"></div>
+                        <div class="chat-input-area2">
+                            <input type="text" id="chat-input-msg" maxlength="500" placeholder="Prihláste sa..." disabled onkeydown="handleChatKeyPress(event)" aria-label="Správa">
+                            <button type="button" class="chat-send2" id="chat-send-btn" disabled onclick="sendChatMessage()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4z"></path></svg>
+                                <span data-i18n="chat_send">Odoslať</span>
+                            </button>
                         </div>
                     </div>
 
@@ -2108,6 +2146,7 @@
             chat_welcome: "Vitajte v online chate UniFlo!",
             chat_placeholder_login: "Prihláste sa...",
             chat_send: "Odoslať",
+            chat_title: "Online chat", chat_tab_group: "Moja skupina", chat_tab_all: "Všetci", chat_today: "dnes", chat_yesterday: "včera", chat_you: "Vy", chat_you_label: "vy", chat_online: "online", chat_empty: "Zatiaľ žiadne správy. Napíš prvý!", chat_login_hint: "Prihlás sa, aby si mohol písať", chat_sub_group: "chat skupiny", chat_sub_all: "spoločný chat UniFlo", chat_placeholder: "Napísať do chatu…", chat_send_error: "Správu sa nepodarilo odoslať:",
             btn_open: "Otvoriť ↗",
             btn_subscribe: "Odoberať ↗",
             promo_punkto_desc: "Pohodlné vyhľadávanie miest na mape: jedlo, obchody, služby, voľný čas a veľa ďalšieho.",
@@ -2211,6 +2250,7 @@
             chat_welcome: "Welcome to UniFlo online chat!",
             chat_placeholder_login: "Sign in...",
             chat_send: "Send",
+            chat_title: "Online chat", chat_tab_group: "My group", chat_tab_all: "Everyone", chat_today: "today", chat_yesterday: "yesterday", chat_you: "You", chat_you_label: "you", chat_online: "online", chat_empty: "No messages yet. Be the first!", chat_login_hint: "Sign in to write", chat_sub_group: "group chat", chat_sub_all: "UniFlo common chat", chat_placeholder: "Write to chat…", chat_send_error: "Message could not be sent:",
             btn_open: "Open ↗",
             btn_subscribe: "Subscribe ↗",
             promo_punkto_desc: "Convenient place search on map: food, shops, services, leisure and more.",
@@ -2314,6 +2354,7 @@
             chat_welcome: "Добро пожаловать в онлайн-чат UniFlo!",
             chat_placeholder_login: "Войдите...",
             chat_send: "Отправить",
+            chat_title: "Онлайн чат", chat_tab_group: "Моя группа", chat_tab_all: "Все", chat_today: "сегодня", chat_yesterday: "вчера", chat_you: "Вы", chat_you_label: "вы", chat_online: "онлайн", chat_empty: "Пока нет сообщений. Напиши первым!", chat_login_hint: "Войди, чтобы писать", chat_sub_group: "чат группы", chat_sub_all: "общий чат UniFlo", chat_placeholder: "Написать в чат…", chat_send_error: "Не удалось отправить сообщение:",
             btn_open: "Открыть ↗",
             btn_subscribe: "Подписаться ↗",
             promo_punkto_desc: "Удобный поиск мест на карте: еда, магазины, услуги, досуг и многое другое.",
@@ -2417,6 +2458,7 @@
             chat_welcome: "Ласкаво просимо до онлайн-чату UniFlo!",
             chat_placeholder_login: "Увійдіть...",
             chat_send: "Надіслати",
+            chat_title: "Онлайн чат", chat_tab_group: "Моя група", chat_tab_all: "Усі", chat_today: "сьогодні", chat_yesterday: "вчора", chat_you: "Ви", chat_you_label: "ви", chat_online: "онлайн", chat_empty: "Поки немає повідомлень. Напиши першим!", chat_login_hint: "Увійди, щоб писати", chat_sub_group: "чат групи", chat_sub_all: "спільний чат UniFlo", chat_placeholder: "Написати в чат…", chat_send_error: "Не вдалося надіслати повідомлення:",
             btn_open: "Відкрити ↗",
             btn_subscribe: "Підтримати ↗",
             promo_punkto_desc: "Зручний пошук місць на карті: їжа, магазини, послуги, дозвілля та багато іншого.",
@@ -2500,6 +2542,7 @@
         renderUpcomingDay();
         renderCompactCalendar();
         updateLiveLesson();
+        if (chatInited) { updateChatUserUI(); connectChatRoom(true); }
     }
 
     function applyTranslations() {
@@ -2605,6 +2648,7 @@
             customNickname = newNick.trim() || currentUser.displayName;
             saveLS('uniza_custom_nickname', customNickname);
             updateChatUserUI();
+            if (chatInited) updatePresence();
         }
     }
 
@@ -2628,83 +2672,206 @@
         updateChatUserUI();
     });
 
+    // ==========================================
+    // ЧАТ: комнаты (своя группа / все), онлайн, пузыри
+    // ==========================================
+    const trc = (k, fb) => ((translations[currentLang] || {})[k]) || translations.sk[k] || fb;
+    let chatTab = localStorage.getItem('uniflo_chat_tab') === 'all' ? 'all' : 'group';
+    let chatRef = null;
+    let chatRoomKey = null;
+    let chatLast = null;
+    let chatInited = false;
+    let presenceListenRef = null;
+    let presenceMineRef = null;
+
+    function chatGroupKey() {
+        return String(currentGroup || '').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 20) || 'NONE';
+    }
+    function chatRoomPath() { return chatTab === 'all' ? 'messages' : 'groupChats/' + chatGroupKey(); }
+    function presenceRoomPath() { return 'presence/' + (chatTab === 'all' ? 'all' : 'g_' + chatGroupKey()); }
+    function chatName() { return (customNickname || (currentUser && currentUser.displayName) || 'Študent').slice(0, 40); }
+
     function updateChatUserUI() {
         const authContainer = document.getElementById('chat-auth-container');
         const input = document.getElementById('chat-input-msg');
         const sendBtn = document.getElementById('chat-send-btn');
+        const badge = document.getElementById('chat-room-badge');
+        if (!authContainer || !input || !sendBtn) return;
+
+        if (badge) badge.textContent = chatTab === 'all' ? trc('chat_tab_all', 'Všetci') : chatGroupKey();
+        const roomSub = chatTab === 'all' ? trc('chat_sub_all', 'spoločný chat UniFlo') : trc('chat_sub_group', 'chat skupiny');
 
         if (currentUser) {
-            const displayName = customNickname || currentUser.displayName || "Študent";
-            const photoURL = currentUser.photoURL || 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg';
-
             authContainer.innerHTML = `
-                <div class="chat-user-profile">
-                    <img src="${escapeHtml(photoURL)}" class="chat-avatar" alt="">
-                    <span style="font-weight:600; color:var(--text-primary);">${escapeHtml(displayName)}</span>
-                    <button onclick="changeCustomNickname()" title="Zmeniť nick" style="background:none; border:none; cursor:pointer; font-size:0.75rem;">✏️</button>
-                    <button onclick="logoutUser()" title="Odhlásiť sa" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; margin-left:2px;">✕</button>
-                </div>
+                <span>${escapeHtml(trc('chat_you_label', 'vy'))}: <b>${escapeHtml(chatName())}</b></span>
+                <button type="button" class="chat-link-btn" onclick="changeCustomNickname()" title="Zmeniť nick">✏️</button>
+                <span>· ${escapeHtml(roomSub)}</span>
+                <button type="button" class="chat-link-btn" onclick="logoutUser()" title="Odhlásiť sa">✕</button>
             `;
             input.disabled = false;
             sendBtn.disabled = false;
+            input.placeholder = trc('chat_placeholder', 'Napísať do chatu…');
         } else {
             authContainer.innerHTML = `
-                <button class="btn-google-login" onclick="loginWithGoogle()">
-                    <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                <span>${escapeHtml(trc('chat_login_hint', 'Prihlás sa, aby si mohol písať'))}</span>
+                <button class="btn-google-login" onclick="loginWithGoogle()" style="padding: 3px 8px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
                     <span>Google</span>
                 </button>
             `;
             input.disabled = true;
             sendBtn.disabled = true;
+            input.placeholder = trc('chat_placeholder_login', 'Prihláste sa...');
         }
     }
 
+    function chatAvatarHtml(msg) {
+        if (typeof msg.photoURL === 'string' && /^https:\/\//.test(msg.photoURL)) {
+            return `<img class="chat-ava" src="${escapeHtml(msg.photoURL)}" alt="">`;
+        }
+        const name = String(msg.author || '?');
+        const colors = ['#f97316', '#3b82f6', '#22c55e', '#a855f7', '#ef4444', '#eab308', '#14b8a6'];
+        let h = 0;
+        for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+        return `<div class="chat-ava" style="background:${colors[h % colors.length]}">${escapeHtml(name.trim().charAt(0).toUpperCase() || '?')}</div>`;
+    }
+
+    function chatDayLabel(d) {
+        const today = new Date();
+        const y = new Date(); y.setDate(today.getDate() - 1);
+        if (d.toDateString() === today.toDateString()) return trc('chat_today', 'dnes');
+        if (d.toDateString() === y.toDateString()) return trc('chat_yesterday', 'včera');
+        return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+    }
+
+    function showChatEmpty() {
+        const list = document.getElementById('chat-messages-list');
+        if (list && !list.children.length) {
+            list.innerHTML = `<div class="chat-empty" id="chat-empty">${escapeHtml(trc('chat_empty', 'Zatiaľ žiadne správy. Napíš prvý!'))}</div>`;
+        }
+    }
+
+    function appendChatMessage(msg) {
+        if (!msg || typeof msg.text !== 'string') return;
+        const list = document.getElementById('chat-messages-list');
+        if (!list) return;
+        const empty = document.getElementById('chat-empty');
+        if (empty) empty.remove();
+
+        const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+        const ts = Number(msg.timestamp) || Date.now();
+        const d = new Date(ts);
+        const dayKey = d.toDateString();
+        const authorKey = msg.uid || msg.author || '?';
+        const mine = Boolean(currentUser && msg.uid && msg.uid === currentUser.uid);
+
+        if (!chatLast || chatLast.dayKey !== dayKey) {
+            const div = document.createElement('div');
+            div.className = 'chat-divider';
+            div.textContent = chatDayLabel(d);
+            list.appendChild(div);
+            chatLast = null;
+        }
+        const cont = Boolean(chatLast && chatLast.key === authorKey && ts - chatLast.ts < 5 * 60 * 1000);
+        const time = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+        const row = document.createElement('div');
+        row.className = 'chat-row' + (mine ? ' mine' : '') + (cont ? ' cont' : '');
+        const avatar = cont ? '<div class="chat-ava spacer"></div>' : chatAvatarHtml(msg);
+        const meta = cont ? '' : `<div class="chat-meta"><b>${escapeHtml(mine ? trc('chat_you', 'Vy') : (msg.author || 'Študent'))}</b>${time}</div>`;
+        row.innerHTML = `${avatar}<div class="chat-col">${meta}<div class="chat-bubble">${escapeHtml(msg.text)}</div></div>`;
+        if (cont) row.title = time;
+        list.appendChild(row);
+
+        chatLast = { dayKey, key: authorKey, ts };
+        if (nearBottom || mine) list.scrollTop = list.scrollHeight;
+    }
+
+    function connectChatRoom(force) {
+        const path = chatRoomPath();
+        if (!force && path === chatRoomKey) return;
+        if (chatRef) chatRef.off();
+        chatRoomKey = path;
+        chatLast = null;
+        const list = document.getElementById('chat-messages-list');
+        if (list) list.innerHTML = '';
+        showChatEmpty();
+        chatRef = db.ref(path).limitToLast(100);
+        chatRef.on('child_added', (snap) => appendChatMessage(snap.val()), (err) => console.warn('chat:', err));
+        updateChatUserUI();
+        updatePresence();
+    }
+
+    // «Онлайн»: каждый вошедший пишет себя в presence/<комната>/<uid>, при закрытии вкладки запись удаляется
+    function updatePresence() {
+        if (presenceListenRef) { presenceListenRef.off(); presenceListenRef = null; }
+        if (presenceMineRef) {
+            presenceMineRef.onDisconnect().cancel();
+            presenceMineRef.remove().catch(() => {});
+            presenceMineRef = null;
+        }
+        const roomPath = presenceRoomPath();
+        presenceListenRef = db.ref(roomPath);
+        presenceListenRef.on('value', (s) => {
+            const el = document.getElementById('chat-online-count');
+            if (el) el.textContent = s.numChildren();
+        }, () => {});
+        if (currentUser) {
+            presenceMineRef = db.ref(roomPath + '/' + currentUser.uid);
+            presenceMineRef.onDisconnect().remove();
+            presenceMineRef.set({ name: chatName(), ts: firebase.database.ServerValue.TIMESTAMP }).catch(() => {});
+        }
+    }
+
+    db.ref('.info/connected').on('value', (s) => {
+        if (s.val() === true && chatInited && currentUser) updatePresence();
+    });
+
+    auth.onAuthStateChanged(() => {
+        if (chatInited) connectChatRoom(true);
+    });
+
+    function setChatTab(tab) {
+        chatTab = tab === 'all' ? 'all' : 'group';
+        saveLS('uniflo_chat_tab', chatTab);
+        document.getElementById('chat-tab-group').classList.toggle('active', chatTab === 'group');
+        document.getElementById('chat-tab-all').classList.toggle('active', chatTab === 'all');
+        connectChatRoom();
+    }
+
+    function initChat() {
+        if (!chatInited) {
+            chatInited = true;
+            document.getElementById('chat-tab-group').classList.toggle('active', chatTab === 'group');
+            document.getElementById('chat-tab-all').classList.toggle('active', chatTab === 'all');
+        }
+        connectChatRoom();
+    }
+
     function sendChatMessage() {
-        if (!currentUser) return;
+        if (!currentUser) { loginWithGoogle(); return; }
         const input = document.getElementById('chat-input-msg');
-        const text = input.value.trim();
+        const text = input.value.trim().slice(0, 500);
         if (!text) return;
-
-        const displayName = customNickname || currentUser.displayName || "Študent";
-        const photoURL = currentUser.photoURL || '';
-
-        db.ref('messages').push({
-            author: displayName,
-            photoURL: photoURL,
-            text: text,
-            timestamp: Date.now()
-        });
-
         input.value = '';
+        db.ref(chatRoomPath()).push({
+            uid: currentUser.uid,
+            author: chatName(),
+            photoURL: currentUser.photoURL || '',
+            text: text,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).catch((err) => {
+            input.value = text;
+            alert(trc('chat_send_error', 'Správu sa nepodarilo odoslať:') + ' ' + err.message);
+        });
     }
 
     function handleChatKeyPress(e) {
-        if (e.key === 'Enter') sendChatMessage();
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendChatMessage();
+        }
     }
-
-    db.ref('messages').limitToLast(50).on('value', (snapshot) => {
-        const list = document.getElementById('chat-messages-list');
-        list.innerHTML = '';
-        const data = snapshot.val();
-        if (!data) return;
-
-        Object.values(data).forEach(msg => {
-            const div = document.createElement('div');
-            div.className = 'chat-msg';
-            const avatarHtml = (typeof msg.photoURL === 'string' && /^https:\/\//.test(msg.photoURL)) ? `<img src="${escapeHtml(msg.photoURL)}" class="chat-msg-avatar" alt="">` : '';
-
-            div.innerHTML = `
-                <div class="chat-msg-header">
-                    ${avatarHtml}
-                    <span class="chat-msg-author">${escapeHtml(msg.author)}</span>
-                </div>
-                <div>${escapeHtml(msg.text)}</div>
-            `;
-            list.appendChild(div);
-        });
-
-        list.scrollTop = list.scrollHeight;
-    });
 
     function openReviewModal() {
         document.getElementById('review-modal').classList.add('active');
@@ -4483,6 +4650,7 @@
         initMap();
         applyTranslations();
         updateLiveLesson();
+        initChat();
     }
 
     setInterval(() => {
