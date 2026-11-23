@@ -1437,6 +1437,30 @@
         .b-side .week-day-column { background-size: 100% var(--row, 39px); }
         .b-side .section-header { margin-bottom: 8px; gap: 8px; }
         .b-side .section-meta { white-space: nowrap; }
+
+        /* компактная шапка колонки: больше места расписанию */
+        .b-side { gap: 9px; padding-top: 10px; }
+        .b-side-head { font-size: 1.3rem; min-height: 38px; gap: 9px; padding: 0 2px 8px; }
+        .b-side-head > svg { width: 24px; height: 24px; }
+        .b-side-head .b-beta { font-size: 0.68rem; padding: 2px 7px; border-radius: 6px; }
+        .b-next { gap: 2px; }
+        .b-next-label { font-size: 0.72rem; }
+        .b-next-title { font-size: 1.2rem; gap: 8px; }
+        .b-next-sub { font-size: 0.8rem; }
+        .b-next-sub .b-time { color: var(--accent-orange); font-weight: 700; }
+        body.lesson-live .b-next-sub .b-time { color: var(--live); }
+        .b-group.b-group-side { gap: 5px; padding: 8px 8px 8px 10px; width: clamp(150px, 30%, 190px); border-radius: 12px; }
+        .b-group-label { font-size: 0.68rem; }
+        .b-group-line { gap: 6px; }
+        .b-group.b-group-side .group-input { height: 34px; font-size: 0.95rem; border-radius: 9px; }
+        .b-group-side .b-fetch { width: 34px; height: 34px; border-radius: 9px; }
+        .b-group-side .b-fetch svg { width: 16px; height: 16px; }
+        .b-side .b-actions .btn-main-action { height: 38px; min-height: 0; padding-top: 0; padding-bottom: 0; font-size: 0.85rem; }
+        .b-side .b-actions .btn-square-reset { width: 38px; height: 38px; min-height: 0; }
+        .b-seg { padding: 2px; border-radius: 10px; }
+        .b-seg button { padding: 0; height: 30px; font-size: 0.8rem; border-radius: 8px; }
+        .b-side .section-header { margin-bottom: 6px; }
+        .b-side .section-header h2, .b-side .section-title { font-size: 1rem; }
         .b-glass { background: rgba(26, 28, 32, 0.94); border: 1px solid #2c3037; border-radius: 18px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
 
         .b-top { position: fixed !important; top: 12px; left: calc(var(--side) + 12px); right: 12px; z-index: 900; display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 0 !important; background: transparent !important; border: 0 !important; }
@@ -5055,9 +5079,9 @@
         const color = typeColor(found.type);
         box.innerHTML = `
             <div class="b-next-label">${escapeHtml(label)}</div>
-            <div class="b-next-title">${escapeHtml(found.title)} <span class="b-time">${escapeHtml(found.start)}</span>
+            <div class="b-next-title">${escapeHtml(found.title)}
                 <span class="badge" style="background:${color}33; color:${color}; font-size:0.72rem">${escapeHtml(found.type || '')}</span></div>
-            <div class="b-next-sub">${escapeHtml(found.start)}–${escapeHtml(found.end)}${found.room ? ' · ' + escapeHtml(found.room) : ''}${found.teacher ? ' · ' + escapeHtml(found.teacher) : ''}</div>`;
+            <div class="b-next-sub"><span class="b-time">${escapeHtml(found.start)}–${escapeHtml(found.end)}</span>${found.room ? ' · ' + escapeHtml(found.room) : ''}${found.teacher ? ' · ' + escapeHtml(found.teacher) : ''}</div>`;
     }
 
     // Подписи беты на языке сайта
