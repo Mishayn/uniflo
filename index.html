@@ -1309,6 +1309,56 @@
             margin-top: 6px;
         }
 
+        /* ===== Подсветка сайта во время пары ===== */
+        body.lesson-live { --live: #22c55e; --live-rgb: 34, 197, 94; }
+        body.lesson-live.live-cvicenie { --live: #3b82f6; --live-rgb: 59, 130, 246; }
+        body.lesson-live.live-laboratorne { --live: #ef4444; --live-rgb: 239, 68, 68; }
+        body.lesson-live {
+            background-image: radial-gradient(1400px 520px at 50% -8%, rgba(var(--live-rgb), 0.18), transparent 70%);
+            background-attachment: fixed;
+        }
+        body.lesson-live::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1500;
+            box-shadow: inset 0 0 0 2px rgba(var(--live-rgb), 0.55), inset 0 0 160px rgba(var(--live-rgb), 0.20);
+        }
+        body.lesson-live .top-header { border-bottom: 2px solid var(--live); }
+        body.lesson-live .dash-card,
+        body.lesson-live .notes-dashboard-card { border-color: rgba(var(--live-rgb), 0.35); }
+        body.lesson-live .header-title { color: var(--live); }
+        .live-lesson-pill {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: rgba(var(--live-rgb), 0.22);
+            border: 1px solid rgba(var(--live-rgb), 0.6);
+            border-radius: 999px;
+            padding: 3px 10px;
+            white-space: nowrap;
+        }
+        body.lesson-live .live-lesson-pill { display: inline-flex; }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--live);
+            animation: live-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes live-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+        .week-card.is-live { box-shadow: 0 0 0 2px var(--live), 0 0 14px rgba(var(--live-rgb), 0.6); }
+        @media (max-width: 1199px) {
+            .live-lesson-pill .live-text-long { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .live-dot { animation: none; }
+        }
+
         #upcoming-arrow {
             display: inline-block;
             transition: transform 0.2s ease;
@@ -1351,6 +1401,7 @@
 
         <div class="header-title">
             <span>📅 UniFlo Beta</span>
+            <span class="live-lesson-pill" id="live-lesson-pill"><span class="live-dot"></span><span id="live-lesson-text"></span></span>
         </div>
 
         <div class="header-right mobile-header-group">
@@ -2448,6 +2499,7 @@
         renderCategoriesView();
         renderUpcomingDay();
         renderCompactCalendar();
+        updateLiveLesson();
     }
 
     function applyTranslations() {
@@ -3793,6 +3845,7 @@
 
                 const card = document.createElement('div');
                 card.className = `week-card ${l.type}`;
+                card.dataset.id = l.id;
                 card.style.position = 'absolute';
                 card.style.top = `${topPx}px`;
                 card.style.height = `${heightPx - 2}px`;
@@ -4374,6 +4427,52 @@
         renderAll();
     }
 
+    // ===== Подсветка сайта цветом текущей пары =====
+    const LIVE_LEFT_TEXT = {
+        sk: (m) => `ešte ${m} min`,
+        en: (m) => `${m} min left`,
+        ru: (m) => `ещё ${m} мин`,
+        uk: (m) => `ще ${m} хв`
+    };
+
+    function updateLiveLesson() {
+        const now = new Date();
+        const day = now.getDay();
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+        const toMins = (t) => { const [h, m] = String(t || '').split(':').map(Number); return h * 60 + m; };
+
+        const lesson = (day >= 1 && day <= 5)
+            ? schedule.find(l => l.day === day && toMins(l.start) <= nowMins && nowMins < toMins(l.end))
+            : null;
+
+        const body = document.body;
+        body.classList.remove('live-prednaska', 'live-cvicenie', 'live-laboratorne');
+        const textEl = document.getElementById('live-lesson-text');
+
+        document.querySelectorAll('.week-card.is-live').forEach(c => c.classList.remove('is-live'));
+
+        if (!lesson) {
+            body.classList.remove('lesson-live');
+            if (textEl) textEl.textContent = '';
+            return;
+        }
+
+        const typeClass = lesson.type === 'cvičenie' ? 'live-cvicenie'
+            : (lesson.type === 'laboratórne' ? 'live-laboratorne' : 'live-prednaska');
+        body.classList.add('lesson-live', typeClass);
+
+        const left = toMins(lesson.end) - nowMins;
+        const leftText = (LIVE_LEFT_TEXT[currentLang] || LIVE_LEFT_TEXT.sk)(left);
+        if (textEl) {
+            textEl.innerHTML = `${escapeHtml(lesson.title)}<span class="live-text-long">${lesson.room ? ' · ' + escapeHtml(lesson.room) : ''}</span> · ${leftText}`;
+        }
+
+        const card = document.querySelector(`.week-card[data-id="${CSS.escape(String(lesson.id))}"]`);
+        if (card) card.classList.add('is-live');
+    }
+
+    setInterval(updateLiveLesson, 30000);
+
     function renderAll() {
         renderUpcomingDay();
         renderWeekGrid();
@@ -4383,6 +4482,7 @@
         fetchWeather();
         initMap();
         applyTranslations();
+        updateLiveLesson();
     }
 
     setInterval(() => {
