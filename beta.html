@@ -1417,13 +1417,21 @@
         .b-side { position: fixed; z-index: 800; top: 0; left: 0; bottom: 0; width: var(--side); box-sizing: border-box; padding: 14px 16px 16px; background: #16181b; border-right: 1px solid #2c3037; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; scrollbar-width: none; }
         .b-side::-webkit-scrollbar { display: none; }
         .b-side .header-title { position: static; transform: none; pointer-events: auto; }
-        .b-next-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-        .b-next-row .b-next { flex: 1; min-width: 0; }
-        .b-group-side { height: 44px; padding: 0 5px 0 10px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; flex-shrink: 0; }
-        .b-group-side .group-input { width: 84px; height: 32px; font-size: 0.9rem; }
+        .b-next-row { display: flex; justify-content: space-between; align-items: stretch; gap: 14px; }
+        .b-next-row .b-next { flex: 1; min-width: 0; justify-content: center; }
+        .b-group.b-group-side { height: auto; flex-direction: column; align-items: stretch; justify-content: center; gap: 8px; padding: 12px 12px 12px 14px; width: clamp(184px, 36%, 240px); box-sizing: border-box; background: #1c1f23; border: 1px solid var(--border-color); border-radius: 16px; flex-shrink: 0; }
+        .b-group-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); }
+        .b-group-line { display: flex; align-items: center; gap: 8px; }
+        .b-group.b-group-side .group-input { flex: 1; min-width: 0; width: auto; height: 46px; padding: 0 8px; font-size: 1.1rem; font-weight: 800; letter-spacing: 0.02em; text-align: center; border-radius: 12px; background: #121417; }
+        .b-group-side .group-input:focus { border-color: var(--accent-orange); }
+        .b-group-side .b-fetch { width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0; }
+        .b-group-side .b-fetch svg { width: 20px; height: 20px; }
         .b-toast { position: fixed; z-index: 2500; top: 76px; left: calc(var(--side) + (100vw - var(--side)) / 2); transform: translateX(-50%) translateY(-10px); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; background: rgba(26, 28, 32, 0.97); border: 1px solid #F5B83D; color: var(--text-primary); padding: 10px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.45); white-space: pre-line; max-width: 420px; }
         .b-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .b-side-head { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; font-weight: 800; color: var(--accent-orange); min-height: 40px; }
+        .b-side-head { display: flex; align-items: center; gap: 12px; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; color: var(--accent-orange); min-height: 56px; padding: 2px 2px 12px; border-bottom: 1px solid #2c3037; }
+        .b-side-head > svg { width: 32px; height: 32px; flex-shrink: 0; }
+        .b-side-head .b-beta { font-size: 0.8rem; padding: 4px 9px; border-radius: 8px; letter-spacing: 0; }
+        .b-side-head .live-lesson-pill { margin-left: auto; }
         .b-side .week-time-cell { height: var(--row, 39px); }
         .b-side .week-body-grid, .b-side .week-day-column { height: calc(var(--row, 39px) * 13); }
         .b-side .week-day-column { background-size: 100% var(--row, 39px); }
@@ -1469,7 +1477,7 @@
         .b-next-title { font-size: 1.7rem; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .b-next-title .b-time { color: var(--accent-orange); }
         body.lesson-live .b-next-title .b-time { color: var(--live); }
-        .b-next-sub { font-size: 0.86rem; color: var(--text-secondary); }
+        .b-next-sub { font-size: 0.86rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .b-next-empty { font-size: 0.95rem; color: var(--text-secondary); padding: 6px 0; }
         .b-actions { display: flex; gap: 8px; }
         .b-actions .btn-main-action { padding: 10px 12px; font-size: 0.82rem; }
@@ -1600,8 +1608,11 @@
     <div class="b-next-row">
         <div class="b-next" id="b-next"></div>
         <div class="b-group b-group-side">
+            <span class="b-group-label" data-bt="group">Skupina</span>
+            <div class="b-group-line">
             <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" aria-label="Skupina" placeholder="Skupina">
             <button class="btn-fetch-sched server-online b-fetch" id="btn-fetch-sched-header" onclick="fetchScheduleFromServer()" title="Preniesť rozvrh" aria-label="Preniesť rozvrh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3M4 5v4h4"></path><path d="M4 13a8 8 0 0 0 14.9 3M20 19v-4h-4"></path></svg></button>
+            </div>
         </div>
     </div>
     <div class="b-actions">
@@ -2667,7 +2678,13 @@
         updateBellState();
         showToast('🔔 ' + bt('notif_on'));
         if (('Notification' in window) && Notification.permission === 'default') {
-            Notification.requestPermission().then(() => updateBellState()).catch(() => {});
+            Notification.requestPermission().then(() => { updateBellState(); testNotif(); }).catch(() => {});
+        } else testNotif();
+        checkLessonReminders();
+    }
+    function testNotif() {
+        if (('Notification' in window) && Notification.permission === 'granted') {
+            try { new Notification('🔔 UniFlo', { body: bt('notif_on') }); } catch (e) {}
         }
     }
 
@@ -2676,19 +2693,27 @@
         const now = new Date();
         const currentDay = now.getDay();
         const nowMins = now.getHours() * 60 + now.getMinutes();
+        const dayKey = 'uniflo_notified_' + now.toDateString();
+        let sent = []; try { sent = JSON.parse(localStorage.getItem(dayKey) || '[]'); } catch (e) {}
         schedule.filter(l => l.day === currentDay).forEach(lesson => {
             const [h, m] = String(lesson.start).split(':').map(Number);
-            if (h * 60 + m - nowMins !== 10) return;
+            const diff = h * 60 + m - nowMins;
+            // окно 0–10 мин: если браузер в фоне пропустил проверку, напоминание всё равно придёт, но один раз
+            if (diff < 0 || diff > 10) return;
+            const key = lesson.title + '|' + lesson.start;
+            if (sent.includes(key)) return;
+            sent.push(key); saveLS(dayKey, JSON.stringify(sent));
             const title = '⏰ ' + lesson.title + ' · ' + lesson.start;
-            const body = (lesson.type || '') + (lesson.room ? ' · ' + lesson.room : '');
+            const body = (diff > 0 ? bt('inT') + ' ' + diff + ' min · ' : '') + (lesson.type || '') + (lesson.room ? ' · ' + lesson.room : '');
             if (('Notification' in window) && Notification.permission === 'granted') {
-                try { new Notification(title, { body }); } catch (e) {}
+                try { new Notification(title, { body, tag: key }); } catch (e) {}
             }
             showToast(title + '\n' + body, 15000);
         });
     }
 
-    setInterval(checkLessonReminders, 60000);
+    setInterval(checkLessonReminders, 30000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) checkLessonReminders(); });
 
     const firebaseConfig = {
         apiKey: "AIzaSyB8Ra6zgICw2Og0-xiIHwyNLxx52aM-Y3s",
@@ -4980,13 +5005,13 @@
 
     // ===== BETA 2: оболочка =====
     const B_TXT = {
-        sk: { now: 'Teraz', until: 'do', next: 'Ďalšia hodina', today: 'dnes', tomorrow: 'zajtra', inT: 'o', left: 'ešte', none: 'Žiadne hodiny v rozvrhu. Prenes rozvrh tlačidlom ⟳ hore.', day: 'Deň', week: 'Týždeň',
+        sk: { group: 'Tvoja skupina', now: 'Teraz', until: 'do', next: 'Ďalšia hodina', today: 'dnes', tomorrow: 'zajtra', inT: 'o', left: 'ešte', none: 'Žiadne hodiny v rozvrhu. Prenes rozvrh tlačidlom ⟳ vpravo.', day: 'Deň', week: 'Týždeň',
               lang: 'Jazyk', reviews: 'Recenzie', hours: 'Otváracie hodiny', old: 'Stará verzia', r_cal: 'Kal.', r_notes: 'Pozn.', r_chat: 'Chat', r_hours: 'Hod.', search: 'Budova, miesto, kategória…', layers: 'Vrstvy', add_point: '+ Bod', map: 'Mapa', m_dark: 'Tmavá', m_osm: 'Schéma', m_sat: 'Satelit', points: 'Body', pts_admin: 'Budovy a oficiálne miesta', pts_user: 'Študentské body', lists: 'Zoznamy', place_hint: 'Posuň mapu — bod bude tu', cancel: 'Zrušiť', here: 'Tu', route: 'Trasa pešo', official: 'Oficiálne miesto', student_pt: 'Študentský bod', notif_on: 'Pripomienky zapnuté', notif_off: 'Pripomienky vypnuté' },
-        en: { now: 'Now', until: 'until', next: 'Next class', today: 'today', tomorrow: 'tomorrow', inT: 'in', left: 'left', none: 'No classes yet. Import your schedule with ⟳ at the top.', day: 'Day', week: 'Week',
+        en: { group: 'Your group', now: 'Now', until: 'until', next: 'Next class', today: 'today', tomorrow: 'tomorrow', inT: 'in', left: 'left', none: 'No classes yet. Import your schedule with ⟳ on the right.', day: 'Day', week: 'Week',
               lang: 'Language', reviews: 'Reviews', hours: 'Opening hours', old: 'Old version', r_cal: 'Cal.', r_notes: 'Notes', r_chat: 'Chat', r_hours: 'Hours', search: 'Building, place, category…', layers: 'Layers', add_point: '+ Point', map: 'Map', m_dark: 'Dark', m_osm: 'Street', m_sat: 'Satellite', points: 'Points', pts_admin: 'Buildings & official places', pts_user: 'Student points', lists: 'Lists', place_hint: 'Move the map — the point goes here', cancel: 'Cancel', here: 'Here', route: 'Walking route', official: 'Official place', student_pt: 'Student point', notif_on: 'Reminders on', notif_off: 'Reminders off' },
-        ru: { now: 'Сейчас', until: 'до', next: 'Следующая пара', today: 'сегодня', tomorrow: 'завтра', inT: 'через', left: 'ещё', none: 'Пар пока нет. Перенеси расписание кнопкой ⟳ сверху.', day: 'День', week: 'Неделя',
+        ru: { group: 'Твоя группа', now: 'Сейчас', until: 'до', next: 'Следующая пара', today: 'сегодня', tomorrow: 'завтра', inT: 'через', left: 'ещё', none: 'Пар пока нет. Перенеси расписание кнопкой ⟳ справа.', day: 'День', week: 'Неделя',
               lang: 'Язык', reviews: 'Отзывы', hours: 'График работы', old: 'Старая версия', r_cal: 'Кал.', r_notes: 'Зам.', r_chat: 'Чат', r_hours: 'Часы', search: 'Корпус, место, категория…', layers: 'Слои', add_point: '+ Точка', map: 'Карта', m_dark: 'Тёмная', m_osm: 'Схема', m_sat: 'Спутник', points: 'Точки', pts_admin: 'Корпуса и официальные места', pts_user: 'Студенческие точки', lists: 'Списки', place_hint: 'Подвинь карту — точка будет здесь', cancel: 'Отмена', here: 'Здесь', route: 'Маршрут пешком', official: 'Официальное место', student_pt: 'Студенческая точка', notif_on: 'Напоминания включены', notif_off: 'Напоминания выключены' },
-        uk: { now: 'Зараз', until: 'до', next: 'Наступна пара', today: 'сьогодні', tomorrow: 'завтра', inT: 'через', left: 'ще', none: 'Пар поки немає. Перенеси розклад кнопкою ⟳ зверху.', day: 'День', week: 'Тиждень',
+        uk: { group: 'Твоя група', now: 'Зараз', until: 'до', next: 'Наступна пара', today: 'сьогодні', tomorrow: 'завтра', inT: 'через', left: 'ще', none: 'Пар поки немає. Перенеси розклад кнопкою ⟳ праворуч.', day: 'День', week: 'Тиждень',
               lang: 'Мова', reviews: 'Відгуки', hours: 'Графік роботи', old: 'Стара версія', r_cal: 'Кал.', r_notes: 'Нот.', r_chat: 'Чат', r_hours: 'Год.', search: 'Корпус, місце, категорія…', layers: 'Шари', add_point: '+ Точка', map: 'Карта', m_dark: 'Темна', m_osm: 'Схема', m_sat: 'Супутник', points: 'Точки', pts_admin: 'Корпуси та офіційні місця', pts_user: 'Студентські точки', lists: 'Списки', place_hint: 'Посунь карту — точка буде тут', cancel: 'Скасувати', here: 'Тут', route: 'Маршрут пішки', official: 'Офіційне місце', student_pt: 'Студентська точка', notif_on: 'Нагадування увімкнено', notif_off: 'Нагадування вимкнено' }
     };
     const bt = (k) => (B_TXT[currentLang] || B_TXT.sk)[k];
