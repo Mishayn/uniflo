@@ -1407,7 +1407,7 @@
                 <div class="dash-card">
                     <div class="section-header">
                         <div class="section-title" data-i18n="weekly_schedule">📅 Týždenný rozvrh</div>
-                        <div class="section-meta">19. 10. – 25. 10. 2026 (07:00 – 20:00)</div>
+                        <div class="section-meta" id="week-range-meta">19. 10. – 25. 10. 2026 (07:00 – 20:00)</div>
                     </div>
                     
                     <div class="week-wrapper">
@@ -1953,6 +1953,37 @@
     // ==========================================
     const API_URL = 'https://uniflo-jz2t.onrender.com'; 
 
+    // ==========================================
+    // БЕЗОПАСНОЕ ХРАНИЛИЩЕ
+    // ==========================================
+    // Испорченная запись больше не роняет весь сайт, а переполнение (~5 МБ) не теряет данные молча
+    function loadJSON(key, fallback) {
+        try {
+            const raw = localStorage.getItem(key);
+            if (raw === null) return fallback;
+            const val = JSON.parse(raw);
+            return val === null || val === undefined ? fallback : val;
+        } catch (e) {
+            console.warn('Poškodené dáta v localStorage:', key, e);
+            return fallback;
+        }
+    }
+
+    let storageWarningShown = false;
+    function saveLS(key, value) {
+        try {
+            localStorage.setItem(key, value);
+            return true;
+        } catch (e) {
+            console.error('localStorage:', key, e);
+            if (!storageWarningShown) {
+                storageWarningShown = true;
+                alert('⚠️ Úložisko prehliadača je plné, posledná zmena sa neuložila. Odstráň staré kresby alebo veľké obrázky.');
+            }
+            return false;
+        }
+    }
+
     async function checkServerConnection() {
         const btnHeader = document.getElementById('btn-fetch-sched-header');
         const btnMobile = document.getElementById('btn-fetch-sched-mobile');
@@ -2401,7 +2432,8 @@
     let upcomingExpanded = false;
     let selectedRating = 5;
 
-    let calendarEvents = JSON.parse(localStorage.getItem('uniza_calendar_events')) || [];
+    let calendarEvents = loadJSON('uniza_calendar_events', []);
+    if (!Array.isArray(calendarEvents)) calendarEvents = [];
     let calCurrentDate = new Date();
 
     function toggleLangMenu() {
@@ -2410,7 +2442,7 @@
 
     function setLanguage(lang) {
         currentLang = lang;
-        localStorage.setItem('uniza_lang', lang);
+        saveLS('uniza_lang', lang);
         document.getElementById('lang-menu').classList.remove('active');
         applyTranslations();
         renderCategoriesView();
@@ -2519,16 +2551,27 @@
         const newNick = prompt("Zadajte váš nový nick v chate:", currentNick);
         if (newNick !== null) {
             customNickname = newNick.trim() || currentUser.displayName;
-            localStorage.setItem('uniza_custom_nickname', customNickname);
+            saveLS('uniza_custom_nickname', customNickname);
             updateChatUserUI();
         }
     }
 
+    // Админ = uid есть в /admins (добавляется вручную в консоли Firebase)
+    let isAdminUser = false;
+
     auth.onAuthStateChanged((user) => {
         currentUser = user;
-        if (user && !customNickname) {
+        if (user && !customNickname && user.displayName) {
             customNickname = user.displayName;
-            localStorage.setItem('uniza_custom_nickname', customNickname);
+            saveLS('uniza_custom_nickname', customNickname);
+        }
+        isAdminUser = false;
+        if (user) {
+            db.ref('admins/' + user.uid).once('value')
+                .then(s => { isAdminUser = s.val() === true; refreshMapMarkers(); })
+                .catch(() => {});
+        } else {
+            refreshMapMarkers();
         }
         updateChatUserUI();
     });
@@ -2544,7 +2587,7 @@
 
             authContainer.innerHTML = `
                 <div class="chat-user-profile">
-                    <img src="${photoURL}" class="chat-avatar" alt="Avatar">
+                    <img src="${escapeHtml(photoURL)}" class="chat-avatar" alt="">
                     <span style="font-weight:600; color:var(--text-primary);">${escapeHtml(displayName)}</span>
                     <button onclick="changeCustomNickname()" title="Zmeniť nick" style="background:none; border:none; cursor:pointer; font-size:0.75rem;">✏️</button>
                     <button onclick="logoutUser()" title="Odhlásiť sa" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; margin-left:2px;">✕</button>
@@ -2596,7 +2639,7 @@
         Object.values(data).forEach(msg => {
             const div = document.createElement('div');
             div.className = 'chat-msg';
-            const avatarHtml = msg.photoURL ? `<img src="${msg.photoURL}" class="chat-msg-avatar" alt="">` : '';
+            const avatarHtml = (typeof msg.photoURL === 'string' && /^https:\/\//.test(msg.photoURL)) ? `<img src="${escapeHtml(msg.photoURL)}" class="chat-msg-avatar" alt="">` : '';
 
             div.innerHTML = `
                 <div class="chat-msg-header">
@@ -2632,7 +2675,8 @@
         const text = input.value.trim();
         if (!text) return;
 
-        const authorName = currentUser ? (customNickname || currentUser.displayName) : "Anonym";
+        if (!currentUser) { alert('Na pridanie recenzie sa najprv prihláste cez Google (v online chate).'); return; }
+        const authorName = customNickname || currentUser.displayName || 'Študent';
 
         db.ref('reviews').push({
             author: authorName,
@@ -2660,7 +2704,8 @@
             const item = document.createElement('div');
             item.className = 'review-item';
             
-            const starsStr = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+            const stars = Math.max(0, Math.min(5, Math.round(Number(r.rating)) || 0));
+            const starsStr = '★'.repeat(stars) + '☆'.repeat(5 - stars);
 
             item.innerHTML = `
                 <div class="review-header">
@@ -2674,7 +2719,7 @@
     });
 
     function escapeHtml(text) {
-        return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
+        return text ? String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;") : '';
     }
 
     function getBasicNotes() {
@@ -2682,7 +2727,7 @@
         catch (e) { return []; }
     }
     function setBasicNotes(notes) { 
-        localStorage.setItem('uniflo_basic_notes', JSON.stringify(notes)); 
+        saveLS('uniflo_basic_notes', JSON.stringify(notes)); 
         renderUnifiedNotes(); 
     }
 
@@ -2692,12 +2737,21 @@
     }
 
     function getDrawingsList() {
-        try { return JSON.parse(localStorage.getItem('uniflo_drawings')) || []; }
-        catch (e) { return []; }
+        const list = loadJSON('uniflo_drawings', []);
+        return Array.isArray(list) ? list : [];
     }
+
+    // Разовая очистка: раньше к каждому рисунку сохранялся тяжёлый PNG-снимок (dataUrl), он не нужен
+    (function cleanupOldDrawingSnapshots() {
+        const list = getDrawingsList();
+        if (list.some(d => d && d.dataUrl)) {
+            saveLS('uniflo_drawings', JSON.stringify(list.map(({ dataUrl, ...rest }) => rest)));
+        }
+    })();
     function setDrawingsList(drawings) {
-        localStorage.setItem('uniflo_drawings', JSON.stringify(drawings));
+        const ok = saveLS('uniflo_drawings', JSON.stringify(drawings));
         renderUnifiedNotes();
+        return ok;
     }
 
     function renderUnifiedNotes() {
@@ -3224,7 +3278,10 @@
         redrawCanvas();
     }
 
+    let pasteEventsBound = false;
     function setupPasteAndDropEvents() {
+        if (pasteEventsBound) return; // раньше при каждом открытии холста добавлялся новый обработчик
+        pasteEventsBound = true;
         const modal = document.getElementById('drawing-modal');
         const paper = document.getElementById('drawing-paper-wrap');
         const overlay = document.getElementById('canvas-drop-overlay');
@@ -3345,7 +3402,6 @@
         const canvas = document.getElementById('drawing-canvas');
         if (!canvas) return;
         const title = document.getElementById('drawing-title-input').value.trim() || 'Рисунок';
-        const dataUrl = canvas.toDataURL('image/png');
 
         const cleanElements = canvasElements.map(el => {
             const { imgObj, ...rest } = el;
@@ -3357,7 +3413,6 @@
         const item = { 
             id: currentDrawingId || Date.now(), 
             title, 
-            dataUrl, 
             width: canvasWidth, 
             height: canvasHeight, 
             elements: cleanElements 
@@ -3366,8 +3421,8 @@
         if (existingIdx >= 0) drawings[existingIdx] = item;
         else drawings.unshift(item);
 
-        setDrawingsList(drawings);
-        document.getElementById('drawing-status').textContent = 'Успешно сохранено';
+        const ok = setDrawingsList(drawings);
+        document.getElementById('drawing-status').textContent = ok ? 'Успешно сохранено' : '⚠️ Не сохранено: хранилище заполнено';
     }
 
     function deleteCurrentDrawing() {
@@ -3406,7 +3461,7 @@
         renderLessonNotesListModal();
     }
     function persistLessonNotes() { 
-        localStorage.setItem('uniflo_notes', JSON.stringify(lessonNotes)); 
+        saveLS('uniflo_notes', JSON.stringify(lessonNotes)); 
         renderUnifiedNotes();
     }
 
@@ -3497,10 +3552,10 @@
 
     function loadInitialSchedule(group) {
         let upperGroup = group.trim().toUpperCase();
-        let sched = JSON.parse(localStorage.getItem(`uniza_sched_${upperGroup}`));
-        if (!sched) {
+        let sched = loadJSON(`uniza_sched_${upperGroup}`, null);
+        if (!Array.isArray(sched)) {
             sched = [];
-            localStorage.setItem(`uniza_sched_${upperGroup}`, JSON.stringify(sched));
+            saveLS(`uniza_sched_${upperGroup}`, JSON.stringify(sched));
         }
         return sched;
     }
@@ -3540,7 +3595,7 @@
     function changeGroup(groupName) {
         if (!groupName.trim()) return;
         currentGroup = groupName.trim().toUpperCase();
-        localStorage.setItem('uniza_active_group', currentGroup);
+        saveLS('uniza_active_group', currentGroup);
         syncGroupInputs(currentGroup);
         updateEvzdLink(currentGroup);
         schedule = loadInitialSchedule(currentGroup);
@@ -3550,7 +3605,7 @@
     function resetScheduleWithConfirm() {
         if (confirm(`Naozaj chcete vymazať rozvrh pre skupinu ${currentGroup}?`)) {
             schedule = [];
-            localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+            saveLS(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
             renderAll();
         }
     }
@@ -3584,7 +3639,7 @@
 
             if (Array.isArray(newSched)) {
                 schedule = newSched;
-                localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+                saveLS(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
                 renderAll();
                 loaderBadge.innerHTML = t.sched_success || "✅ Rozvrh bol úspešne aktualizovaný!";
                 setTimeout(() => { loaderBadge.style.display = 'none'; }, 3000);
@@ -3620,6 +3675,17 @@
         renderUpcomingDay();
     }
 
+    // Понедельник показываемой недели (в выходные — следующей)
+    function getDisplayWeekMonday() {
+        const now = new Date();
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const wd = d.getDay();
+        if (wd === 6) d.setDate(d.getDate() + 2);
+        else if (wd === 0) d.setDate(d.getDate() + 1);
+        else d.setDate(d.getDate() - (wd - 1));
+        return d;
+    }
+
     function renderUpcomingDay() {
         const upcomingList = document.getElementById('upcoming-list');
         const badgeTextEl = document.getElementById('upcoming-date-badge-text');
@@ -3627,37 +3693,30 @@
         upcomingList.innerHTML = '';
 
         const now = new Date();
-        let jsDay = now.getDay();
+        const jsDay = now.getDay();
+        const nowHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const hasLessons = (d) => schedule.some(l => l.day === d);
+        // сегодня все пары уже закончились — показываем следующий день
+        const todayFinished = (d) => d === jsDay && schedule.filter(l => l.day === d).every(l => l.end <= nowHM);
+
         let targetDay = 1;
+        let nextWeek = false;
+        let found = false;
 
         if (jsDay >= 1 && jsDay <= 5) {
-            let found = false;
             for (let d = jsDay; d <= 5; d++) {
-                if (schedule.some(l => l.day === d)) {
-                    targetDay = d;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                for (let d = 1; d <= 5; d++) {
-                    if (schedule.some(l => l.day === d)) {
-                        targetDay = d;
-                        found = true;
-                        break;
-                    }
-                }
-            }
-        } else {
-            for (let d = 1; d <= 5; d++) {
-                if (schedule.some(l => l.day === d)) {
-                    targetDay = d;
-                    break;
-                }
+                if (hasLessons(d) && !todayFinished(d)) { targetDay = d; found = true; break; }
             }
         }
+        if (!found) {
+            for (let d = 1; d <= 5; d++) {
+                if (hasLessons(d)) { targetDay = d; found = true; break; }
+            }
+            nextWeek = jsDay >= 1 && jsDay <= 5;
+        }
 
-        const baseMonday = new Date(2026, 9, 19);
+        const baseMonday = getDisplayWeekMonday();
+        if (nextWeek) baseMonday.setDate(baseMonday.getDate() + 7);
         const targetDate = new Date(baseMonday);
         targetDate.setDate(baseMonday.getDate() + (targetDay - 1));
 
@@ -3692,13 +3751,13 @@
             item.onclick = () => openEditModal(lesson.id);
             item.innerHTML = `
                 <div class="card-time">
-                    <span class="time-range">${lesson.start} – ${lesson.end}</span>
+                    <span class="time-range">${escapeHtml(lesson.start)} – ${escapeHtml(lesson.end)}</span>
                     <span class="time-block">blok</span>
                 </div>
                 <div class="card-main">
                     <div class="subject-title">
                         ${escapeHtml(lesson.title)}
-                        <span class="badge ${badgeClass}">${lesson.type}</span>
+                        <span class="badge ${badgeClass}">${escapeHtml(lesson.type)}</span>
                     </div>
                     <div class="teacher-name">${escapeHtml(lesson.teacher || '')}</div>
                 </div>
@@ -3711,6 +3770,14 @@
     }
 
     function renderWeekGrid() {
+        const metaEl = document.getElementById('week-range-meta');
+        if (metaEl) {
+            const mon = getDisplayWeekMonday();
+            const sun = new Date(mon);
+            sun.setDate(mon.getDate() + 6);
+            const f = (d) => `${d.getDate()}. ${d.getMonth() + 1}.`;
+            metaEl.textContent = `${f(mon)} – ${f(sun)} ${sun.getFullYear()} (07:00 – 20:00)`;
+        }
         for (let d = 1; d <= 5; d++) {
             const col = document.getElementById(`week-day-${d}`);
             col.innerHTML = '';
@@ -3735,7 +3802,7 @@
 
                 card.innerHTML = `
                     <div style="font-weight:700;">${escapeHtml(l.title)}</div>
-                    <div style="font-size:0.62rem;">${l.start}–${l.end} | ${escapeHtml(l.room)}</div>
+                    <div style="font-size:0.62rem;">${escapeHtml(l.start)}–${escapeHtml(l.end)} | ${escapeHtml(l.room)}</div>
                 `;
                 col.appendChild(card);
 
@@ -3899,7 +3966,7 @@
             calendarEvents.push({ id: Date.now().toString(), date: dateStr, title, timeStart, timeEnd, type, desc });
         }
 
-        localStorage.setItem('uniza_calendar_events', JSON.stringify(calendarEvents));
+        saveLS('uniza_calendar_events', JSON.stringify(calendarEvents));
         closeModal('cal-event-modal');
         renderCompactCalendar();
     }
@@ -3908,7 +3975,7 @@
         const id = document.getElementById('event-edit-id').value;
         if (!id) return;
         calendarEvents = calendarEvents.filter(e => e.id !== id);
-        localStorage.setItem('uniza_calendar_events', JSON.stringify(calendarEvents));
+        saveLS('uniza_calendar_events', JSON.stringify(calendarEvents));
         closeModal('cal-event-modal');
         renderCompactCalendar();
     }
@@ -3994,21 +4061,9 @@
                 }
             }
         } catch (e) {
-            generateFallbackWeatherData();
-            if (btn) btn.innerText = `14°C`;
-        }
-    }
-
-    function generateFallbackWeatherData() {
-        hourlyWeatherData = [];
-        const nowH = new Date().getHours();
-        for (let i = 0; i < 24; i++) {
-            const hourVal = (nowH + i) % 24;
-            hourlyWeatherData.push({
-                timeStr: String(hourVal).padStart(2, '0') + ':00',
-                temp: 12 + Math.round(Math.sin(i / 3) * 5),
-                code: 0
-            });
+            console.warn('Počasie:', e);
+            hourlyWeatherData = [];
+            if (btn) btn.innerText = '--°';
         }
     }
 
@@ -4024,13 +4079,16 @@
     }
 
     function drawWeatherCards() {
-        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
-            generateFallbackWeatherData();
-        }
-
         const track = document.getElementById('weather-flex-track');
         if (!track) return;
         track.innerHTML = '';
+
+        if (!hourlyWeatherData || hourlyWeatherData.length === 0) {
+            track.style.cssText = 'padding: 20px; color: var(--text-muted); font-size: 0.85rem;';
+            track.textContent = 'Počasie sa nepodarilo načítať. Skúste to neskôr.';
+            fetchWeather();
+            return;
+        }
 
         track.style.cssText = `
             display: flex;
@@ -4088,7 +4146,7 @@
             document.getElementById('map-lng').value = e.latlng.lng;
             document.getElementById('map-point-title').value = '';
             document.getElementById('map-is-admin-check').checked = false;
-            document.getElementById('admin-checkbox-wrapper').style.display = 'block';
+            document.getElementById('admin-checkbox-wrapper').style.display = isAdminUser ? 'block' : 'none';
             document.getElementById('map-point-modal').classList.add('active');
         });
         renderCustomMapPoints();
@@ -4102,22 +4160,22 @@
         const cat = document.getElementById('map-point-cat').value;
         const lat = parseFloat(document.getElementById('map-lat').value);
         const lng = parseFloat(document.getElementById('map-lng').value);
-        const isAdminRequested = document.getElementById('map-is-admin-check').checked;
+        const wantsAdmin = document.getElementById('map-is-admin-check').checked && isAdminUser;
+        const existing = id ? customMapPoints.find(p => p.id === id) : null;
+        const isAdmin = existing ? Boolean(existing.isAdmin) : wantsAdmin;
 
-        let isAdmin = false;
-        if (id) {
-            const existing = customMapPoints.find(p => p.id === id);
-            isAdmin = existing ? Boolean(existing.isAdmin) : false;
-        } else if (isAdminRequested) {
-            if (prompt("Zadajte heslo pre admin bod:") === "454") isAdmin = true;
-            else { alert("Nesprávne heslo!"); return; }
-        }
-
-        const pointData = { title, cat, lat, lng, isAdmin: Boolean(isAdmin), timestamp: Date.now() };
-        if (id) db.ref('mapPoints/' + id).set(pointData);
-        else db.ref('mapPoints').push(pointData);
+        if (!title.trim() || isNaN(lat) || isNaN(lng)) return;
+        const pointData = { title: title.trim().slice(0, 80), cat, lat, lng, isAdmin: Boolean(isAdmin), timestamp: Date.now() };
+        const op = id ? db.ref('mapPoints/' + id).set(pointData) : db.ref('mapPoints').push(pointData);
+        Promise.resolve(op).catch(err => alert('❌ Bod sa nepodarilo uložiť: ' + err.message));
         closeModal('map-point-modal');
         document.getElementById('map-point-form').reset();
+    }
+
+    function refreshMapMarkers() {
+        if (!leafletMap) return;
+        clearMapMarkers();
+        renderCustomMapPoints();
     }
 
     function renderCustomMapPoints() {
@@ -4197,14 +4255,30 @@
         const t = translations[currentLang];
         let marker = p.isAdmin ? L.marker([p.lat, p.lng], { icon: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }) }).addTo(leafletMap) : L.marker([p.lat, p.lng]).addTo(leafletMap);
 
-        marker.bindPopup(`<b>${escapeHtml(p.cat)}</b><br><b>${escapeHtml(p.title)}</b><div style="margin-top:6px; display:flex; gap:6px;"><button onclick="editCustomPoint('${p.id}')" style="background:#3b82f6; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;">${t.edit_btn}</button><button onclick="deleteCustomPoint('${p.id}')" style="background:#ef4444; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;">${t.delete_btn}</button></div>`);
+        // Попап собираем из DOM-элементов: id из базы больше не попадает в onclick-строку
+        const box = document.createElement('div');
+        box.innerHTML = `<b>${escapeHtml(p.cat)}</b><br><b>${escapeHtml(p.title)}</b>`;
+        if (!p.isAdmin || isAdminUser) {
+            const row = document.createElement('div');
+            row.style.cssText = 'margin-top:6px; display:flex; gap:6px;';
+            const mkBtn = (label, bg, fn) => {
+                const b = document.createElement('button');
+                b.textContent = label;
+                b.style.cssText = `background:${bg}; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:0.7rem; cursor:pointer;`;
+                b.onclick = fn;
+                return b;
+            };
+            row.append(mkBtn(t.edit_btn, '#3b82f6', () => editCustomPoint(p.id)), mkBtn(t.delete_btn, '#ef4444', () => deleteCustomPoint(p.id)));
+            box.appendChild(row);
+        }
+        marker.bindPopup(box);
         mapMarkers.push(marker);
     }
 
     window.editCustomPoint = function(id) {
         const point = customMapPoints.find(p => p.id === id);
         if (!point) return;
-        if (point.isAdmin && prompt("Heslo:") !== "454") { alert("Chyba!"); return; }
+        if (point.isAdmin && !isAdminUser) { alert('Oficiálne body môže upravovať len admin.'); return; }
         document.getElementById('map-point-id').value = point.id;
         document.getElementById('map-lat').value = point.lat;
         document.getElementById('map-lng').value = point.lng;
@@ -4217,8 +4291,9 @@
     window.deleteCustomPoint = function(id) {
         const point = customMapPoints.find(p => p.id === id);
         if (!point) return;
-        if (point.isAdmin && prompt("Heslo 454:") !== "454") { alert("Chyba!"); return; }
-        db.ref('mapPoints/' + id).remove();
+        if (point.isAdmin && !isAdminUser) { alert('Oficiálne body môže mazať len admin.'); return; }
+        if (!confirm(`Odstrániť bod „${point.title}“?`)) return;
+        db.ref('mapPoints/' + id).remove().catch(err => alert('❌ ' + err.message));
     };
 
     function locateUser() {
@@ -4281,14 +4356,11 @@
             room: document.getElementById('form-room').value
         };
 
-        if (id) {
-            const idx = schedule.findIndex(l => l.id === id);
-            schedule[idx] = newLesson;
-        } else {
-            schedule.push(newLesson);
-        }
+        const idx = id ? schedule.findIndex(l => l.id === id) : -1;
+        if (idx >= 0) schedule[idx] = newLesson;
+        else schedule.push(newLesson);
 
-        localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+        saveLS(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
         closeModal('lesson-modal');
         renderAll();
     }
@@ -4297,7 +4369,7 @@
         const id = document.getElementById('edit-id').value;
         if (!id) return;
         schedule = schedule.filter(l => l.id !== id);
-        localStorage.setItem(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
+        saveLS(`uniza_sched_${currentGroup}`, JSON.stringify(schedule));
         closeModal('lesson-modal');
         renderAll();
     }
