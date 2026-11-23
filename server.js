@@ -51,6 +51,10 @@ app.get('/api/status', (req, res) => {
 app.get('/api/schedule/:group', async (req, res) => {
     try {
         const group = req.params.group.toUpperCase();
+        // только буквы, цифры, дефис и подчёркивание — чтобы в URL UNIZA нельзя было подставить свои параметры
+        if (!/^[A-Z0-9_-]{2,20}$/.test(group)) {
+            return res.status(400).json({ error: 'Neplatný názov skupiny' });
+        }
         const url = `https://vzdelavanie.uniza.sk/vzdelavanie/rozvrh2.php?sq=2&id=${group}`;
 
         const response = await axios.get(url, {
