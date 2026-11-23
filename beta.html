@@ -1416,6 +1416,13 @@
         .b-shade { display: none; }
         .b-side { position: fixed; z-index: 800; top: 0; left: 0; bottom: 0; width: var(--side); box-sizing: border-box; padding: 14px 16px 16px; background: #16181b; border-right: 1px solid #2c3037; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; scrollbar-width: none; }
         .b-side::-webkit-scrollbar { display: none; }
+        .b-side .header-title { position: static; transform: none; pointer-events: auto; }
+        .b-next-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .b-next-row .b-next { flex: 1; min-width: 0; }
+        .b-group-side { height: 44px; padding: 0 5px 0 10px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; flex-shrink: 0; }
+        .b-group-side .group-input { width: 84px; height: 32px; font-size: 0.9rem; }
+        .b-toast { position: fixed; z-index: 2500; top: 76px; left: calc(var(--side) + (100vw - var(--side)) / 2); transform: translateX(-50%) translateY(-10px); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; background: rgba(26, 28, 32, 0.97); border: 1px solid #F5B83D; color: var(--text-primary); padding: 10px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.45); white-space: pre-line; max-width: 420px; }
+        .b-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .b-side-head { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; font-weight: 800; color: var(--accent-orange); min-height: 40px; }
         .b-side .week-time-cell { height: var(--row, 39px); }
         .b-side .week-body-grid, .b-side .week-day-column { height: calc(var(--row, 39px) * 13); }
@@ -1532,6 +1539,7 @@
 
 
         @media (max-width: 860px) {
+            .b-toast { left: 50%; }
             body.beta { --side: 0px; overflow: auto; display: flex; flex-direction: column; }
             .b-side { position: relative; width: auto; border-right: 0; order: 1; overflow: visible; }
             .b-top { position: sticky !important; top: 0; left: 0; right: 0; order: 0; padding: 8px !important; background: rgba(13,14,16,0.95) !important; flex-wrap: wrap; }
@@ -1555,10 +1563,6 @@
 <!-- Верхняя панель -->
 <div class="top-header b-top">
     <div class="b-top-right">
-        <div class="b-glass b-group">
-            <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" aria-label="Skupina" placeholder="Skupina">
-            <button class="btn-fetch-sched server-online b-fetch" id="btn-fetch-sched-header" onclick="fetchScheduleFromServer()" title="Preniesť rozvrh" aria-label="Preniesť rozvrh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3M4 5v4h4"></path><path d="M4 13a8 8 0 0 0 14.9 3M20 19v-4h-4"></path></svg></button>
-        </div>
         <div class="b-glass b-chip">
             <span id="b-clock">--:--</span><span style="color:var(--text-muted)">·</span>
             <button type="button" id="btn-weather-temp" onclick="openWeatherModal()" title="Počasie">--°</button>
@@ -1593,7 +1597,13 @@
         <span>UniFlo</span><span class="b-beta">Beta 2</span>
         <span class="live-lesson-pill" id="live-lesson-pill"><span class="live-dot"></span><span id="live-lesson-text"></span></span>
     </div>
-    <div class="b-next" id="b-next"></div>
+    <div class="b-next-row">
+        <div class="b-next" id="b-next"></div>
+        <div class="b-group b-group-side">
+            <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" aria-label="Skupina" placeholder="Skupina">
+            <button class="btn-fetch-sched server-online b-fetch" id="btn-fetch-sched-header" onclick="fetchScheduleFromServer()" title="Preniesť rozvrh" aria-label="Preniesť rozvrh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3M4 5v4h4"></path><path d="M4 13a8 8 0 0 0 14.9 3M20 19v-4h-4"></path></svg></button>
+        </div>
+    </div>
     <div class="b-actions">
         <button class="btn-main-action" onclick="openAddModal()" data-i18n="add_lesson">+ Pridať hodinu</button>
         <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
@@ -1760,6 +1770,8 @@
         </div>
     </div>
 </div>
+
+<div class="b-toast" id="b-toast" role="status" aria-live="polite"></div>
 
 <!-- Карточка места -->
 <div class="b-card b-glass" id="b-card"></div>
@@ -2643,53 +2655,36 @@
         }
     });
 
+    // Колокольчик — собственный переключатель UniFlo (не зависит от разрешения браузера)
     function requestNotificationPermission() {
-        // уже разрешено — колокольчик включает/выключает напоминания UniFlo
-        if (("Notification" in window) && Notification.permission === "granted") {
-            if (localStorage.getItem('uniflo_notif_off') === '1') localStorage.removeItem('uniflo_notif_off');
-            else saveLS('uniflo_notif_off', '1');
+        if (notifEnabled()) {
+            saveLS('uniflo_notif_on', '0');
             updateBellState();
+            showToast('🔕 ' + bt('notif_off'));
             return;
         }
-        if (!("Notification" in window)) {
-            alert("Ваш браузер не поддерживает уведомления.");
-            return;
+        saveLS('uniflo_notif_on', '1');
+        updateBellState();
+        showToast('🔔 ' + bt('notif_on'));
+        if (('Notification' in window) && Notification.permission === 'default') {
+            Notification.requestPermission().then(() => updateBellState()).catch(() => {});
         }
-        Notification.requestPermission().then(permission => {
-            updateBellState();
-            if (permission === "granted") {
-                alert("Успешно! Уведомления включены. Вы получите оповещение за 10 минут до пары.");
-            } else {
-                alert("Разрешение на уведомления отклонено.");
-            }
-        });
     }
 
     function checkLessonReminders() {
         if (!notifEnabled()) return;
-
         const now = new Date();
         const currentDay = now.getDay();
-        const currentHours = now.getHours();
-        const currentMinutes = now.getMinutes();
-        const currentTotalMins = currentHours * 60 + currentMinutes;
-
-        const todayLessons = schedule.filter(l => l.day === currentDay);
-
-        todayLessons.forEach(lesson => {
-            const [startH, startM] = lesson.start.split(':').map(Number);
-            const lessonTotalMins = startH * 60 + startM;
-            const diffMins = lessonTotalMins - currentTotalMins;
-
-            if (diffMins === 10) {
-                const title = `⏰ Напоминание о паре`;
-                const body = `Через 10 минут пара по ${lesson.title} (${lesson.type})\nАудитория: ${lesson.room || 'Не указана'}`;
-                
-                new Notification(title, {
-                    body: body,
-                    icon: 'https://img.magnific.com/free-vector/calendar-red-glyph-style_78370-7233.jpg?semt=ais_hybrid&w=740&q=80'
-                });
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+        schedule.filter(l => l.day === currentDay).forEach(lesson => {
+            const [h, m] = String(lesson.start).split(':').map(Number);
+            if (h * 60 + m - nowMins !== 10) return;
+            const title = '⏰ ' + lesson.title + ' · ' + lesson.start;
+            const body = (lesson.type || '') + (lesson.room ? ' · ' + lesson.room : '');
+            if (('Notification' in window) && Notification.permission === 'granted') {
+                try { new Notification(title, { body }); } catch (e) {}
             }
+            showToast(title + '\n' + body, 15000);
         });
     }
 
@@ -5050,7 +5045,16 @@
 
     // Колокольчик: подсвечен, когда напоминания включены; повторный клик — пауза
     function notifEnabled() {
-        return ('Notification' in window) && Notification.permission === 'granted' && localStorage.getItem('uniflo_notif_off') !== '1';
+        return localStorage.getItem('uniflo_notif_on') === '1';
+    }
+    let toastTimer = null;
+    function showToast(msg, ms) {
+        const t = document.getElementById('b-toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), ms || 2500);
     }
     function updateBellState() {
         const b = document.getElementById('btn-notif-header');
