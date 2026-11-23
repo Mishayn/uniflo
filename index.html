@@ -67,31 +67,6 @@
             flex-direction: column;
         }
 
-        .column-disabled-overlay {
-            position: relative;
-        }
-
-        .block-cross-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 500;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding-top: 30%;
-            background: transparent;
-            pointer-events: none;
-        }
-
-        .block-cross-img {
-            width: 65%;
-            max-width: 220px;
-            height: auto;
-            object-fit: contain;
-            opacity: 0.92;
-            filter: brightness(0.62) contrast(1.15) drop-shadow(0 6px 18px rgba(0, 0, 0, 0.6));
-        }
-
         /* Top Header */
         .top-header {
             display: flex;
@@ -1473,8 +1448,8 @@
             </div>
         </div>
 
-<!-- COLUMN 2: Map & Compact Calendar -->
-        <div class="dash-column column-disabled-overlay">
+        <!-- COLUMN 2: Map & Compact Calendar -->
+        <div class="dash-column">
             <div class="dash-column-2">
                 <div id="screen-mapa" class="screen active">
                     <div class="dash-card">
@@ -1523,11 +1498,6 @@
                         <div class="cal-grid" id="compact-calendar-grid"></div>
                     </div>
                 </div>
-            </div>
-
-            <!-- ВСТАВЛЯЕТСЯ ВНУТРИ .dash-column В САМОМ КОНЦЕ КОЛОНКИ -->
-            <div class="block-cross-overlay" aria-hidden="true">
-                <img src="cross.png" alt="Не работает" class="block-cross-img" />
             </div>
         </div>
 
