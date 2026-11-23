@@ -1426,7 +1426,7 @@
         .b-group-side .group-input:focus { border-color: var(--accent-orange); }
         .b-group-side .b-fetch { width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0; }
         .b-group-side .b-fetch svg { width: 20px; height: 20px; }
-        .b-toast { position: fixed; z-index: 2500; top: 76px; left: calc(var(--side) + (100vw - var(--side)) / 2); transform: translateX(-50%) translateY(-10px); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; background: rgba(var(--b-panel-rgb), 0.97); border: 1px solid #F5B83D; color: var(--text-primary); padding: 10px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.45); white-space: pre-line; max-width: 420px; }
+        .b-toast { position: fixed; z-index: 2500; top: 76px; left: calc(var(--side) + (100vw - var(--side)) / 2); transform: translateX(-50%) translateY(-10px); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; background: rgba(var(--b-panel-rgb), 0.97); border: 1px solid rgba(245, 184, 61, 0.45); color: var(--text-primary); padding: 10px 16px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.45); white-space: pre-line; max-width: 420px; }
         .b-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .b-side-head { display: flex; align-items: center; gap: 12px; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; color: var(--accent-orange); min-height: 56px; padding: 2px 2px 12px; border-bottom: 1px solid var(--b-line); }
         .b-side-head > svg { width: 32px; height: 32px; flex-shrink: 0; }
@@ -1483,6 +1483,23 @@
         body.beta[data-theme="light"] .btn-fetch-sched.server-online, body.beta[data-theme="cream"] .btn-fetch-sched.server-online { color: #15803d; }
         body.beta .b-mi-swatch { width: 26px; height: 26px; border-radius: 8px; background: conic-gradient(#f97316, #38bdf8, #a78bfa, #f472b6, #a3e635, #f97316); flex-shrink: 0; }
 
+
+        /* спокойная палитра левой колонки */
+        .b-side .b-actions .btn-square-reset { background: color-mix(in srgb, var(--accent-orange) 10%, transparent); color: color-mix(in srgb, var(--accent-orange) 80%, #000); border: 1px solid color-mix(in srgb, var(--accent-orange) 30%, transparent); }
+        .b-side .b-actions .btn-square-reset:hover { background: color-mix(in srgb, var(--accent-orange) 20%, transparent); color: var(--accent-orange); }
+        .b-group-side .btn-fetch-sched.server-online { color: var(--text-secondary); border-color: var(--b-line); box-shadow: none; background: var(--b-input2); position: relative; }
+        .b-group-side .btn-fetch-sched.server-online::after { content: ''; position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+        .b-group-side .btn-fetch-sched.server-online:hover { color: var(--text-primary); border-color: var(--accent-orange); background: var(--b-input2); box-shadow: none; }
+        .b-side .b-seg button.active { background: color-mix(in srgb, var(--next-c, var(--accent-orange)) 22%, transparent); color: var(--next-c, var(--accent-orange)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--next-c, var(--accent-orange)) 45%, transparent); }
+        body.lesson-live .b-side .b-seg button.active { --next-c: var(--live); }
+
+        /* панель «Оформление» без прокрутки */
+        .b-look { top: 70px; width: min(600px, calc(100vw - var(--side) - 120px)); max-height: calc(100vh - 84px); padding: 14px 16px 16px; }
+        .b-look h4 { margin: 10px 2px 7px; }
+        .b-look .b-theme-grid, .b-look .b-map-grid { gap: 8px 8px; }
+        .b-look .b-tile-btn { gap: 3px; font-size: 0.7rem; }
+        .b-look .b-tile-btn .b-prev { aspect-ratio: 16 / 9; border-radius: 10px; }
+        .b-look-head { margin-bottom: 4px; }
         /* панель «Оформление» */
         .b-look { position: fixed; z-index: 1600; top: 76px; right: 84px; width: min(560px, calc(100vw - var(--side) - 120px)); max-height: calc(100vh - 100px); overflow-y: auto; padding: 16px 16px 18px; display: none; scrollbar-width: thin; }
         .b-look.open { display: block; }
@@ -1524,7 +1541,7 @@
         .b-group .group-input { width: 92px; height: 34px; }
         .b-icon-btn { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); padding: 0; }
         .b-icon-btn:hover { border-color: var(--accent-orange); }
-        .b-icon-btn.on { border-color: #F5B83D; background: rgba(245, 184, 61, 0.2); box-shadow: 0 0 14px rgba(245, 184, 61, 0.35); }
+        .b-icon-btn.on { border-color: rgba(245, 184, 61, 0.55); background: rgba(245, 184, 61, 0.09); box-shadow: none; color: #F5B83D; }
         .b-icon-btn.muted svg { opacity: 0.45; }
         .b-fetch { width: 36px; height: 34px; padding: 0; justify-content: center; }
         .b-chip { height: 48px; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -4572,6 +4589,10 @@
         { id: 'night',    src: 'osm',    f: 'invert(1) grayscale(1) contrast(1.1) brightness(0.95) sepia(1) hue-rotate(180deg) saturate(2.4)' },
         { id: 'graphite', src: 'osm',    f: 'invert(1) grayscale(1) brightness(0.8) contrast(1.1)' },
         { id: 'warm',     src: 'osm',    f: 'invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.5) sepia(0.35)' },
+        { id: 'emerald',  src: 'osm',    f: 'invert(1) grayscale(1) contrast(1.1) brightness(0.95) sepia(1) hue-rotate(105deg) saturate(2.3)' },
+        { id: 'amethyst', src: 'osm',    f: 'invert(1) grayscale(1) contrast(1.1) brightness(0.95) sepia(1) hue-rotate(235deg) saturate(2.3)' },
+        { id: 'gold',     src: 'osm',    f: 'invert(1) grayscale(1) contrast(1.1) brightness(1.15) sepia(1) hue-rotate(5deg) saturate(3)' },
+        { id: 'coffee',   src: 'osm',    f: 'invert(1) grayscale(1) brightness(0.9) sepia(0.9) saturate(1.2) contrast(1.05)' },
         { id: 'edark',    src: 'edark',  f: '' },
         { id: 'osm',      src: 'osm',    f: '' },
         { id: 'streets',  src: 'street', f: '' },
@@ -4579,18 +4600,19 @@
         { id: 'paper',    src: 'osm',    f: 'grayscale(1) contrast(0.85) brightness(1.08)' },
         { id: 'vintage',  src: 'osm',    f: 'sepia(0.75) saturate(1.3) contrast(0.92) brightness(0.98)' },
         { id: 'pastel',   src: 'osm',    f: 'saturate(0.55) brightness(1.08) contrast(0.9)' },
+        { id: 'ice',      src: 'osm',    f: 'grayscale(1) sepia(0.5) hue-rotate(170deg) saturate(2) brightness(1.05) contrast(0.9)' },
         { id: 'topo',     src: 'topo',   f: '' },
         { id: 'sat',      src: 'sat',    f: '' },
         { id: 'satdark',  src: 'sat',    f: 'brightness(0.6) saturate(0.8) contrast(1.1)' }
     ];
     const LOOK_NAMES = {
-        ru: { dark: 'Тёмная', tint: 'Под тему', night: 'Ночь', graphite: 'Графит', warm: 'Тёплая', edark: 'Холст', osm: 'Схема', streets: 'Улицы', elight: 'Светлая', paper: 'Бумага', vintage: 'Винтаж', pastel: 'Пастель', topo: 'Рельеф', sat: 'Спутник', satdark: 'Спутник ночь',
+        ru: { emerald: 'Изумруд', amethyst: 'Аметист', gold: 'Золото', coffee: 'Кофе', ice: 'Лёд', dark: 'Тёмная', tint: 'Под тему', night: 'Ночь', graphite: 'Графит', warm: 'Тёплая', edark: 'Холст', osm: 'Схема', streets: 'Улицы', elight: 'Светлая', paper: 'Бумага', vintage: 'Винтаж', pastel: 'Пастель', topo: 'Рельеф', sat: 'Спутник', satdark: 'Спутник ночь',
               uniflo: 'UniFlo', midnight: 'Полночь', violet: 'Аметист', sakura: 'Сакура', forest: 'Лес', ocean: 'Океан', sunset: 'Закат', mono: 'Моно', light: 'Светлая', cream: 'Крем' },
-        uk: { dark: 'Темна', tint: 'Під тему', night: 'Ніч', graphite: 'Графіт', warm: 'Тепла', edark: 'Полотно', osm: 'Схема', streets: 'Вулиці', elight: 'Світла', paper: 'Папір', vintage: 'Вінтаж', pastel: 'Пастель', topo: 'Рельєф', sat: 'Супутник', satdark: 'Супутник ніч',
+        uk: { emerald: 'Смарагд', amethyst: 'Аметист', gold: 'Золото', coffee: 'Кава', ice: 'Лід', dark: 'Темна', tint: 'Під тему', night: 'Ніч', graphite: 'Графіт', warm: 'Тепла', edark: 'Полотно', osm: 'Схема', streets: 'Вулиці', elight: 'Світла', paper: 'Папір', vintage: 'Вінтаж', pastel: 'Пастель', topo: 'Рельєф', sat: 'Супутник', satdark: 'Супутник ніч',
               uniflo: 'UniFlo', midnight: 'Північ', violet: 'Аметист', sakura: 'Сакура', forest: 'Ліс', ocean: 'Океан', sunset: 'Захід', mono: 'Моно', light: 'Світла', cream: 'Крем' },
-        sk: { dark: 'Tmavá', tint: 'Podľa témy', night: 'Noc', graphite: 'Grafit', warm: 'Teplá', edark: 'Plátno', osm: 'Schéma', streets: 'Ulice', elight: 'Svetlá', paper: 'Papier', vintage: 'Vintage', pastel: 'Pastel', topo: 'Reliéf', sat: 'Satelit', satdark: 'Satelit noc',
+        sk: { emerald: 'Smaragd', amethyst: 'Ametyst', gold: 'Zlato', coffee: 'Káva', ice: 'Ľad', dark: 'Tmavá', tint: 'Podľa témy', night: 'Noc', graphite: 'Grafit', warm: 'Teplá', edark: 'Plátno', osm: 'Schéma', streets: 'Ulice', elight: 'Svetlá', paper: 'Papier', vintage: 'Vintage', pastel: 'Pastel', topo: 'Reliéf', sat: 'Satelit', satdark: 'Satelit noc',
               uniflo: 'UniFlo', midnight: 'Polnoc', violet: 'Ametyst', sakura: 'Sakura', forest: 'Les', ocean: 'Oceán', sunset: 'Západ', mono: 'Mono', light: 'Svetlá', cream: 'Krém' },
-        en: { dark: 'Dark', tint: 'Theme tint', night: 'Night', graphite: 'Graphite', warm: 'Warm', edark: 'Canvas', osm: 'Classic', streets: 'Streets', elight: 'Light', paper: 'Paper', vintage: 'Vintage', pastel: 'Pastel', topo: 'Terrain', sat: 'Satellite', satdark: 'Satellite night',
+        en: { emerald: 'Emerald', amethyst: 'Amethyst', gold: 'Gold', coffee: 'Coffee', ice: 'Ice', dark: 'Dark', tint: 'Theme tint', night: 'Night', graphite: 'Graphite', warm: 'Warm', edark: 'Canvas', osm: 'Classic', streets: 'Streets', elight: 'Light', paper: 'Paper', vintage: 'Vintage', pastel: 'Pastel', topo: 'Terrain', sat: 'Satellite', satdark: 'Satellite night',
               uniflo: 'UniFlo', midnight: 'Midnight', violet: 'Amethyst', sakura: 'Sakura', forest: 'Forest', ocean: 'Ocean', sunset: 'Sunset', mono: 'Mono', light: 'Light', cream: 'Cream' }
     };
     // цвета для мини-превью темы: [фон, колонка, карточка, акцент, текст]
@@ -5206,6 +5228,7 @@
             if (hit) { found = hit; offset = i; }
         }
         if (!found) {
+            document.body.style.removeProperty('--next-c');
             box.innerHTML = `<div class="b-next-empty">${escapeHtml(bt('none'))}</div>`;
             return;
         }
@@ -5224,6 +5247,7 @@
             label = `${bt('next')} · ${dayNames[d.getDay()] || ''}`;
         }
         const color = typeColor(found.type);
+        document.body.style.setProperty('--next-c', color);
         box.innerHTML = `
             <div class="b-next-label">${escapeHtml(label)}</div>
             <div class="b-next-title">${escapeHtml(found.title)}
