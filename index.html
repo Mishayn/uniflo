@@ -1126,6 +1126,9 @@
         .chat-head-sub b { color: var(--text-primary); font-weight: 700; }
         .chat-link-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; padding: 0 2px; }
         .chat-link-btn:hover { color: var(--accent-orange); }
+        .chat-logout { width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.45); color: #f87171; cursor: pointer; padding: 0; }
+        .chat-logout:hover { background: rgba(239, 68, 68, 0.3); }
+        .chat-logout[hidden] { display: none; }
         .chat-online { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.08); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
         .chat-online-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
         .chat-tabs { display: flex; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 3px; gap: 3px; }
@@ -1625,9 +1628,9 @@
                                 <div class="chat-head-title"><span data-i18n="chat_title">Online chat</span><span class="chat-room-badge" id="chat-room-badge">—</span></div>
                                 <div class="chat-head-sub" id="chat-auth-container"></div>
                             </div>
-                            <div class="chat-online" id="chat-online" title="Prihlásení ľudia v tejto miestnosti">
-                                <span class="chat-online-dot"></span><span id="chat-online-count">0</span>&nbsp;<span data-i18n="chat_online">online</span>
-                            </div>
+                            <button type="button" class="chat-logout" id="chat-logout-btn" onclick="logoutUser()" title="Odhlásiť sa" aria-label="Odhlásiť sa" hidden>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+                            </button>
                         </div>
                         <div class="chat-tabs">
                             <button type="button" class="chat-tab active" id="chat-tab-group" onclick="setChatTab('group')" data-i18n="chat_tab_group">Moja skupina</button>
@@ -2696,18 +2699,17 @@
         const input = document.getElementById('chat-input-msg');
         const sendBtn = document.getElementById('chat-send-btn');
         const badge = document.getElementById('chat-room-badge');
+        const logoutBtn = document.getElementById('chat-logout-btn');
         if (!authContainer || !input || !sendBtn) return;
 
         if (badge) badge.textContent = chatTab === 'all' ? trc('chat_tab_all', 'Všetci') : chatGroupKey();
-        const roomSub = chatTab === 'all' ? trc('chat_sub_all', 'spoločný chat UniFlo') : trc('chat_sub_group', 'chat skupiny');
 
         if (currentUser) {
             authContainer.innerHTML = `
                 <span>${escapeHtml(trc('chat_you_label', 'vy'))}: <b>${escapeHtml(chatName())}</b></span>
                 <button type="button" class="chat-link-btn" onclick="changeCustomNickname()" title="Zmeniť nick">✏️</button>
-                <span>· ${escapeHtml(roomSub)}</span>
-                <button type="button" class="chat-link-btn" onclick="logoutUser()" title="Odhlásiť sa">✕</button>
             `;
+            if (logoutBtn) logoutBtn.hidden = false;
             input.disabled = false;
             sendBtn.disabled = false;
             input.placeholder = trc('chat_placeholder', 'Napísať do chatu…');
@@ -2722,6 +2724,7 @@
             input.disabled = true;
             sendBtn.disabled = true;
             input.placeholder = trc('chat_placeholder_login', 'Prihláste sa...');
+            if (logoutBtn) logoutBtn.hidden = true;
         }
     }
 
@@ -2804,6 +2807,7 @@
 
     // «Онлайн»: каждый вошедший пишет себя в presence/<комната>/<uid>, при закрытии вкладки запись удаляется
     function updatePresence() {
+        if (!document.getElementById('chat-online-count')) return; // счётчик онлайн скрыт
         if (presenceListenRef) { presenceListenRef.off(); presenceListenRef = null; }
         if (presenceMineRef) {
             presenceMineRef.onDisconnect().cancel();
