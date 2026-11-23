@@ -1411,12 +1411,20 @@
         /* =====================================================
            BETA 2: карта на весь экран, панели поверх
            ===================================================== */
-        body.beta { padding: 0 !important; overflow: hidden; background: #0d0e10; }
-        .b-map { position: fixed !important; inset: 0; z-index: 0; width: auto !important; height: auto !important; margin: 0 !important; border: 0 !important; border-radius: 0 !important; background: #15171a; }
-        .b-shade { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(13,14,16,0.55) 0%, rgba(13,14,16,0) 38%, rgba(13,14,16,0) 75%, rgba(13,14,16,0.35) 100%); }
+        body.beta { --side: clamp(440px, 33vw, 640px); padding: 0 !important; overflow: hidden; background: #0d0e10; }
+        .b-map { position: fixed !important; inset: 0; left: var(--side) !important; z-index: 0; width: auto !important; height: auto !important; margin: 0 !important; border: 0 !important; border-radius: 0 !important; background: #15171a; }
+        .b-shade { display: none; }
+        .b-side { position: fixed; z-index: 800; top: 0; left: 0; bottom: 0; width: var(--side); box-sizing: border-box; padding: 14px 16px 16px; background: #16181b; border-right: 1px solid #2c3037; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; scrollbar-width: none; }
+        .b-side::-webkit-scrollbar { display: none; }
+        .b-side-head { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; font-weight: 800; color: var(--accent-orange); min-height: 40px; }
+        .b-side .week-time-cell { height: var(--row, 39px); }
+        .b-side .week-body-grid, .b-side .week-day-column { height: calc(var(--row, 39px) * 13); }
+        .b-side .week-day-column { background-size: 100% var(--row, 39px); }
+        .b-side .section-header { margin-bottom: 8px; gap: 8px; }
+        .b-side .section-meta { white-space: nowrap; }
         .b-glass { background: rgba(26, 28, 32, 0.94); border: 1px solid #2c3037; border-radius: 18px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
 
-        .b-top { position: fixed !important; top: 12px; left: 12px; right: 12px; z-index: 900; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 !important; background: transparent !important; border: 0 !important; }
+        .b-top { position: fixed !important; top: 12px; left: calc(var(--side) + 12px); right: 12px; z-index: 900; display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 0 !important; background: transparent !important; border: 0 !important; }
         body.beta.lesson-live .b-top { border: 0 !important; }
         .b-top-left, .b-top-right { display: flex; align-items: center; gap: 8px; }
         .b-top .header-title { position: static; transform: none; pointer-events: auto; }
@@ -1427,6 +1435,8 @@
         .b-group .group-input { width: 92px; height: 34px; }
         .b-icon-btn { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); padding: 0; }
         .b-icon-btn:hover { border-color: var(--accent-orange); }
+        .b-icon-btn.on { border-color: #F5B83D; background: rgba(245, 184, 61, 0.2); box-shadow: 0 0 14px rgba(245, 184, 61, 0.35); }
+        .b-icon-btn.muted svg { opacity: 0.45; }
         .b-fetch { width: 36px; height: 34px; padding: 0; justify-content: center; }
         .b-chip { height: 48px; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .b-chip button { background: none; border: 0; color: var(--text-primary); font: inherit; cursor: pointer; padding: 0; }
@@ -1435,9 +1445,18 @@
         .b-menu-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); padding: 6px 12px 2px; text-transform: uppercase; letter-spacing: 0.04em; }
         .b-menu-sep { height: 1px; background: var(--border-color); margin: 6px 0; }
         .b-menu a.lang-item { text-decoration: none; }
+        .b-mi { display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; padding: 9px 14px; background: none; border: 0; color: var(--text-primary); font: inherit; font-size: 0.86rem; text-align: left; text-decoration: none; cursor: pointer; }
+        .b-mi:hover { background: var(--bg-card-hover); color: var(--accent-orange); }
+        .b-mi svg { flex-shrink: 0; color: var(--text-secondary); }
+        .b-mi:hover svg { color: var(--accent-orange); }
+        .b-mi .b-mi-label { flex: 1; }
+        .b-mi .b-mi-right { color: var(--text-muted); font-size: 0.8rem; }
+        .b-lang-code { width: 26px; height: 20px; border-radius: 5px; background: var(--bg-input); border: 1px solid var(--border-color); display: inline-flex; align-items: center; justify-content: center; font-size: 0.66rem; font-weight: 800; color: var(--text-secondary); flex-shrink: 0; }
+        .b-mi.current .b-lang-code { background: var(--accent-orange); border-color: var(--accent-orange); color: #111214; }
+        .b-mi .b-check { color: var(--accent-orange); font-weight: 800; visibility: hidden; }
+        .b-mi.current .b-check { visibility: visible; }
 
-        .b-left { position: fixed; z-index: 800; top: 72px; left: 12px; bottom: 84px; width: 470px; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .b-left.dash-card { width: 470px; }
+
         .b-next { display: flex; flex-direction: column; gap: 4px; }
         .b-next-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); }
         .b-next-title { font-size: 1.7rem; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -1464,7 +1483,7 @@
         .b-pane-title { font-size: 1rem; font-weight: 800; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .b-pane-close { background: none; border: 0; color: var(--text-muted); font-size: 1.3rem; cursor: pointer; }
 
-        .b-mapbar { position: fixed; z-index: 800; bottom: 14px; left: 494px; right: 80px; display: flex; justify-content: center; pointer-events: none; }
+        .b-mapbar { position: fixed; z-index: 800; bottom: 14px; left: calc(var(--side) + 12px); right: 80px; display: flex; justify-content: center; pointer-events: none; }
         .b-mapbar-inner { pointer-events: auto; width: 100%; max-width: 640px; padding: 6px; display: flex; gap: 6px; align-items: center; position: relative; }
         .b-search { flex: 1; min-width: 0; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--bg-main); border-radius: 12px; }
         .b-search input { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; color: var(--text-primary); font-size: 0.9rem; }
@@ -1483,7 +1502,7 @@
         .b-layer-opt:hover { background: var(--bg-card-hover); }
         .b-layer-opt input { accent-color: var(--accent-orange); width: 16px; height: 16px; }
 
-        .b-card { position: fixed; z-index: 820; bottom: 82px; left: 494px; right: 80px; margin: 0 auto; max-width: 560px; padding: 16px 18px; display: none; }
+        .b-card { position: fixed; z-index: 820; bottom: 82px; left: calc(var(--side) + 12px); right: 80px; margin: 0 auto; max-width: 560px; padding: 16px 18px; display: none; }
         .b-card.open { display: block; }
         .b-card-cat { font-size: 0.75rem; font-weight: 700; }
         .b-card-title { font-size: 1.15rem; font-weight: 800; margin-top: 2px; padding-right: 30px; }
@@ -1500,37 +1519,31 @@
         .b-pin-label { position: absolute; top: 38px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; font-weight: 800; color: #ffffff; background: rgba(17,18,20,0.88); border: 1px solid #33373e; padding: 1px 6px; border-radius: 6px; pointer-events: none; }
         .b-user-dot { width: 16px; height: 16px; border-radius: 50%; background: #3b82f6; border: 3px solid #ffffff; box-shadow: 0 0 0 6px rgba(59,130,246,0.25); }
 
-        .b-place { position: fixed; inset: 0; z-index: 850; pointer-events: none; display: none; }
+        .b-place { position: fixed; inset: 0; left: var(--side); z-index: 850; pointer-events: none; display: none; }
         .b-place.open { display: block; }
         .b-place-pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -100%); }
         .b-place-bar { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%); pointer-events: auto; display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 14px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
 
         .leaflet-container { background: #15171a; font-family: var(--font-family); }
+        .b-dark-tiles { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.6); }
         .leaflet-control-zoom a { background: rgba(26,28,32,0.94) !important; color: var(--text-primary) !important; border-color: #2c3037 !important; }
         .leaflet-control-attribution { background: rgba(17,18,20,0.7) !important; color: #9aa0a6 !important; }
         .leaflet-control-attribution a { color: #c9ced6 !important; }
 
-        @media (max-width: 1100px) {
-            .b-left { width: 400px; }
-            .b-left.dash-card { width: 400px; }
-            .b-mapbar, .b-card { left: 424px; }
-        }
+
         @media (max-width: 860px) {
-            body.beta { overflow: auto; }
-            .b-map { bottom: auto !important; height: 48vh !important; }
-            .b-shade { display: none; }
-            .b-top { position: sticky !important; top: 0; left: 0; right: 0; padding: 8px !important; background: rgba(13,14,16,0.92) !important; flex-wrap: wrap; }
+            body.beta { --side: 0px; overflow: auto; display: flex; flex-direction: column; }
+            .b-side { position: relative; width: auto; border-right: 0; order: 1; overflow: visible; }
+            .b-top { position: sticky !important; top: 0; left: 0; right: 0; order: 0; padding: 8px !important; background: rgba(13,14,16,0.95) !important; flex-wrap: wrap; }
             .b-chip { display: none; }
-            .b-mapbar { top: calc(48vh - 62px); bottom: auto; left: 8px; right: 8px; }
-            .b-card { left: 8px; right: 8px; bottom: auto; top: 76px; }
-            .b-place-bar { bottom: auto; top: calc(48vh - 120px); }
-            .b-place-pin { top: 24vh; }
-            .b-results, .b-layers { bottom: auto; top: 58px; }
-            .b-left { position: relative; top: auto; left: auto; bottom: auto; width: auto; margin: calc(48vh - 60px) 8px 8px; overflow: visible; }
-            .b-left.dash-card { width: auto; }
-            .b-rail { position: sticky; top: 64px; right: auto; margin: 0 8px; flex-direction: row; justify-content: space-around; }
+            .b-rail { position: relative; top: auto; right: auto; order: 2; margin: 8px; flex-direction: row; justify-content: space-around; }
             .b-rail-btn { flex: 1; }
-            .b-drawer { position: relative; top: auto; right: auto; width: auto; max-height: none; margin: 8px 8px 24px; }
+            .b-drawer { position: relative; top: auto; right: auto; width: auto; max-height: none; margin: 0 8px 8px; order: 3; }
+            .b-map { position: relative !important; inset: auto; left: 0 !important; height: 62vh !important; order: 4; }
+            .b-mapbar { position: sticky; bottom: 8px; left: 8px; right: 8px; order: 5; margin: -64px 8px 8px; }
+            .b-card { left: 8px; right: 8px; bottom: 80px; }
+            .b-place { left: 0; }
+            .b-results, .b-layers { bottom: 58px; }
         }
     </style>
 </head>
@@ -1541,13 +1554,6 @@
 
 <!-- Верхняя панель -->
 <div class="top-header b-top">
-    <div class="b-top-left">
-        <div class="header-title b-glass b-logo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
-            <span>UniFlo</span><span class="b-beta">Beta 2</span>
-            <span class="live-lesson-pill" id="live-lesson-pill"><span class="live-dot"></span><span id="live-lesson-text"></span></span>
-        </div>
-    </div>
     <div class="b-top-right">
         <div class="b-glass b-group">
             <input type="text" id="group-input" class="group-input" value="5ZYR11" onchange="changeGroup(this.value)" aria-label="Skupina" placeholder="Skupina">
@@ -1561,26 +1567,32 @@
         <div class="lang-dropdown-container">
             <button class="b-glass b-icon-btn" onclick="toggleLangMenu()" title="Viac" aria-label="Viac"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></button>
             <div class="lang-menu b-menu" id="lang-menu">
-                <div class="b-menu-label">Jazyk</div>
-                <div class="lang-item" onclick="setLanguage('sk')">🇸🇰 Slovenčina</div>
-                <div class="lang-item" onclick="setLanguage('en')">🇬🇧 English</div>
-                <div class="lang-item" onclick="setLanguage('ru')">🇷🇺 Русский</div>
-                <div class="lang-item" onclick="setLanguage('uk')">🇺🇦 Українська</div>
+                <div class="b-menu-label" data-bt="lang">Jazyk</div>
+                <button type="button" class="b-mi" data-lang="sk" onclick="setLanguage('sk')"><span class="b-lang-code">SK</span><span class="b-mi-label">Slovenčina</span><span class="b-check">✓</span></button>
+                <button type="button" class="b-mi" data-lang="en" onclick="setLanguage('en')"><span class="b-lang-code">EN</span><span class="b-mi-label">English</span><span class="b-check">✓</span></button>
+                <button type="button" class="b-mi" data-lang="ru" onclick="setLanguage('ru')"><span class="b-lang-code">RU</span><span class="b-mi-label">Русский</span><span class="b-check">✓</span></button>
+                <button type="button" class="b-mi" data-lang="uk" onclick="setLanguage('uk')"><span class="b-lang-code">UA</span><span class="b-mi-label">Українська</span><span class="b-check">✓</span></button>
                 <div class="b-menu-sep"></div>
-                <div class="lang-item" onclick="openReviewModal()">⭐ <span data-i18n="reviews_modal_title">Recenzie</span></div>
-                <div class="lang-item" onclick="openOpeningHoursModal()">⏰ <span data-i18n="opening_hours_title">Otváracie hodiny</span></div>
-                <a class="lang-item" href="#" id="evzd-link" target="_blank">e-vzdelávanie ↗</a>
-                <a class="lang-item" href="https://punkto.sk" target="_blank">punkto.sk ↗</a>
-                <a class="lang-item" href="https://www.youtube.com/@mishayn" target="_blank">YouTube ↗</a>
+                <button type="button" class="b-mi" onclick="openReviewModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z"></path></svg><span class="b-mi-label" data-bt="reviews">Recenzie</span></button>
+                <button type="button" class="b-mi" onclick="openOpeningHoursModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg><span class="b-mi-label" data-bt="hours">Otváracie hodiny</span></button>
                 <div class="b-menu-sep"></div>
-                <a class="lang-item" href="index.html">← Stará verzia</a>
+                <a class="b-mi" href="#" id="evzd-link" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"></path><path d="M9 12h7M9 16h5"></path></svg><span class="b-mi-label">e-vzdelávanie</span><span class="b-mi-right">↗</span></a>
+                <a class="b-mi" href="https://punkto.sk" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg><span class="b-mi-label">punkto.sk</span><span class="b-mi-right">↗</span></a>
+                <a class="b-mi" href="https://www.youtube.com/@mishayn" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="4"></rect><path d="M10 9l5 3-5 3z"></path></svg><span class="b-mi-label">YouTube</span><span class="b-mi-right">↗</span></a>
+                <div class="b-menu-sep"></div>
+                <a class="b-mi" href="index.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg><span class="b-mi-label" data-bt="old">Stará verzia</span></a>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Левая панель: следующая пара, день / неделя -->
-<aside class="b-left b-glass dash-card">
+<aside class="b-side">
+    <div class="b-side-head header-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
+        <span>UniFlo</span><span class="b-beta">Beta 2</span>
+        <span class="live-lesson-pill" id="live-lesson-pill"><span class="live-dot"></span><span id="live-lesson-text"></span></span>
+    </div>
     <div class="b-next" id="b-next"></div>
     <div class="b-actions">
         <button class="btn-main-action" onclick="openAddModal()" data-i18n="add_lesson">+ Pridať hodinu</button>
@@ -1643,10 +1655,10 @@
 
 <!-- Правая полоска и выдвижные панели -->
 <nav class="b-rail b-glass" aria-label="Panely">
-    <button type="button" class="b-rail-btn" id="rail-cal" onclick="toggleDrawer('cal')" title="Kalendár"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg><span>Kal.</span></button>
-    <button type="button" class="b-rail-btn" id="rail-notes" onclick="toggleDrawer('notes')" title="Poznámky"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"></path><path d="M14 6l3 3"></path></svg><span>Pozn.</span></button>
-    <button type="button" class="b-rail-btn" id="rail-chat" onclick="toggleDrawer('chat')" title="Chat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"></path></svg><span>Chat</span></button>
-    <button type="button" class="b-rail-btn" onclick="openOpeningHoursModal()" title="Otváracie hodiny"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2"></path></svg><span>Hod.</span></button>
+    <button type="button" class="b-rail-btn" id="rail-cal" onclick="toggleDrawer('cal')" title="Kalendár"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg><span data-bt="r_cal">Kal.</span></button>
+    <button type="button" class="b-rail-btn" id="rail-notes" onclick="toggleDrawer('notes')" title="Poznámky"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"></path><path d="M14 6l3 3"></path></svg><span data-bt="r_notes">Pozn.</span></button>
+    <button type="button" class="b-rail-btn" id="rail-chat" onclick="toggleDrawer('chat')" title="Chat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"></path></svg><span data-bt="r_chat">Chat</span></button>
+    <button type="button" class="b-rail-btn" onclick="openOpeningHoursModal()" title="Otváracie hodiny"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2"></path></svg><span data-bt="r_hours">Hod.</span></button>
 </nav>
 
 <section class="b-drawer b-glass" id="b-drawer">
@@ -1728,21 +1740,21 @@
 <div class="b-mapbar">
     <div class="b-mapbar-inner b-glass">
         <label class="b-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
-            <input type="search" id="b-search" placeholder="Budova, miesto, kategória…" autocomplete="off" oninput="onMapSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();mapSearchGo();}" aria-label="Hľadať na mape">
+            <input type="search" id="b-search" placeholder="Budova, miesto, kategória…" data-bt-ph="search" autocomplete="off" oninput="onMapSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();mapSearchGo();}" aria-label="Hľadať na mape">
         </label>
-        <button type="button" class="b-bar-btn" onclick="toggleLayersMenu()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path></svg><span>Vrstvy</span></button>
+        <button type="button" class="b-bar-btn" onclick="toggleLayersMenu()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path></svg><span data-bt="layers">Vrstvy</span></button>
         <button type="button" class="b-bar-btn" onclick="locateUser()" title="Moja poloha" aria-label="Moja poloha"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg></button>
-        <button type="button" class="b-bar-btn b-add" onclick="startPlacePoint()">+ Bod</button>
+        <button type="button" class="b-bar-btn b-add" onclick="startPlacePoint()" data-bt="add_point">+ Bod</button>
         <div class="b-results b-glass" id="b-results"></div>
         <div class="b-layers b-glass" id="b-layers">
-            <h4>Mapa</h4>
-            <label class="b-layer-opt"><input type="radio" name="b-base" value="dark" checked onchange="setBaseLayer(this.value)"> Tmavá</label>
-            <label class="b-layer-opt"><input type="radio" name="b-base" value="osm" onchange="setBaseLayer(this.value)"> Schéma</label>
-            <label class="b-layer-opt"><input type="radio" name="b-base" value="sat" onchange="setBaseLayer(this.value)"> Satelit</label>
-            <h4>Body</h4>
-            <label class="b-layer-opt"><input type="checkbox" id="b-show-admin" checked onchange="setPointFilter()"> Budovy a oficiálne miesta</label>
-            <label class="b-layer-opt"><input type="checkbox" id="b-show-user" checked onchange="setPointFilter()"> Študentské body</label>
-            <h4>Zoznamy</h4>
+            <h4 data-bt="map">Mapa</h4>
+            <label class="b-layer-opt"><input type="radio" name="b-base" value="dark" checked onchange="setBaseLayer(this.value)"> <span data-bt="m_dark">Tmavá</span></label>
+            <label class="b-layer-opt"><input type="radio" name="b-base" value="osm" onchange="setBaseLayer(this.value)"> <span data-bt="m_osm">Schéma</span></label>
+            <label class="b-layer-opt"><input type="radio" name="b-base" value="sat" onchange="setBaseLayer(this.value)"> <span data-bt="m_sat">Satelit</span></label>
+            <h4 data-bt="points">Body</h4>
+            <label class="b-layer-opt"><input type="checkbox" id="b-show-admin" checked onchange="setPointFilter()"> <span data-bt="pts_admin">Budovy a oficiálne miesta</span></label>
+            <label class="b-layer-opt"><input type="checkbox" id="b-show-user" checked onchange="setPointFilter()"> <span data-bt="pts_user">Študentské body</span></label>
+            <h4 data-bt="lists">Zoznamy</h4>
             <div class="b-layer-opt" onclick="openPointsModal('admin')">🔴 <span data-i18n="map_btn_buildings">Budovy / Miesta</span></div>
             <div class="b-layer-opt" onclick="openPointsModal('user')">📍 <span data-i18n="map_btn_student_points">Študentské body</span></div>
         </div>
@@ -1758,9 +1770,9 @@
         <svg width="40" height="52" viewBox="0 0 40 52" aria-hidden="true"><path d="M20 50 C20 50 4 30 4 18 a16 16 0 0 1 32 0 C36 30 20 50 20 50z" fill="#f97316" stroke="#ffffff" stroke-width="3"></path><circle cx="20" cy="18" r="6" fill="#ffffff"></circle></svg>
     </div>
     <div class="b-place-bar b-glass">
-        <span>Posuň mapu — bod bude tu</span>
-        <button type="button" class="b-bar-btn" onclick="cancelPlacePoint()">Zrušiť</button>
-        <button type="button" class="b-bar-btn b-add" onclick="confirmPlacePoint()">Tu</button>
+        <span data-bt="place_hint">Posuň mapu — bod bude tu</span>
+        <button type="button" class="b-bar-btn" onclick="cancelPlacePoint()" data-bt="cancel">Zrušiť</button>
+        <button type="button" class="b-bar-btn b-add" onclick="confirmPlacePoint()" data-bt="here">Tu</button>
     </div>
 </div>
 
@@ -2606,6 +2618,7 @@
         if (chatInited) { updateChatUserUI(); connectChatRoom(true); }
         renderNextLesson();
         setLeftView(leftView);
+        applyBetaTexts();
     }
 
     function applyTranslations() {
@@ -2631,11 +2644,19 @@
     });
 
     function requestNotificationPermission() {
+        // уже разрешено — колокольчик включает/выключает напоминания UniFlo
+        if (("Notification" in window) && Notification.permission === "granted") {
+            if (localStorage.getItem('uniflo_notif_off') === '1') localStorage.removeItem('uniflo_notif_off');
+            else saveLS('uniflo_notif_off', '1');
+            updateBellState();
+            return;
+        }
         if (!("Notification" in window)) {
             alert("Ваш браузер не поддерживает уведомления.");
             return;
         }
         Notification.requestPermission().then(permission => {
+            updateBellState();
             if (permission === "granted") {
                 alert("Успешно! Уведомления включены. Вы получите оповещение за 10 минут до пары.");
             } else {
@@ -2645,7 +2666,7 @@
     }
 
     function checkLessonReminders() {
-        if (Notification.permission !== "granted") return;
+        if (!notifEnabled()) return;
 
         const now = new Date();
         const currentDay = now.getDay();
@@ -4070,9 +4091,9 @@
                 const [sh, sm] = l.start.split(':').map(Number);
                 const [eh, em] = l.end.split(':').map(Number);
 
-                const topPx = (sh - 7) * 39 + (sm / 60) * 39;
+                const topPx = (sh - 7) * WEEK_ROW + (sm / 60) * WEEK_ROW;
                 const durationHrs = (eh * 60 + em - (sh * 60 + sm)) / 60;
-                const heightPx = durationHrs * 39;
+                const heightPx = durationHrs * WEEK_ROW;
 
                 const card = document.createElement('div');
                 card.className = `week-card ${l.type}`;
@@ -4096,7 +4117,7 @@
                     if (gapText) {
                         const gapTopPx = topPx + heightPx;
                         const [nextSh, nextSm] = nextL.start.split(':').map(Number);
-                        const nextTopPx = (nextSh - 7) * 39 + (nextSm / 60) * 39;
+                        const nextTopPx = (nextSh - 7) * WEEK_ROW + (nextSm / 60) * WEEK_ROW;
                         const gapHeightPx = nextTopPx - gapTopPx;
 
                         const gapBox = document.createElement('div');
@@ -4432,9 +4453,10 @@
 
     function makeBaseLayers() {
         return {
-            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 20, subdomains: 'abcd',
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            // тёмная = обычные тайлы OSM, затемнённые CSS-фильтром (без ключей и регистраций)
+            dark: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19, className: 'b-dark-tiles',
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }),
             osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
@@ -4471,6 +4493,8 @@
         if (leafletMap) return;
         leafletMap = L.map('map-container', { zoomControl: false }).setView([49.2065, 18.7580], 16);
         L.control.zoom({ position: 'bottomright' }).addTo(leafletMap);
+        // кампус в видимой части экрана, а не под левой панелью
+        if (window.innerWidth > 860) leafletMap.panBy([-240, 0], { animate: false });
         setBaseLayer(localStorage.getItem('uniflo_beta_base') || 'dark');
         leafletMap.on('contextmenu', (e) => openNewPointAt(e.latlng));
         leafletMap.on('click', () => { closePlaceCard(); closeMapMenus(); });
@@ -4654,7 +4678,7 @@
         const card = document.getElementById('b-card');
         const st = pointStyle(p);
         const t = translations[currentLang] || translations.sk;
-        const kind = p.isAdmin ? 'Oficiálne miesto' : 'Študentský bod';
+        const kind = p.isAdmin ? bt('official') : bt('student_pt');
         let meta = kind;
         if (userLatLng) {
             const d = distanceMeters(userLatLng, p);
@@ -4669,7 +4693,7 @@
         card.querySelector('.b-card-close').onclick = closePlaceCard;
         const actions = card.querySelector('.b-card-actions');
         const mk = (label, cls, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'b-bar-btn' + (cls ? ' ' + cls : ''); b.textContent = label; b.onclick = fn; actions.appendChild(b); };
-        mk('Trasa pešo', 'b-add', () => routeTo(p));
+        mk(bt('route'), 'b-add', () => routeTo(p));
         if (!p.isAdmin || isAdminUser) {
             mk(t.edit_btn || 'Upraviť', '', () => editCustomPoint(p.id));
             mk(t.delete_btn || 'Odstrániť', '', () => deleteCustomPoint(p.id));
@@ -4943,6 +4967,7 @@
         updateLiveLesson();
         initChat();
         renderNextLesson();
+        requestAnimationFrame(fitWeek);
     }
 
     setInterval(() => {
@@ -4960,10 +4985,14 @@
 
     // ===== BETA 2: оболочка =====
     const B_TXT = {
-        sk: { now: 'Teraz', until: 'do', next: 'Ďalšia hodina', today: 'dnes', tomorrow: 'zajtra', inT: 'o', left: 'ešte', none: 'Žiadne hodiny v rozvrhu. Prenes rozvrh tlačidlom ⟳ hore.', day: 'Deň', week: 'Týždeň' },
-        en: { now: 'Now', until: 'until', next: 'Next class', today: 'today', tomorrow: 'tomorrow', inT: 'in', left: 'left', none: 'No classes yet. Import your schedule with ⟳ at the top.', day: 'Day', week: 'Week' },
-        ru: { now: 'Сейчас', until: 'до', next: 'Следующая пара', today: 'сегодня', tomorrow: 'завтра', inT: 'через', left: 'ещё', none: 'Пар пока нет. Перенеси расписание кнопкой ⟳ сверху.', day: 'День', week: 'Неделя' },
-        uk: { now: 'Зараз', until: 'до', next: 'Наступна пара', today: 'сьогодні', tomorrow: 'завтра', inT: 'через', left: 'ще', none: 'Пар поки немає. Перенеси розклад кнопкою ⟳ зверху.', day: 'День', week: 'Тиждень' }
+        sk: { now: 'Teraz', until: 'do', next: 'Ďalšia hodina', today: 'dnes', tomorrow: 'zajtra', inT: 'o', left: 'ešte', none: 'Žiadne hodiny v rozvrhu. Prenes rozvrh tlačidlom ⟳ hore.', day: 'Deň', week: 'Týždeň',
+              lang: 'Jazyk', reviews: 'Recenzie', hours: 'Otváracie hodiny', old: 'Stará verzia', r_cal: 'Kal.', r_notes: 'Pozn.', r_chat: 'Chat', r_hours: 'Hod.', search: 'Budova, miesto, kategória…', layers: 'Vrstvy', add_point: '+ Bod', map: 'Mapa', m_dark: 'Tmavá', m_osm: 'Schéma', m_sat: 'Satelit', points: 'Body', pts_admin: 'Budovy a oficiálne miesta', pts_user: 'Študentské body', lists: 'Zoznamy', place_hint: 'Posuň mapu — bod bude tu', cancel: 'Zrušiť', here: 'Tu', route: 'Trasa pešo', official: 'Oficiálne miesto', student_pt: 'Študentský bod', notif_on: 'Pripomienky zapnuté', notif_off: 'Pripomienky vypnuté' },
+        en: { now: 'Now', until: 'until', next: 'Next class', today: 'today', tomorrow: 'tomorrow', inT: 'in', left: 'left', none: 'No classes yet. Import your schedule with ⟳ at the top.', day: 'Day', week: 'Week',
+              lang: 'Language', reviews: 'Reviews', hours: 'Opening hours', old: 'Old version', r_cal: 'Cal.', r_notes: 'Notes', r_chat: 'Chat', r_hours: 'Hours', search: 'Building, place, category…', layers: 'Layers', add_point: '+ Point', map: 'Map', m_dark: 'Dark', m_osm: 'Street', m_sat: 'Satellite', points: 'Points', pts_admin: 'Buildings & official places', pts_user: 'Student points', lists: 'Lists', place_hint: 'Move the map — the point goes here', cancel: 'Cancel', here: 'Here', route: 'Walking route', official: 'Official place', student_pt: 'Student point', notif_on: 'Reminders on', notif_off: 'Reminders off' },
+        ru: { now: 'Сейчас', until: 'до', next: 'Следующая пара', today: 'сегодня', tomorrow: 'завтра', inT: 'через', left: 'ещё', none: 'Пар пока нет. Перенеси расписание кнопкой ⟳ сверху.', day: 'День', week: 'Неделя',
+              lang: 'Язык', reviews: 'Отзывы', hours: 'График работы', old: 'Старая версия', r_cal: 'Кал.', r_notes: 'Зам.', r_chat: 'Чат', r_hours: 'Часы', search: 'Корпус, место, категория…', layers: 'Слои', add_point: '+ Точка', map: 'Карта', m_dark: 'Тёмная', m_osm: 'Схема', m_sat: 'Спутник', points: 'Точки', pts_admin: 'Корпуса и официальные места', pts_user: 'Студенческие точки', lists: 'Списки', place_hint: 'Подвинь карту — точка будет здесь', cancel: 'Отмена', here: 'Здесь', route: 'Маршрут пешком', official: 'Официальное место', student_pt: 'Студенческая точка', notif_on: 'Напоминания включены', notif_off: 'Напоминания выключены' },
+        uk: { now: 'Зараз', until: 'до', next: 'Наступна пара', today: 'сьогодні', tomorrow: 'завтра', inT: 'через', left: 'ще', none: 'Пар поки немає. Перенеси розклад кнопкою ⟳ зверху.', day: 'День', week: 'Тиждень',
+              lang: 'Мова', reviews: 'Відгуки', hours: 'Графік роботи', old: 'Стара версія', r_cal: 'Кал.', r_notes: 'Нот.', r_chat: 'Чат', r_hours: 'Год.', search: 'Корпус, місце, категорія…', layers: 'Шари', add_point: '+ Точка', map: 'Карта', m_dark: 'Темна', m_osm: 'Схема', m_sat: 'Супутник', points: 'Точки', pts_admin: 'Корпуси та офіційні місця', pts_user: 'Студентські точки', lists: 'Списки', place_hint: 'Посунь карту — точка буде тут', cancel: 'Скасувати', here: 'Тут', route: 'Маршрут пішки', official: 'Офіційне місце', student_pt: 'Студентська точка', notif_on: 'Нагадування увімкнено', notif_off: 'Нагадування вимкнено' }
     };
     const bt = (k) => (B_TXT[currentLang] || B_TXT.sk)[k];
     const bMins = (t) => { const [h, m] = String(t || '0:0').split(':').map(Number); return h * 60 + m; };
@@ -5011,6 +5040,46 @@
             <div class="b-next-sub">${escapeHtml(found.start)}–${escapeHtml(found.end)}${found.room ? ' · ' + escapeHtml(found.room) : ''}${found.teacher ? ' · ' + escapeHtml(found.teacher) : ''}</div>`;
     }
 
+    // Подписи беты на языке сайта
+    function applyBetaTexts() {
+        document.querySelectorAll('[data-bt]').forEach(el => { const v = bt(el.dataset.bt); if (v) el.textContent = v; });
+        document.querySelectorAll('[data-bt-ph]').forEach(el => { const v = bt(el.dataset.btPh); if (v) el.placeholder = v; });
+        document.querySelectorAll('.b-mi[data-lang]').forEach(el => el.classList.toggle('current', el.dataset.lang === currentLang));
+        updateBellState();
+    }
+
+    // Колокольчик: подсвечен, когда напоминания включены; повторный клик — пауза
+    function notifEnabled() {
+        return ('Notification' in window) && Notification.permission === 'granted' && localStorage.getItem('uniflo_notif_off') !== '1';
+    }
+    function updateBellState() {
+        const b = document.getElementById('btn-notif-header');
+        if (!b) return;
+        const on = notifEnabled();
+        b.classList.toggle('on', on);
+        b.classList.toggle('muted', !on);
+        b.title = on ? bt('notif_on') : bt('notif_off');
+    }
+
+    // Сетка недели целиком помещается в колонку: высота строки подстраивается под экран
+    let WEEK_ROW = 39;
+    function fitWeek() {
+        let row = 34;
+        const grid = document.querySelector('.b-side .week-body-grid');
+        const side = document.querySelector('.b-side');
+        if (window.innerWidth > 860 && grid && side && leftView === 'week') {
+            const avail = side.getBoundingClientRect().bottom - 18 - grid.getBoundingClientRect().top;
+            row = Math.max(24, Math.min(48, Math.floor(avail / 13)));
+        }
+        if (row !== WEEK_ROW) {
+            WEEK_ROW = row;
+            document.documentElement.style.setProperty('--row', row + 'px');
+            renderWeekGrid();
+            updateLiveLesson();
+        }
+    }
+    window.addEventListener('resize', () => { fitWeek(); if (leafletMap) leafletMap.invalidateSize(); });
+
     let leftView = localStorage.getItem('uniflo_beta_view') === 'day' ? 'day' : 'week';
     function setLeftView(v) {
         leftView = v === 'day' ? 'day' : 'week';
@@ -5021,6 +5090,7 @@
         document.getElementById('b-view-week').classList.toggle('active', leftView === 'week');
         document.getElementById('b-view-day').textContent = bt('day');
         document.getElementById('b-view-week').textContent = bt('week');
+        requestAnimationFrame(fitWeek);
     }
 
     let openDrawer = localStorage.getItem('uniflo_beta_drawer') || null;
@@ -5057,7 +5127,9 @@
     });
 
     upcomingExpanded = true;
+    applyBetaTexts();
     setLeftView(leftView);
+    window.addEventListener('load', fitWeek);
     applyDrawer(openDrawer);
     tickBetaClock();
 
