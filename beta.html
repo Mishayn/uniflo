@@ -1493,6 +1493,72 @@
         .b-side .b-seg button.active { background: color-mix(in srgb, var(--next-c, var(--accent-orange)) 22%, transparent); color: var(--next-c, var(--accent-orange)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--next-c, var(--accent-orange)) 45%, transparent); }
         body.lesson-live .b-side .b-seg button.active { --next-c: var(--live); }
 
+
+        /* ===== Профиль, друзья, избранные группы ===== */
+        .b-ava { position: relative; flex-shrink: 0; border-radius: 50%; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; }
+        .b-ava svg, .b-ava img { width: 100%; height: 100%; display: block; object-fit: cover; }
+        .b-profile-btn { width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .b-profile-btn .b-ava { width: 34px; height: 34px; }
+        .b-profile-btn .b-dot { position: absolute; top: 9px; right: 9px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent-orange); border: 2px solid var(--b-sidebg); display: none; }
+        .b-profile-btn.has-req .b-dot { display: block; }
+        .b-profile-btn { position: relative; }
+
+        .b-modal-back { position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; padding: 16px; }
+        .b-modal-back.open { display: flex; }
+        .b-modal { width: min(520px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .b-modal h3 { margin: 0 0 4px; font-size: 1.2rem; font-weight: 800; color: var(--text-primary); }
+        .b-modal .b-hint { font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 14px; }
+        .b-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+        .b-field label { font-size: 0.76rem; font-weight: 700; color: var(--text-secondary); }
+        .b-field input[type=text] { height: 42px; padding: 0 12px; border-radius: 11px; border: 1px solid var(--b-line); background: var(--b-input2); color: var(--text-primary); font: inherit; font-size: 0.95rem; }
+        .b-field input[type=text]:focus { outline: none; border-color: var(--accent-orange); }
+        .b-at { display: flex; align-items: center; height: 42px; border-radius: 11px; border: 1px solid var(--b-line); background: var(--b-input2); padding-left: 12px; }
+        .b-at span { color: var(--text-muted); font-weight: 700; }
+        .b-at input[type=text] { border: 0 !important; background: transparent !important; flex: 1; height: 40px; padding-left: 2px !important; }
+        .b-msg { font-size: 0.75rem; min-height: 1em; color: var(--text-muted); }
+        .b-msg.bad { color: #f87171; } .b-msg.good { color: #4ade80; }
+        .b-ava-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+        .b-ava-opt { aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent; padding: 0; cursor: pointer; background: none; overflow: hidden; }
+        .b-ava-opt.active { border-color: var(--accent-orange); box-shadow: 0 0 0 2px var(--b-sidebg) inset; }
+        .b-prof-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .b-prof-top .b-ava { width: 64px; height: 64px; }
+        .b-row-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+        .b-btn { height: 40px; padding: 0 16px; border-radius: 11px; border: 1px solid var(--b-line); background: var(--b-card2); color: var(--text-primary); font: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .b-btn.primary { background: var(--accent-orange); border-color: var(--accent-orange); color: var(--on-accent); }
+        .b-btn.small { height: 32px; padding: 0 11px; font-size: 0.78rem; border-radius: 9px; }
+        .b-btn.danger { color: #f87171; }
+        .b-btn:disabled { opacity: 0.5; cursor: default; }
+        .b-switch { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; color: var(--text-secondary); cursor: pointer; margin: 4px 0 12px; }
+        .b-switch input { width: 18px; height: 18px; accent-color: var(--accent-orange); }
+
+        /* избранные группы */
+        .b-favs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .b-fav { height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--b-line); background: var(--b-input2); color: var(--text-secondary); font: inherit; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .b-fav .b-ava { width: 18px; height: 18px; }
+        .b-fav.active { color: var(--accent-orange); border-color: color-mix(in srgb, var(--accent-orange) 55%, transparent); background: color-mix(in srgb, var(--accent-orange) 10%, transparent); }
+        .b-fav.star { width: 30px; padding: 0; justify-content: center; font-size: 0.9rem; }
+        .b-fav.star.on { color: #F5B83D; }
+        .b-viewing { font-size: 0.76rem; font-weight: 700; color: var(--accent-orange); display: none; align-items: center; gap: 8px; }
+        .b-viewing.show { display: flex; }
+        .b-viewing button { font: inherit; font-size: 0.74rem; font-weight: 800; color: var(--text-primary); background: var(--b-card2); border: 1px solid var(--b-line); border-radius: 8px; height: 26px; padding: 0 8px; cursor: pointer; }
+
+        /* панель друзей */
+        .b-fr-search { display: flex; gap: 6px; margin-bottom: 8px; }
+        .b-fr-search input { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--b-line); background: var(--b-input2); color: var(--text-primary); font: inherit; font-size: 0.85rem; }
+        .b-fr-mode { display: flex; background: var(--b-input2); border: 1px solid var(--b-line); border-radius: 10px; padding: 2px; }
+        .b-fr-mode button { border: 0; background: transparent; color: var(--text-secondary); font: inherit; font-size: 0.75rem; font-weight: 800; border-radius: 8px; padding: 0 9px; cursor: pointer; }
+        .b-fr-mode button.active { background: var(--b-card2); color: var(--text-primary); }
+        .b-fr-h { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 12px 0 6px; }
+        .b-fr { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 12px; background: var(--b-card2); margin-bottom: 6px; }
+        .b-fr .b-ava { width: 38px; height: 38px; }
+        .b-fr-main { flex: 1; min-width: 0; }
+        .b-fr-name { font-size: 0.88rem; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .b-fr-sub { font-size: 0.74rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .b-fr-act { display: flex; gap: 4px; flex-shrink: 0; }
+        .b-fr-gaps { margin: -2px 0 8px 48px; display: flex; flex-direction: column; gap: 3px; }
+        .b-gap { font-size: 0.74rem; color: var(--text-secondary); }
+        .b-gap b { color: var(--accent-orange); font-weight: 800; }
+        .b-empty { font-size: 0.8rem; color: var(--text-muted); padding: 6px 2px; }
         /* панель «Оформление» без прокрутки */
         .b-look { top: 70px; width: min(600px, calc(100vw - var(--side) - 120px)); max-height: calc(100vh - 84px); padding: 14px 16px 16px; }
         .b-look h4 { margin: 10px 2px 7px; }
@@ -1667,6 +1733,7 @@
             <span id="b-clock">--:--</span><span style="color:var(--text-muted)">·</span>
             <button type="button" id="btn-weather-temp" onclick="openWeatherModal()" title="Počasie">--°</button>
         </div>
+        <button type="button" class="b-glass b-profile-btn" id="b-profile-btn" onclick="openProfile()" aria-label="Profil" title="Profil"><span class="b-ava" id="b-profile-ava"></span><span class="b-dot"></span></button>
         <button class="b-glass b-icon-btn" id="btn-notif-header" onclick="requestNotificationPermission()" title="Pripomienky" aria-label="Pripomienky"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5B83D" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg></button>
         <div class="lang-dropdown-container">
             <button class="b-glass b-icon-btn" onclick="toggleLangMenu()" title="Viac" aria-label="Viac"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg></button>
@@ -1701,6 +1768,11 @@
     <div class="b-map-grid" id="b-map-grid"></div>
 </div>
 
+<!-- Профиль -->
+<div class="b-modal-back" id="b-profile-modal" onclick="if (event.target === this) closeProfile()">
+    <div class="b-modal b-glass" role="dialog" aria-modal="true" aria-labelledby="b-prof-title" id="b-profile-body"></div>
+</div>
+
 <!-- Левая панель: следующая пара, день / неделя -->
 <aside class="b-side">
     <div class="b-side-head header-title">
@@ -1718,6 +1790,8 @@
             </div>
         </div>
     </div>
+    <div class="b-favs" id="b-favs"></div>
+    <div class="b-viewing" id="b-viewing"></div>
     <div class="b-actions">
         <button class="btn-main-action" onclick="openAddModal()" data-i18n="add_lesson">+ Pridať hodinu</button>
         <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
@@ -1782,6 +1856,7 @@
     <button type="button" class="b-rail-btn" id="rail-cal" onclick="toggleDrawer('cal')" title="Kalendár"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg><span data-bt="r_cal">Kal.</span></button>
     <button type="button" class="b-rail-btn" id="rail-notes" onclick="toggleDrawer('notes')" title="Poznámky"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"></path><path d="M14 6l3 3"></path></svg><span data-bt="r_notes">Pozn.</span></button>
     <button type="button" class="b-rail-btn" id="rail-chat" onclick="toggleDrawer('chat')" title="Chat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"></path></svg><span data-bt="r_chat">Chat</span></button>
+    <button type="button" class="b-rail-btn" id="rail-friends" onclick="toggleDrawer('friends')" title="Priatelia"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .8 3 2.8 3 6"></path></svg><span data-bt="r_friends">Priat.</span></button>
     <button type="button" class="b-rail-btn" onclick="openOpeningHoursModal()" title="Otváracie hodiny"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2"></path></svg><span data-bt="r_hours">Hod.</span></button>
 </nav>
 
@@ -1826,6 +1901,10 @@
                     </div>
 
                     
+    </div>
+    <div class="b-pane" id="pane-friends">
+        <div class="b-pane-title"><span data-bt="friends_t">Priatelia</span><button type="button" class="b-pane-close" onclick="toggleDrawer(null)" aria-label="Zavrieť">&times;</button></div>
+        <div id="b-friends-body"></div>
     </div>
     <div class="b-pane" id="pane-chat">
         <!-- Онлайн Чат -->
@@ -2744,6 +2823,7 @@
         renderNextLesson();
         setLeftView(leftView);
         applyBetaTexts();
+        if (typeof renderFavs === 'function') { renderFavs(); if (openDrawer === 'friends') renderFriendsPane(); }
     }
 
     function applyTranslations() {
@@ -4022,10 +4102,13 @@
         if (!groupName.trim()) return;
         currentGroup = groupName.trim().toUpperCase();
         saveLS('uniza_active_group', currentGroup);
+        if (!localStorage.getItem('uniflo_my_group')) saveLS('uniflo_my_group', currentGroup);
         syncGroupInputs(currentGroup);
         updateEvzdLink(currentGroup);
         schedule = loadInitialSchedule(currentGroup);
         renderAll();
+        if (typeof renderFavs === 'function') renderFavs();
+        if (typeof autoLoadGroup === 'function') autoLoadGroup(currentGroup);
     }
 
     function resetScheduleWithConfirm() {
@@ -5211,6 +5294,500 @@
     const bMins = (t) => { const [h, m] = String(t || '0:0').split(':').map(Number); return h * 60 + m; };
     const bDur = (m) => { const h = Math.floor(m / 60), r = m % 60; return (h ? h + ' h ' : '') + (r ? r + ' min' : (h ? '' : '0 min')); };
 
+    // =====================================================================
+    // ПРОФИЛЬ · ДРУЗЬЯ · ИЗБРАННЫЕ ГРУППЫ · ОБЩИЕ ОКНА · ОБЩАЯ БАЗА РАСПИСАНИЙ
+    // =====================================================================
+    const F_TXT = {
+        ru: { prof_t: 'Профиль', prof_new: 'Создай профиль', prof_new_h: 'Имя видят друзья и чат. По @нику тебя находят в поиске.', name: 'Имя (можно менять всегда)', uname: 'Ник для друзей (меняется раз в неделю)', ava: 'Аватарка', google_ph: 'Фото из Google', group: 'Твоя группа', share: 'Друзья видят мои ручные пары', save: 'Сохранить', logout: 'Выйти', login: 'Войти через Google', login_h: 'Войди, чтобы создать профиль и добавлять друзей.',
+              u_bad: '3–20 символов: a–z, 0–9, _ и точка', u_taken: 'Этот ник уже занят', u_free: 'Ник свободен', u_week: 'Ник можно сменить после', n_bad: 'Имя: 1–30 символов', bad_word: 'Без неприличных слов, пожалуйста', saved: 'Профиль сохранён', err: 'Ошибка: ',
+              friends_t: 'Друзья', search_ph_u: '@ник', search_ph_n: 'Имя', by_u: '@ник', by_n: 'Имя', add: 'Добавить', sent: 'Заявка отправлена', pending: 'ждёт ответа', incoming: 'Заявки в друзья', accept: 'Принять', decline: 'Отклонить', my_friends: 'Мои друзья', no_friends: 'Пока никого. Найди друга по @нику или имени.', not_found: 'Никого не нашли', you: 'это ты', already: 'уже в друзьях',
+              view: 'Расписание', remove: 'Удалить', remove_q: 'Удалить из друзей', gaps: 'Общие окна', no_gaps: 'общих окон на этой неделе нет', both_free: 'оба свободны', viewing: 'Смотришь', back_mine: '← моё', fav_add: 'В избранные', fav_del: 'Убрать из избранных', min: 'мин', h: 'ч', added_fr: 'теперь в друзьях', cloud: 'Расписание из общей базы', need_profile: 'Сначала создай профиль' },
+        uk: { prof_t: 'Профіль', prof_new: 'Створи профіль', prof_new_h: 'Ім’я бачать друзі та чат. За @ніком тебе знаходять у пошуку.', name: 'Ім’я (можна змінювати завжди)', uname: 'Нік для друзів (змінюється раз на тиждень)', ava: 'Аватарка', google_ph: 'Фото з Google', group: 'Твоя група', share: 'Друзі бачать мої ручні пари', save: 'Зберегти', logout: 'Вийти', login: 'Увійти через Google', login_h: 'Увійди, щоб створити профіль і додавати друзів.',
+              u_bad: '3–20 символів: a–z, 0–9, _ і крапка', u_taken: 'Цей нік уже зайнятий', u_free: 'Нік вільний', u_week: 'Нік можна змінити після', n_bad: 'Ім’я: 1–30 символів', bad_word: 'Без непристойних слів, будь ласка', saved: 'Профіль збережено', err: 'Помилка: ',
+              friends_t: 'Друзі', search_ph_u: '@нік', search_ph_n: 'Ім’я', by_u: '@нік', by_n: 'Ім’я', add: 'Додати', sent: 'Запит надіслано', pending: 'чекає відповіді', incoming: 'Запити в друзі', accept: 'Прийняти', decline: 'Відхилити', my_friends: 'Мої друзі', no_friends: 'Поки нікого. Знайди друга за @ніком або ім’ям.', not_found: 'Нікого не знайшли', you: 'це ти', already: 'вже в друзях',
+              view: 'Розклад', remove: 'Видалити', remove_q: 'Видалити з друзів', gaps: 'Спільні вікна', no_gaps: 'спільних вікон цього тижня немає', both_free: 'обидва вільні', viewing: 'Дивишся', back_mine: '← мій', fav_add: 'В обрані', fav_del: 'Прибрати з обраних', min: 'хв', h: 'год', added_fr: 'тепер у друзях', cloud: 'Розклад зі спільної бази', need_profile: 'Спочатку створи профіль' },
+        sk: { prof_t: 'Profil', prof_new: 'Vytvor si profil', prof_new_h: 'Meno vidia priatelia a chat. Podľa @prezývky ťa nájdu vo vyhľadávaní.', name: 'Meno (zmeníš kedykoľvek)', uname: 'Prezývka pre priateľov (raz za týždeň)', ava: 'Avatar', google_ph: 'Fotka z Google', group: 'Tvoja skupina', share: 'Priatelia vidia moje vlastné hodiny', save: 'Uložiť', logout: 'Odhlásiť', login: 'Prihlásiť cez Google', login_h: 'Prihlás sa a vytvor si profil, aby si mohol pridávať priateľov.',
+              u_bad: '3–20 znakov: a–z, 0–9, _ a bodka', u_taken: 'Táto prezývka je obsadená', u_free: 'Prezývka je voľná', u_week: 'Prezývku zmeníš po', n_bad: 'Meno: 1–30 znakov', bad_word: 'Bez vulgarizmov, prosím', saved: 'Profil uložený', err: 'Chyba: ',
+              friends_t: 'Priatelia', search_ph_u: '@prezývka', search_ph_n: 'Meno', by_u: '@nick', by_n: 'Meno', add: 'Pridať', sent: 'Žiadosť odoslaná', pending: 'čaká na odpoveď', incoming: 'Žiadosti o priateľstvo', accept: 'Prijať', decline: 'Odmietnuť', my_friends: 'Moji priatelia', no_friends: 'Zatiaľ nikto. Nájdi priateľa podľa @prezývky alebo mena.', not_found: 'Nikoho sme nenašli', you: 'to si ty', already: 'už ste priatelia',
+              view: 'Rozvrh', remove: 'Odstrániť', remove_q: 'Odstrániť z priateľov', gaps: 'Spoločné voľno', no_gaps: 'tento týždeň nemáte spoločné voľno', both_free: 'obaja voľní', viewing: 'Pozeráš', back_mine: '← môj', fav_add: 'Do obľúbených', fav_del: 'Odobrať z obľúbených', min: 'min', h: 'h', added_fr: 'je teraz tvoj priateľ', cloud: 'Rozvrh zo spoločnej databázy', need_profile: 'Najprv si vytvor profil' },
+        en: { prof_t: 'Profile', prof_new: 'Create your profile', prof_new_h: 'Friends and chat see your name. People find you by @username.', name: 'Name (change anytime)', uname: 'Username for friends (once a week)', ava: 'Avatar', google_ph: 'Google photo', group: 'Your group', share: 'Friends see my own added classes', save: 'Save', logout: 'Log out', login: 'Sign in with Google', login_h: 'Sign in to create a profile and add friends.',
+              u_bad: '3–20 chars: a–z, 0–9, _ and dot', u_taken: 'This username is taken', u_free: 'Username is free', u_week: 'You can change it after', n_bad: 'Name: 1–30 characters', bad_word: 'No offensive words, please', saved: 'Profile saved', err: 'Error: ',
+              friends_t: 'Friends', search_ph_u: '@username', search_ph_n: 'Name', by_u: '@user', by_n: 'Name', add: 'Add', sent: 'Request sent', pending: 'pending', incoming: 'Friend requests', accept: 'Accept', decline: 'Decline', my_friends: 'My friends', no_friends: 'No one yet. Find a friend by @username or name.', not_found: 'Nobody found', you: 'that’s you', already: 'already friends',
+              view: 'Schedule', remove: 'Remove', remove_q: 'Remove from friends', gaps: 'Shared breaks', no_gaps: 'no shared breaks this week', both_free: 'both free', viewing: 'Viewing', back_mine: '← mine', fav_add: 'Add to favourites', fav_del: 'Remove from favourites', min: 'min', h: 'h', added_fr: 'is now your friend', cloud: 'Schedule from the shared database', need_profile: 'Create a profile first' }
+    };
+    function dayName(d) { const t = translations[currentLang] || translations.sk; const w = t.weekdays_clock || []; return w[d] || ''; }
+    const fT = (k) => (F_TXT[currentLang] || F_TXT.sk)[k];
+    B_TXT.sk.r_friends = 'Priat.'; B_TXT.en.r_friends = 'Friends'; B_TXT.ru.r_friends = 'Друзья'; B_TXT.uk.r_friends = 'Друзі';
+    B_TXT.sk.friends_t = 'Priatelia'; B_TXT.en.friends_t = 'Friends'; B_TXT.ru.friends_t = 'Друзья'; B_TXT.uk.friends_t = 'Друзі';
+
+    // ----- аватарки: 8 цветов × 6 узоров, рисуются кодом -----
+    const AVA_COLORS = ['#f97316', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#eab308', '#14b8a6', '#ef4444'];
+    const AVA_SHAPES = ['letter', 'ring', 'wave', 'dots', 'star', 'moon'];
+    function avatarSvg(code, name) {
+        const [, ci, si] = String(code || 'p:0:0').split(':').map(Number);
+        const bg = AVA_COLORS[(ci || 0) % AVA_COLORS.length];
+        const shape = AVA_SHAPES[(si || 0) % AVA_SHAPES.length];
+        const letter = escapeHtml(String(name || '?').trim().charAt(0).toUpperCase() || '?');
+        let g = '';
+        if (shape === 'letter') g = `<text x="20" y="27" text-anchor="middle" font-size="19" font-weight="800" fill="#fff" font-family="system-ui,sans-serif">${letter}</text>`;
+        if (shape === 'ring') g = `<circle cx="20" cy="20" r="10" fill="none" stroke="#fff" stroke-width="4"></circle><circle cx="20" cy="20" r="3" fill="#fff"></circle>`;
+        if (shape === 'wave') g = `<path d="M6 17c4-5 7 5 11 0s7 5 11 0 6 4 8 2M6 25c4-5 7 5 11 0s7 5 11 0 6 4 8 2" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"></path>`;
+        if (shape === 'dots') g = `<circle cx="13" cy="15" r="3.5" fill="#fff"></circle><circle cx="27" cy="15" r="3.5" fill="#fff"></circle><path d="M12 25c4 4 12 4 16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"></path>`;
+        if (shape === 'star') g = `<path d="M20 8l3.6 7.4 8.1 1.2-5.9 5.7 1.4 8.1L20 26.6l-7.2 3.8 1.4-8.1-5.9-5.7 8.1-1.2z" fill="#fff"></path>`;
+        if (shape === 'moon') g = `<path d="M25 9a11 11 0 1 0 6 18A9 9 0 0 1 25 9z" fill="#fff"></path><circle cx="12" cy="12" r="1.6" fill="#fff"></circle>`;
+        return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" fill="${bg}"></rect>${g}</svg>`;
+    }
+    function avatarHTML(u) {
+        if (u && u.avatar === 'google' && u.photo) return `<img src="${escapeHtml(u.photo)}" alt="" referrerpolicy="no-referrer">`;
+        return avatarSvg(u && u.avatar && u.avatar !== 'google' ? u.avatar : 'p:0:0', u && u.name);
+    }
+
+    // ----- фильтр ников и имён (RU/UA/SK/EN, с заменой похожих символов) -----
+    const BAD_ROOTS = ['хуй', 'хуе', 'хуё', 'пизд', 'ебат', 'ебан', 'ёбан', 'еблан', 'бляд', 'блят', 'сука', 'суки', 'мудак', 'мудил', 'пидор', 'пидар', 'гандон', 'залуп', 'шлюх', 'дроч', 'хер', 'нахуй',
+        'fuck', 'shit', 'bitch', 'cunt', 'nigg', 'fagg', 'whore', 'slut', 'dick', 'cock', 'pussy', 'porn', 'rape', 'hitler', 'nazi', 'kurv', 'kurw', 'pica', 'pici', 'kokot', 'jeban', 'jebat', 'chuj', 'hovn', 'buzerant', 'debil', 'cigan'];
+    function normBad(str) {
+        return String(str || '').toLowerCase().replace(/ё/g, 'е').replace(/й/g, 'и').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e').replace(/4/g, 'a').replace(/@/g, 'a').replace(/\$/g, 's').replace(/[._\-\s]/g, '');
+    }
+    const BAD_N = BAD_ROOTS.map(normBad);
+    function hasBadWord(str) {
+        const n = String(str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+            .replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e').replace(/4/g, 'a').replace(/@/g, 'a').replace(/\$/g, 's').replace(/[._\-\s]/g, '');
+        const lat2cyr = n.replace(/x/g, 'х').replace(/y/g, 'у').replace(/e/g, 'е').replace(/a/g, 'а').replace(/o/g, 'о').replace(/p/g, 'р').replace(/c/g, 'с').replace(/k/g, 'к');
+        return BAD_N.some(w => n.includes(w) || lat2cyr.includes(w));
+    }
+    const UNAME_RE = /^[a-z0-9_][a-z0-9_.]{2,19}$/;
+    const WEEK_MS = 7 * 24 * 3600 * 1000;
+
+    let myProfile = null;
+    let myFriends = {};        // uid -> профиль
+    let incomingReq = {};      // uid -> профиль
+    let outgoingReq = {};      // uid -> true
+    let profileRefs = [];
+    let profilePrompted = false;
+    let friendGapsCache = {};
+
+    function offProfileRefs() { profileRefs.forEach(r => r.off()); profileRefs = []; }
+    function listen(path, cb) { const r = db.ref(path); r.on('value', cb, () => {}); profileRefs.push(r); }
+
+    auth.onAuthStateChanged((user) => {
+        offProfileRefs();
+        myProfile = null; myFriends = {}; incomingReq = {}; outgoingReq = {}; profilePrompted = false;
+        renderProfileBtn(); renderFavs();
+        if (!user) { if (openDrawer === 'friends') renderFriendsPane(); return; }
+        listen('users/' + user.uid, (snap) => {
+            myProfile = snap.val();
+            if (myProfile && myProfile.name) { customNickname = myProfile.name; saveLS('uniza_custom_nickname', customNickname); if (typeof updateChatUserUI === 'function') updateChatUserUI(); }
+            renderProfileBtn(); renderFavs();
+            if (!myProfile || !myProfile.username) { if (!profilePrompted) { profilePrompted = true; openProfile(true); } }
+            else syncSharedCustom();
+        });
+        listen('userPrivate/' + user.uid + '/favGroups', (snap) => {
+            const cloud = snap.val() || {};
+            const local = getFavGroups();
+            const merged = Array.from(new Set([...Object.keys(cloud), ...local]));
+            saveLS('uniflo_fav_groups', JSON.stringify(merged));
+            if (merged.length !== Object.keys(cloud).length) pushFavsToCloud(merged);
+            renderFavs();
+        });
+        listen('friends/' + user.uid, async (snap) => {
+            const ids = Object.keys(snap.val() || {});
+            const next = {};
+            await Promise.all(ids.map(async id => { next[id] = await loadPublicProfile(id); }));
+            myFriends = next;
+            renderFavs(); if (openDrawer === 'friends') renderFriendsPane();
+        });
+        listen('friendRequests/' + user.uid, async (snap) => {
+            const ids = Object.keys(snap.val() || {});
+            const next = {};
+            await Promise.all(ids.map(async id => { next[id] = await loadPublicProfile(id); }));
+            incomingReq = next;
+            renderProfileBtn(); if (openDrawer === 'friends') renderFriendsPane();
+        });
+        listen('friendRequestsOut/' + user.uid, (snap) => { outgoingReq = snap.val() || {}; if (openDrawer === 'friends') renderFriendsPane(); });
+    });
+
+    const profileCache = {};
+    async function loadPublicProfile(uid) {
+        try { const v = (await db.ref('users/' + uid).once('value')).val(); if (v) profileCache[uid] = Object.assign({ uid }, v); return profileCache[uid] || { uid, name: '?', username: '' }; }
+        catch (e) { return profileCache[uid] || { uid, name: '?', username: '' }; }
+    }
+
+    function renderProfileBtn() {
+        const el = document.getElementById('b-profile-ava');
+        if (!el) return;
+        if (myProfile && myProfile.username) el.innerHTML = avatarHTML(myProfile);
+        else if (currentUser) el.innerHTML = avatarSvg('p:0:0', currentUser.displayName || '?');
+        else el.innerHTML = '<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" fill="var(--b-card2)"></rect><circle cx="20" cy="16" r="6" fill="none" stroke="currentColor" stroke-width="2.5"></circle><path d="M9 32c1.5-6 6-9 11-9s9.5 3 11 9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></path></svg>';
+        const b = document.getElementById('b-profile-btn');
+        if (b) b.classList.toggle('has-req', Object.keys(incomingReq).length > 0);
+    }
+
+    // ----- окно профиля -----
+    let draftAvatar = null;
+    function openProfile(isNew) {
+        const box = document.getElementById('b-profile-body');
+        document.getElementById('b-profile-modal').classList.add('open');
+        if (!currentUser) {
+            box.innerHTML = `<h3 id="b-prof-title">${escapeHtml(fT('prof_t'))}</h3><p class="b-hint">${escapeHtml(fT('login_h'))}</p>
+                <div class="b-row-btns"><button type="button" class="b-btn primary" onclick="loginWithGoogle()">${escapeHtml(fT('login'))}</button></div>`;
+            return;
+        }
+        const p = myProfile || {};
+        const nameV = p.name || currentUser.displayName || '';
+        let unameV = p.username || '';
+        if (!unameV) unameV = String((currentUser.email || '').split('@')[0] || '').toLowerCase().replace(/[^a-z0-9_.]/g, '').slice(0, 20);
+        draftAvatar = p.avatar || ('p:' + Math.floor(Math.random() * 8) + ':0');
+        const locked = p.username && p.usernameChangedAt && (Date.now() - p.usernameChangedAt < WEEK_MS);
+        const until = locked ? new Date(p.usernameChangedAt + WEEK_MS).toLocaleDateString() : '';
+        let grid = '';
+        for (let si = 0; si < AVA_SHAPES.length; si++) for (let ci = 0; ci < AVA_COLORS.length; ci++) {
+            const code = `p:${ci}:${si}`;
+            grid += `<button type="button" class="b-ava-opt${code === draftAvatar ? ' active' : ''}" data-ava="${code}" aria-label="Avatar ${ci + 1}-${si + 1}">${avatarSvg(code, nameV)}</button>`;
+        }
+        const gPhoto = currentUser.photoURL ? `<button type="button" class="b-btn small${draftAvatar === 'google' ? ' primary' : ''}" id="b-ava-google">${escapeHtml(fT('google_ph'))}</button>` : '';
+        box.innerHTML = `<h3 id="b-prof-title">${escapeHtml(isNew ? fT('prof_new') : fT('prof_t'))}</h3>
+            <p class="b-hint">${escapeHtml(fT('prof_new_h'))}</p>
+            <div class="b-prof-top"><span class="b-ava" id="b-prof-preview"></span>
+                <div style="min-width:0"><div class="b-fr-name" id="b-prof-pname"></div><div class="b-fr-sub" id="b-prof-puname"></div></div></div>
+            <div class="b-field"><label for="b-prof-name">${escapeHtml(fT('name'))}</label><input type="text" id="b-prof-name" maxlength="30" value="${escapeHtml(nameV)}" autocomplete="nickname"></div>
+            <div class="b-field"><label for="b-prof-uname">${escapeHtml(fT('uname'))}</label>
+                <div class="b-at"><span>@</span><input type="text" id="b-prof-uname" maxlength="20" value="${escapeHtml(unameV)}" ${locked ? 'disabled' : ''} autocomplete="off" spellcheck="false"></div>
+                <div class="b-msg" id="b-prof-umsg">${locked ? escapeHtml(fT('u_week') + ' ' + until) : ''}</div></div>
+            <div class="b-field"><label>${escapeHtml(fT('ava'))}</label><div class="b-ava-grid" id="b-ava-grid">${grid}</div><div class="b-row-btns">${gPhoto}</div></div>
+            <div class="b-field"><label for="b-prof-group">${escapeHtml(fT('group'))}</label><input type="text" id="b-prof-group" maxlength="20" value="${escapeHtml(p.group || currentGroup)}" style="text-transform:uppercase"></div>
+            <label class="b-switch"><input type="checkbox" id="b-prof-share" ${p.shareCustom ? 'checked' : ''}> ${escapeHtml(fT('share'))}</label>
+            <div class="b-msg" id="b-prof-msg"></div>
+            <div class="b-row-btns"><button type="button" class="b-btn primary" id="b-prof-save">${escapeHtml(fT('save'))}</button>
+                ${isNew ? '' : `<button type="button" class="b-btn" onclick="closeProfile()">✕</button>`}
+                <button type="button" class="b-btn danger" style="margin-left:auto" onclick="closeProfile(); auth.signOut();">${escapeHtml(fT('logout'))}</button></div>`;
+        const upd = () => {
+            const nm = document.getElementById('b-prof-name').value;
+            document.getElementById('b-prof-preview').innerHTML = avatarHTML({ avatar: draftAvatar, photo: currentUser.photoURL, name: nm });
+            document.getElementById('b-prof-pname').textContent = nm || '…';
+            document.getElementById('b-prof-puname').textContent = '@' + document.getElementById('b-prof-uname').value;
+            document.querySelectorAll('#b-ava-grid .b-ava-opt').forEach(b => { b.classList.toggle('active', b.dataset.ava === draftAvatar); if (b.dataset.ava.endsWith(':0')) b.innerHTML = avatarSvg(b.dataset.ava, nm); });
+            const g = document.getElementById('b-ava-google'); if (g) g.classList.toggle('primary', draftAvatar === 'google');
+        };
+        box.querySelectorAll('.b-ava-opt').forEach(b => b.onclick = () => { draftAvatar = b.dataset.ava; upd(); });
+        const g = document.getElementById('b-ava-google'); if (g) g.onclick = () => { draftAvatar = 'google'; upd(); };
+        document.getElementById('b-prof-name').oninput = upd;
+        let unameTimer = null;
+        document.getElementById('b-prof-uname').oninput = (e) => {
+            e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_.]/g, '');
+            upd(); clearTimeout(unameTimer);
+            unameTimer = setTimeout(() => checkUsername(e.target.value), 350);
+        };
+        document.getElementById('b-prof-save').onclick = saveProfile;
+        upd();
+        if (!locked) checkUsername(unameV);
+    }
+    function closeProfile() {
+        if (currentUser && (!myProfile || !myProfile.username)) return; // профиль обязателен после входа
+        document.getElementById('b-profile-modal').classList.remove('open');
+    }
+    async function checkUsername(u) {
+        const msg = document.getElementById('b-prof-umsg'); if (!msg) return false;
+        if (myProfile && myProfile.username === u) { msg.textContent = ''; msg.className = 'b-msg'; return true; }
+        if (!UNAME_RE.test(u)) { msg.textContent = fT('u_bad'); msg.className = 'b-msg bad'; return false; }
+        if (hasBadWord(u)) { msg.textContent = fT('bad_word'); msg.className = 'b-msg bad'; return false; }
+        try {
+            const owner = (await db.ref('usernames/' + u).once('value')).val();
+            const ok = !owner || owner === currentUser.uid;
+            msg.textContent = ok ? fT('u_free') : fT('u_taken'); msg.className = 'b-msg ' + (ok ? 'good' : 'bad');
+            return ok;
+        } catch (e) { return true; }
+    }
+    async function saveProfile() {
+        const msg = document.getElementById('b-prof-msg');
+        const btn = document.getElementById('b-prof-save');
+        const name = document.getElementById('b-prof-name').value.trim().replace(/\s+/g, ' ');
+        const unameEl = document.getElementById('b-prof-uname');
+        const uname = unameEl.value.trim();
+        const group = document.getElementById('b-prof-group').value.trim().toUpperCase();
+        const share = document.getElementById('b-prof-share').checked;
+        const bad = (t) => { msg.textContent = t; msg.className = 'b-msg bad'; };
+        if (!name || name.length > 30) return bad(fT('n_bad'));
+        if (hasBadWord(name)) return bad(fT('bad_word'));
+        if (!/^[A-Z0-9_-]{2,20}$/.test(group)) return bad('5ZYR12');
+        const uid = currentUser.uid;
+        const old = myProfile || {};
+        const unameChanged = !unameEl.disabled && old.username !== uname;
+        if (unameChanged && !(await checkUsername(uname))) return bad(document.getElementById('b-prof-umsg').textContent);
+        const u = {};
+        u[`users/${uid}/name`] = name;
+        u[`users/${uid}/nameLower`] = name.toLowerCase();
+        u[`users/${uid}/avatar`] = draftAvatar === 'google' && currentUser.photoURL ? 'google' : (draftAvatar || 'p:0:0');
+        if (currentUser.photoURL && currentUser.photoURL.startsWith('https://')) u[`users/${uid}/photo`] = currentUser.photoURL.slice(0, 600);
+        u[`users/${uid}/group`] = group;
+        u[`users/${uid}/shareCustom`] = share;
+        if (!old.username) {
+            u[`users/${uid}/username`] = uname; u[`usernames/${uname}`] = uid;
+            u[`users/${uid}/usernameChangedAt`] = 0;
+            u[`users/${uid}/createdAt`] = firebase.database.ServerValue.TIMESTAMP;
+        } else if (unameChanged) {
+            u[`users/${uid}/username`] = uname; u[`usernames/${uname}`] = uid; u[`usernames/${old.username}`] = null;
+            u[`users/${uid}/usernameChangedAt`] = firebase.database.ServerValue.TIMESTAMP;
+        } else {
+            u[`users/${uid}/username`] = old.username;
+            u[`users/${uid}/usernameChangedAt`] = old.usernameChangedAt || 0;
+        }
+        btn.disabled = true;
+        try {
+            await db.ref().update(u);
+            msg.textContent = fT('saved'); msg.className = 'b-msg good';
+            if (!old.username && group !== currentGroup) changeGroup(group);
+            showToast('✓ ' + fT('saved'));
+            setTimeout(() => document.getElementById('b-profile-modal').classList.remove('open'), 400);
+        } catch (e) {
+            bad(fT('err') + (e && e.message ? e.message : e));
+        } finally { btn.disabled = false; }
+    }
+
+    // ручные пары своей группы → друзьям (если включено)
+    function isManualLesson(l) { return /^\d{12,}$/.test(String(l.id || '')); }
+    function syncSharedCustom() {
+        if (!currentUser || !myProfile) return;
+        const ref = db.ref('friendData/' + currentUser.uid + '/custom');
+        if (!myProfile.shareCustom) { ref.remove().catch(() => {}); return; }
+        const own = loadJSON('uniza_sched_' + (myProfile.group || currentGroup), []);
+        const manual = (Array.isArray(own) ? own : []).filter(isManualLesson).slice(0, 40)
+            .map(l => ({ day: l.day, title: String(l.title || '').slice(0, 60), start: l.start, end: l.end, type: l.type || '', room: String(l.room || '').slice(0, 30) }));
+        ref.set(manual.length ? manual : null).catch(() => {});
+    }
+
+    // ----- избранные группы -----
+    function getFavGroups() { const v = loadJSON('uniflo_fav_groups', []); return Array.isArray(v) ? v : []; }
+    function pushFavsToCloud(list) {
+        if (!currentUser) return;
+        const obj = {}; list.forEach((g, i) => { if (/^[A-Z0-9_-]{2,20}$/.test(g)) obj[g] = i + 1; });
+        db.ref('userPrivate/' + currentUser.uid + '/favGroups').set(Object.keys(obj).length ? obj : null).catch(() => {});
+    }
+    function toggleFavGroup() {
+        let list = getFavGroups();
+        list = list.includes(currentGroup) ? list.filter(g => g !== currentGroup) : [...list, currentGroup].slice(-12);
+        saveLS('uniflo_fav_groups', JSON.stringify(list));
+        pushFavsToCloud(list); renderFavs();
+    }
+    function myGroup() { return (myProfile && myProfile.group) || localStorage.getItem('uniflo_my_group') || null; }
+    function renderFavs() {
+        const box = document.getElementById('b-favs'); if (!box) return;
+        const mine = myGroup();
+        const chips = [];
+        const seen = new Set();
+        const add = (g, html, title) => { if (!g || seen.has(g)) return; seen.add(g); chips.push(`<button type="button" class="b-fav${g === currentGroup ? ' active' : ''}" onclick="changeGroup('${g}')" title="${escapeHtml(title || g)}">${html}</button>`); };
+        if (mine) add(mine, escapeHtml(mine), mine);
+        getFavGroups().forEach(g => add(g, escapeHtml(g)));
+        Object.values(myFriends).forEach(f => { if (f && f.group) add(f.group, `<span class="b-ava">${avatarHTML(f)}</span>${escapeHtml(f.group)}`, f.name); });
+        const fav = getFavGroups().includes(currentGroup);
+        const star = `<button type="button" class="b-fav star${fav ? ' on' : ''}" onclick="toggleFavGroup()" title="${escapeHtml(fav ? fT('fav_del') : fT('fav_add'))}" aria-label="${escapeHtml(fav ? fT('fav_del') : fT('fav_add'))}">${fav ? '★' : '☆'}</button>`;
+        box.innerHTML = chips.join('') + star;
+        const v = document.getElementById('b-viewing');
+        if (v) {
+            const fr = Object.values(myFriends).find(f => f && f.group === currentGroup);
+            const other = mine && currentGroup !== mine;
+            v.classList.toggle('show', Boolean(other));
+            v.innerHTML = other ? `<span>👀 ${escapeHtml(fT('viewing'))}: ${escapeHtml(fr ? fr.name + ' · ' : '')}${escapeHtml(currentGroup)}</span><button type="button" onclick="changeGroup('${mine}')">${escapeHtml(fT('back_mine'))}</button>` : '';
+        }
+    }
+
+    // ----- общая база расписаний: сначала Firebase, потом сервер -----
+    async function cloudSchedule(group) {
+        try {
+            const v = (await db.ref('groupSchedules/' + group).once('value')).val();
+            if (v && Array.isArray(v.lessons)) return v;
+            if (v && v.lessons && typeof v.lessons === 'object') return { lessons: Object.values(v.lessons), updatedAt: v.updatedAt };
+        } catch (e) {}
+        return null;
+    }
+    async function getGroupLessons(group) {
+        const local = loadJSON('uniza_sched_' + group, null);
+        if (Array.isArray(local) && local.length) return local;
+        const c = await cloudSchedule(group);
+        if (c && c.lessons.length) { saveLS('uniza_sched_' + group, JSON.stringify(c.lessons)); return c.lessons; }
+        try {
+            const r = await fetch(`${API_URL}/api/schedule/${group}`);
+            const d = await r.json();
+            const l = d.schedule || d;
+            if (Array.isArray(l)) { saveLS('uniza_sched_' + group, JSON.stringify(l)); return l; }
+        } catch (e) {}
+        return [];
+    }
+    async function autoLoadGroup(group) {
+        if (Array.isArray(schedule) && schedule.length) return;
+        const c = await cloudSchedule(group);
+        if (group !== currentGroup) return;
+        if (c && c.lessons.length) {
+            schedule = c.lessons;
+            saveLS('uniza_sched_' + group, JSON.stringify(schedule));
+            renderAll();
+            showToast('☁ ' + fT('cloud'));
+            if (Date.now() - (c.updatedAt || 0) > 24 * 3600 * 1000) fetchScheduleFromServer();
+        } else {
+            fetchScheduleFromServer();
+        }
+    }
+
+    // ----- общие окна -----
+    const mm = (t) => { const [h, m] = String(t || '0:0').split(':').map(Number); return h * 60 + m; };
+    const hhmm = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    function sharedGaps(a, b) {
+        const out = [];
+        for (let d = 1; d <= 5; d++) {
+            const A = a.filter(l => l.day === d), B = b.filter(l => l.day === d);
+            if (!A.length || !B.length) continue;
+            const from = Math.max(Math.min(...A.map(l => mm(l.start))), Math.min(...B.map(l => mm(l.start))));
+            const to = Math.min(Math.max(...A.map(l => mm(l.end))), Math.max(...B.map(l => mm(l.end))));
+            if (to - from < 30) continue;
+            const busy = [...A, ...B].map(l => [mm(l.start), mm(l.end)]).sort((x, y) => x[0] - y[0]);
+            let cur = from;
+            for (const [s, e] of busy) {
+                if (e <= cur) continue;
+                if (s >= to) break;
+                if (s - cur >= 30) out.push({ day: d, start: cur, end: Math.min(s, to) });
+                cur = Math.max(cur, e);
+            }
+            if (to - cur >= 30) out.push({ day: d, start: cur, end: to });
+        }
+        return out;
+    }
+    function gapPlace() {
+        const p = (customMapPoints || []).find(x => /menz|jedál|jedal|kav|cafe|caf[eé]|bufet|bistro|food|jedlo/i.test((x.cat || '') + ' ' + (x.title || '')));
+        return p ? p.title : '';
+    }
+    async function computeFriendGaps(f) {
+        const mine = myGroup() || currentGroup;
+        const myLessons = (await getGroupLessons(mine)).concat(myProfile && myProfile.shareCustom ? [] : []);
+        let theirs = f.group ? await getGroupLessons(f.group) : [];
+        try { const c = (await db.ref('friendData/' + f.uid + '/custom').once('value')).val(); if (Array.isArray(c)) theirs = theirs.concat(c); } catch (e) {}
+        const gaps = sharedGaps(myLessons, theirs);
+        const today = new Date().getDay();
+        const order = (d) => (d - today + 7) % 7;
+        gaps.sort((x, y) => order(x.day) - order(y.day) || x.start - y.start);
+        friendGapsCache[f.uid] = gaps;
+        return gaps;
+    }
+    function fmtGap(g) {
+        const d = g.end - g.start;
+        const dur = (Math.floor(d / 60) ? Math.floor(d / 60) + ' ' + fT('h') + ' ' : '') + (d % 60 ? (d % 60) + ' ' + fT('min') : '');
+        return `${escapeHtml(dayName(g.day))} <b>${hhmm(g.start)}–${hhmm(g.end)}</b> · ${escapeHtml(dur.trim())}`;
+    }
+
+    // ----- панель друзей -----
+    let frSearchMode = 'u';
+    let frSearchQ = '';
+    let frResults = [];
+    function renderFriendsPane() {
+        const box = document.getElementById('b-friends-body'); if (!box) return;
+        if (!currentUser) {
+            box.innerHTML = `<p class="b-empty">${escapeHtml(fT('login_h'))}</p><button type="button" class="b-btn primary" onclick="loginWithGoogle()">${escapeHtml(fT('login'))}</button>`;
+            return;
+        }
+        if (!myProfile || !myProfile.username) {
+            box.innerHTML = `<p class="b-empty">${escapeHtml(fT('need_profile'))}</p><button type="button" class="b-btn primary" onclick="openProfile(true)">${escapeHtml(fT('prof_new'))}</button>`;
+            return;
+        }
+        const row = (f, actions, sub) => `<div class="b-fr"><span class="b-ava">${avatarHTML(f)}</span><div class="b-fr-main"><div class="b-fr-name">${escapeHtml(f.name || '?')}</div><div class="b-fr-sub">@${escapeHtml(f.username || '')}${f.group ? ' · ' + escapeHtml(f.group) : ''}${sub ? ' · ' + escapeHtml(sub) : ''}</div></div><div class="b-fr-act">${actions}</div></div>`;
+        let html = `<div class="b-fr-search"><input type="text" id="b-fr-q" placeholder="${escapeHtml(frSearchMode === 'u' ? fT('search_ph_u') : fT('search_ph_n'))}" value="${escapeHtml(frSearchQ)}" autocomplete="off" spellcheck="false">
+            <div class="b-fr-mode" role="tablist"><button type="button" class="${frSearchMode === 'u' ? 'active' : ''}" data-m="u">${escapeHtml(fT('by_u'))}</button><button type="button" class="${frSearchMode === 'n' ? 'active' : ''}" data-m="n">${escapeHtml(fT('by_n'))}</button></div></div>
+            <div id="b-fr-results"></div>`;
+        const inc = Object.values(incomingReq);
+        if (inc.length) {
+            html += `<div class="b-fr-h">${escapeHtml(fT('incoming'))}</div>` + inc.map(f => row(f, `<button type="button" class="b-btn small primary" onclick="acceptFriend('${f.uid}')">${escapeHtml(fT('accept'))}</button><button type="button" class="b-btn small" onclick="declineFriend('${f.uid}')" aria-label="${escapeHtml(fT('decline'))}">✕</button>`)).join('');
+        }
+        const fr = Object.values(myFriends).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+        html += `<div class="b-fr-h">${escapeHtml(fT('my_friends'))} · ${fr.length}</div>`;
+        if (!fr.length) html += `<div class="b-empty">${escapeHtml(fT('no_friends'))}</div>`;
+        fr.forEach(f => {
+            html += row(f, `<button type="button" class="b-btn small" onclick="viewFriend('${f.uid}')">${escapeHtml(fT('view'))}</button><button type="button" class="b-btn small danger" onclick="removeFriend('${f.uid}')" aria-label="${escapeHtml(fT('remove'))}" title="${escapeHtml(fT('remove'))}">✕</button>`);
+            html += `<div class="b-fr-gaps" id="b-gaps-${f.uid}"><span class="b-gap">…</span></div>`;
+        });
+        box.innerHTML = html;
+        const q = document.getElementById('b-fr-q');
+        let t = null;
+        q.oninput = () => { frSearchQ = q.value; clearTimeout(t); t = setTimeout(runFriendSearch, 300); };
+        box.querySelectorAll('.b-fr-mode button').forEach(b => b.onclick = () => { frSearchMode = b.dataset.m; renderFriendsPane(); const qq = document.getElementById('b-fr-q'); qq.focus(); runFriendSearch(); });
+        renderSearchResults();
+        const place = gapPlace();
+        fr.forEach(async f => {
+            const gaps = friendGapsCache[f.uid] || await computeFriendGaps(f);
+            const el = document.getElementById('b-gaps-' + f.uid); if (!el) return;
+            el.innerHTML = gaps.length
+                ? gaps.slice(0, 3).map(g => `<span class="b-gap">🤝 ${fmtGap(g)}${place ? ' · ' + escapeHtml(place) : ''}</span>`).join('')
+                : `<span class="b-gap">${escapeHtml(fT('no_gaps'))}</span>`;
+        });
+    }
+    async function runFriendSearch() {
+        let q = frSearchQ.trim().toLowerCase();
+        if (frSearchMode === 'u') q = q.replace(/^@/, '').replace(/[^a-z0-9_.]/g, '');
+        if (q.length < 2) { frResults = []; renderSearchResults(); return; }
+        const field = frSearchMode === 'u' ? 'username' : 'nameLower';
+        try {
+            const snap = await db.ref('users').orderByChild(field).startAt(q).endAt(q + '').limitToFirst(10).once('value');
+            const res = []; snap.forEach(c => { res.push(Object.assign({ uid: c.key }, c.val())); });
+            frResults = res.filter(r => r.username);
+        } catch (e) { frResults = []; }
+        renderSearchResults();
+    }
+    function renderSearchResults() {
+        const el = document.getElementById('b-fr-results'); if (!el) return;
+        if (frSearchQ.trim().length < 2) { el.innerHTML = ''; return; }
+        if (!frResults.length) { el.innerHTML = `<div class="b-empty">${escapeHtml(fT('not_found'))}</div>`; return; }
+        el.innerHTML = frResults.map(f => {
+            let act;
+            if (f.uid === currentUser.uid) act = `<span class="b-fr-sub">${escapeHtml(fT('you'))}</span>`;
+            else if (myFriends[f.uid]) act = `<span class="b-fr-sub">${escapeHtml(fT('already'))}</span>`;
+            else if (incomingReq[f.uid]) act = `<button type="button" class="b-btn small primary" onclick="acceptFriend('${f.uid}')">${escapeHtml(fT('accept'))}</button>`;
+            else if (outgoingReq[f.uid]) act = `<span class="b-fr-sub">${escapeHtml(fT('pending'))}</span>`;
+            else act = `<button type="button" class="b-btn small primary" onclick="addFriend('${f.uid}')">+ ${escapeHtml(fT('add'))}</button>`;
+            return `<div class="b-fr"><span class="b-ava">${avatarHTML(f)}</span><div class="b-fr-main"><div class="b-fr-name">${escapeHtml(f.name || '?')}</div><div class="b-fr-sub">@${escapeHtml(f.username)}${f.group ? ' · ' + escapeHtml(f.group) : ''}</div></div><div class="b-fr-act">${act}</div></div>`;
+        }).join('');
+    }
+    async function addFriend(uid) {
+        if (!currentUser || uid === currentUser.uid) return;
+        if (incomingReq[uid]) return acceptFriend(uid);
+        const u = {};
+        u[`friendRequests/${uid}/${currentUser.uid}`] = firebase.database.ServerValue.TIMESTAMP;
+        u[`friendRequestsOut/${currentUser.uid}/${uid}`] = firebase.database.ServerValue.TIMESTAMP;
+        try { await db.ref().update(u); showToast('✓ ' + fT('sent')); } catch (e) { showToast(fT('err') + e.message, 4000); }
+    }
+    async function acceptFriend(uid) {
+        const me = currentUser.uid;
+        const u = {};
+        u[`friends/${me}/${uid}`] = true;
+        u[`friends/${uid}/${me}`] = true;
+        try {
+            await db.ref().update(u);
+            const cleanup = {};
+            cleanup[`friendRequests/${me}/${uid}`] = null;
+            cleanup[`friendRequestsOut/${uid}/${me}`] = null;
+            cleanup[`friendRequests/${uid}/${me}`] = null;
+            cleanup[`friendRequestsOut/${me}/${uid}`] = null;
+            await db.ref().update(cleanup).catch(() => {});
+            const f = incomingReq[uid] || profileCache[uid];
+            showToast('🤝 ' + (f ? f.name + ' ' : '') + fT('added_fr'));
+        } catch (e) { showToast(fT('err') + e.message, 4000); }
+    }
+    async function declineFriend(uid) {
+        const me = currentUser.uid;
+        const u = {}; u[`friendRequests/${me}/${uid}`] = null; u[`friendRequestsOut/${uid}/${me}`] = null;
+        await db.ref().update(u).catch(() => {});
+    }
+    async function removeFriend(uid) {
+        const f = myFriends[uid];
+        if (!confirm(fT('remove_q') + (f ? ': ' + f.name : '') + '?')) return;
+        const me = currentUser.uid;
+        const u = {}; u[`friends/${me}/${uid}`] = null; u[`friends/${uid}/${me}`] = null;
+        delete friendGapsCache[uid];
+        await db.ref().update(u).catch(e => showToast(fT('err') + e.message, 4000));
+    }
+    function viewFriend(uid) {
+        const f = myFriends[uid];
+        if (!f || !f.group) return;
+        changeGroup(f.group);
+        if (window.innerWidth <= 860) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function renderNextLesson() {
         const box = document.getElementById('b-next');
         if (!box) return;
@@ -5327,15 +5904,17 @@
         saveLS('uniflo_beta_drawer', openDrawer || '');
         const drawer = document.getElementById('b-drawer');
         drawer.classList.toggle('open', Boolean(openDrawer));
-        ['cal', 'notes', 'chat'].forEach(n => {
+        ['cal', 'notes', 'chat', 'friends'].forEach(n => {
             document.getElementById('pane-' + n).classList.toggle('active', openDrawer === n);
             document.getElementById('rail-' + n).classList.toggle('active', openDrawer === n);
         });
+        if (openDrawer === 'friends') renderFriendsPane();
         if (openDrawer === 'chat') {
             const list = document.getElementById('chat-messages-list');
             if (list) list.scrollTop = list.scrollHeight;
         }
     }
+
 
     function tickBetaClock() {
         const el = document.getElementById('b-clock');
@@ -5347,12 +5926,16 @@
     document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
         closeLook();
+        if (typeof closeProfile === 'function') closeProfile();
         if (placeModeOn) cancelPlacePoint();
         closePlaceCard();
         closeMapMenus();
     });
 
     upcomingExpanded = true;
+    if (!localStorage.getItem('uniflo_my_group')) saveLS('uniflo_my_group', currentGroup);
+    renderProfileBtn(); renderFavs();
+    setTimeout(() => autoLoadGroup(currentGroup), 800);
     applyBetaTexts();
     setLeftView(leftView);
     window.addEventListener('load', fitWeek);
