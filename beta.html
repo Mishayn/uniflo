@@ -1576,6 +1576,10 @@
         .b-admin-on { border-color: #FACC15 !important; color: #FACC15 !important; }
 
         /* чат: общий + личные */
+        .chat-logout.b-chat-close { background: transparent; border: 1px solid var(--b-line); color: var(--text-secondary); }
+        .chat-logout.b-chat-close:hover { background: var(--b-card2); color: var(--text-primary); }
+        .b-chat-join { width: 100%; justify-content: center; height: 42px; }
+        .b-chat-join[hidden], #chat-input-row[hidden] { display: none; }
         .chat-convos { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: thin; }
         .chat-conv { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 11px 0 5px; border-radius: 999px; border: 1px solid var(--b-line); background: var(--b-input2); color: var(--text-secondary); font: inherit; font-size: 0.78rem; font-weight: 800; cursor: pointer; }
         .chat-conv.all { padding: 0 12px; }
@@ -1819,7 +1823,6 @@
         </div>
     </div>
     <div class="b-favs" id="b-favs"></div>
-    <div class="b-viewing" id="b-viewing"></div>
     <div class="b-actions">
         <button class="btn-main-action" onclick="openAddModal()" data-i18n="add_lesson">+ Pridať hodinu</button>
         <button class="btn-square-reset" onclick="resetScheduleWithConfirm()" data-i18n-title="reset_title" title="Reset rozvrhu">⟳</button>
@@ -1945,13 +1948,14 @@
                                 <div class="chat-head-title"><span data-i18n="chat_title">Online chat</span><span class="chat-room-badge" id="chat-room-badge">—</span></div>
                                 <div class="chat-head-sub" id="chat-auth-container"></div>
                             </div>
-                            <button type="button" class="chat-logout" id="chat-logout-btn" onclick="logoutUser()" title="Odhlásiť sa" aria-label="Odhlásiť sa" hidden>
+                            <button type="button" class="chat-logout b-chat-close" id="chat-logout-btn" onclick="toggleDrawer(null)" title="Zavrieť" aria-label="Zavrieť">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
                             </button>
                         </div>
                         <div class="chat-convos" id="chat-convos" role="tablist"></div>
                         <div class="chat-messages2" id="chat-messages-list"></div>
-                        <div class="chat-input-area2">
+                        <button type="button" class="b-btn primary b-chat-join" id="b-chat-join" onclick="openProfile(true)" hidden></button>
+                        <div class="chat-input-area2" id="chat-input-row">
                             <input type="text" id="chat-input-msg" maxlength="500" placeholder="Prihláste sa..." disabled onkeydown="handleChatKeyPress(event)" aria-label="Správa">
                             <button type="button" class="chat-send2" id="chat-send-btn" disabled onclick="sendChatMessage()">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4z"></path></svg>
@@ -2848,7 +2852,8 @@
         renderNextLesson();
         setLeftView(leftView);
         applyBetaTexts();
-        if (typeof renderFavs === 'function') { renderFavs(); if (openDrawer === 'friends') renderFriendsPane(); }
+        if (typeof renderFavs === 'function') { renderFavs(); renderConvos(); if (openDrawer === 'friends') renderFriendsPane(); }
+        if (typeof updateChatUserUI === 'function') updateChatUserUI();
     }
 
     function applyTranslations() {
@@ -3015,9 +3020,10 @@
         if (currentUser) {
             authContainer.innerHTML = `
                 <span>${escapeHtml(trc('chat_you_label', 'vy'))}: <b>${escapeHtml(chatName())}</b></span>
-                <button type="button" class="chat-link-btn" onclick="changeCustomNickname()" title="Zmeniť nick">✏️</button>
+                <button type="button" class="chat-link-btn" onclick="openProfile()" title="Profil">✏️</button>
             `;
-            if (logoutBtn) logoutBtn.hidden = false;
+            const jb = document.getElementById('b-chat-join'), ir = document.getElementById('chat-input-row');
+            if (jb) jb.hidden = true; if (ir) ir.hidden = false;
             input.disabled = false;
             sendBtn.disabled = false;
             input.placeholder = trc('chat_placeholder', 'Napísať do chatu…');
@@ -3032,7 +3038,10 @@
             input.disabled = true;
             sendBtn.disabled = true;
             input.placeholder = trc('chat_placeholder_login', 'Prihláste sa...');
-            if (logoutBtn) logoutBtn.hidden = true;
+            authContainer.innerHTML = '';
+            const jb = document.getElementById('b-chat-join'), ir = document.getElementById('chat-input-row');
+            if (jb) { jb.hidden = false; jb.textContent = '👤 ' + (typeof fT === 'function' ? fT('chat_join') : 'Vytvor si účet'); }
+            if (ir) ir.hidden = true;
         }
     }
 
@@ -5328,19 +5337,19 @@
     // ПРОФИЛЬ · ДРУЗЬЯ · ИЗБРАННЫЕ ГРУППЫ · ОБЩИЕ ОКНА · ОБЩАЯ БАЗА РАСПИСАНИЙ
     // =====================================================================
     const F_TXT = {
-        ru: { my_short: 'Моя', groups_label: 'Группы:', fav_add2: 'В избранное', in_fav: 'в избранном', chat_all: 'Общий', write: 'Написать', search_ph: '@ник или имя', prof_t: 'Профиль', prof_new: 'Создай профиль', prof_new_h: 'Имя видят друзья и чат. По @нику тебя находят в поиске.', name: 'Имя (можно менять всегда)', uname: 'Ник для друзей (меняется раз в неделю)', ava: 'Аватарка', google_ph: 'Фото из Google', group: 'Твоя группа', share: 'Друзья видят мои ручные пары', save: 'Сохранить', logout: 'Выйти', login: 'Войти через Google', login_h: 'Войди, чтобы создать профиль и добавлять друзей.',
+        ru: { chat_join: 'Создай аккаунт, чтобы писать', my_short: 'Моя', groups_label: 'Группы:', fav_add2: 'В избранное', in_fav: 'в избранном', chat_all: 'Общий', write: 'Написать', search_ph: '@ник или имя', prof_t: 'Профиль', prof_new: 'Создай профиль', prof_new_h: 'Имя видят друзья и чат. По @нику тебя находят в поиске.', name: 'Имя (можно менять всегда)', uname: 'Ник для друзей (меняется раз в неделю)', ava: 'Аватарка', google_ph: 'Фото из Google', group: 'Твоя группа', share: 'Друзья видят мои ручные пары', save: 'Сохранить', logout: 'Выйти', login: 'Войти через Google', login_h: 'Войди, чтобы создать профиль и добавлять друзей.',
               u_bad: '3–20 символов: a–z, 0–9, _ и точка', u_taken: 'Этот ник уже занят', u_free: 'Ник свободен', u_week: 'Ник можно сменить после', n_bad: 'Имя: 1–30 символов', bad_word: 'Без неприличных слов, пожалуйста', saved: 'Профиль сохранён', err: 'Ошибка: ',
               friends_t: 'Друзья', search_ph_u: '@ник', search_ph_n: 'Имя', by_u: '@ник', by_n: 'Имя', add: 'Добавить', sent: 'Заявка отправлена', pending: 'ждёт ответа', incoming: 'Заявки в друзья', accept: 'Принять', decline: 'Отклонить', my_friends: 'Мои друзья', no_friends: 'Пока никого. Найди друга по @нику или имени.', not_found: 'Никого не нашли', you: 'это ты', already: 'уже в друзьях',
               view: 'Расписание', remove: 'Удалить', remove_q: 'Удалить из друзей', gaps: 'Общие окна', no_gaps: 'общих окон на этой неделе нет', both_free: 'оба свободны', viewing: 'Смотришь', back_mine: '← моё', fav_add: 'В избранные', fav_del: 'Убрать из избранных', min: 'мин', h: 'ч', added_fr: 'теперь в друзьях', cloud: 'Расписание из общей базы', need_profile: 'Сначала создай профиль' },
-        uk: { my_short: 'Моя', groups_label: 'Групи:', fav_add2: 'В обрані', in_fav: 'в обраних', chat_all: 'Загальний', write: 'Написати', search_ph: '@нік або ім’я', prof_t: 'Профіль', prof_new: 'Створи профіль', prof_new_h: 'Ім’я бачать друзі та чат. За @ніком тебе знаходять у пошуку.', name: 'Ім’я (можна змінювати завжди)', uname: 'Нік для друзів (змінюється раз на тиждень)', ava: 'Аватарка', google_ph: 'Фото з Google', group: 'Твоя група', share: 'Друзі бачать мої ручні пари', save: 'Зберегти', logout: 'Вийти', login: 'Увійти через Google', login_h: 'Увійди, щоб створити профіль і додавати друзів.',
+        uk: { chat_join: 'Створи акаунт, щоб писати', my_short: 'Моя', groups_label: 'Групи:', fav_add2: 'В обрані', in_fav: 'в обраних', chat_all: 'Загальний', write: 'Написати', search_ph: '@нік або ім’я', prof_t: 'Профіль', prof_new: 'Створи профіль', prof_new_h: 'Ім’я бачать друзі та чат. За @ніком тебе знаходять у пошуку.', name: 'Ім’я (можна змінювати завжди)', uname: 'Нік для друзів (змінюється раз на тиждень)', ava: 'Аватарка', google_ph: 'Фото з Google', group: 'Твоя група', share: 'Друзі бачать мої ручні пари', save: 'Зберегти', logout: 'Вийти', login: 'Увійти через Google', login_h: 'Увійди, щоб створити профіль і додавати друзів.',
               u_bad: '3–20 символів: a–z, 0–9, _ і крапка', u_taken: 'Цей нік уже зайнятий', u_free: 'Нік вільний', u_week: 'Нік можна змінити після', n_bad: 'Ім’я: 1–30 символів', bad_word: 'Без непристойних слів, будь ласка', saved: 'Профіль збережено', err: 'Помилка: ',
               friends_t: 'Друзі', search_ph_u: '@нік', search_ph_n: 'Ім’я', by_u: '@нік', by_n: 'Ім’я', add: 'Додати', sent: 'Запит надіслано', pending: 'чекає відповіді', incoming: 'Запити в друзі', accept: 'Прийняти', decline: 'Відхилити', my_friends: 'Мої друзі', no_friends: 'Поки нікого. Знайди друга за @ніком або ім’ям.', not_found: 'Нікого не знайшли', you: 'це ти', already: 'вже в друзях',
               view: 'Розклад', remove: 'Видалити', remove_q: 'Видалити з друзів', gaps: 'Спільні вікна', no_gaps: 'спільних вікон цього тижня немає', both_free: 'обидва вільні', viewing: 'Дивишся', back_mine: '← мій', fav_add: 'В обрані', fav_del: 'Прибрати з обраних', min: 'хв', h: 'год', added_fr: 'тепер у друзях', cloud: 'Розклад зі спільної бази', need_profile: 'Спочатку створи профіль' },
-        sk: { my_short: 'Moja', groups_label: 'Skupiny:', fav_add2: 'Do obľúbených', in_fav: 'v obľúbených', chat_all: 'Spoločný', write: 'Napísať', search_ph: '@prezývka alebo meno', prof_t: 'Profil', prof_new: 'Vytvor si profil', prof_new_h: 'Meno vidia priatelia a chat. Podľa @prezývky ťa nájdu vo vyhľadávaní.', name: 'Meno (zmeníš kedykoľvek)', uname: 'Prezývka pre priateľov (raz za týždeň)', ava: 'Avatar', google_ph: 'Fotka z Google', group: 'Tvoja skupina', share: 'Priatelia vidia moje vlastné hodiny', save: 'Uložiť', logout: 'Odhlásiť', login: 'Prihlásiť cez Google', login_h: 'Prihlás sa a vytvor si profil, aby si mohol pridávať priateľov.',
+        sk: { chat_join: 'Vytvor si účet a píš', my_short: 'Moja', groups_label: 'Skupiny:', fav_add2: 'Do obľúbených', in_fav: 'v obľúbených', chat_all: 'Spoločný', write: 'Napísať', search_ph: '@prezývka alebo meno', prof_t: 'Profil', prof_new: 'Vytvor si profil', prof_new_h: 'Meno vidia priatelia a chat. Podľa @prezývky ťa nájdu vo vyhľadávaní.', name: 'Meno (zmeníš kedykoľvek)', uname: 'Prezývka pre priateľov (raz za týždeň)', ava: 'Avatar', google_ph: 'Fotka z Google', group: 'Tvoja skupina', share: 'Priatelia vidia moje vlastné hodiny', save: 'Uložiť', logout: 'Odhlásiť', login: 'Prihlásiť cez Google', login_h: 'Prihlás sa a vytvor si profil, aby si mohol pridávať priateľov.',
               u_bad: '3–20 znakov: a–z, 0–9, _ a bodka', u_taken: 'Táto prezývka je obsadená', u_free: 'Prezývka je voľná', u_week: 'Prezývku zmeníš po', n_bad: 'Meno: 1–30 znakov', bad_word: 'Bez vulgarizmov, prosím', saved: 'Profil uložený', err: 'Chyba: ',
               friends_t: 'Priatelia', search_ph_u: '@prezývka', search_ph_n: 'Meno', by_u: '@nick', by_n: 'Meno', add: 'Pridať', sent: 'Žiadosť odoslaná', pending: 'čaká na odpoveď', incoming: 'Žiadosti o priateľstvo', accept: 'Prijať', decline: 'Odmietnuť', my_friends: 'Moji priatelia', no_friends: 'Zatiaľ nikto. Nájdi priateľa podľa @prezývky alebo mena.', not_found: 'Nikoho sme nenašli', you: 'to si ty', already: 'už ste priatelia',
               view: 'Rozvrh', remove: 'Odstrániť', remove_q: 'Odstrániť z priateľov', gaps: 'Spoločné voľno', no_gaps: 'tento týždeň nemáte spoločné voľno', both_free: 'obaja voľní', viewing: 'Pozeráš', back_mine: '← môj', fav_add: 'Do obľúbených', fav_del: 'Odobrať z obľúbených', min: 'min', h: 'h', added_fr: 'je teraz tvoj priateľ', cloud: 'Rozvrh zo spoločnej databázy', need_profile: 'Najprv si vytvor profil' },
-        en: { my_short: 'Mine', groups_label: 'Groups:', fav_add2: 'Add to favourites', in_fav: 'favourite', chat_all: 'Everyone', write: 'Message', search_ph: '@username or name', prof_t: 'Profile', prof_new: 'Create your profile', prof_new_h: 'Friends and chat see your name. People find you by @username.', name: 'Name (change anytime)', uname: 'Username for friends (once a week)', ava: 'Avatar', google_ph: 'Google photo', group: 'Your group', share: 'Friends see my own added classes', save: 'Save', logout: 'Log out', login: 'Sign in with Google', login_h: 'Sign in to create a profile and add friends.',
+        en: { chat_join: 'Create an account to chat', my_short: 'Mine', groups_label: 'Groups:', fav_add2: 'Add to favourites', in_fav: 'favourite', chat_all: 'Everyone', write: 'Message', search_ph: '@username or name', prof_t: 'Profile', prof_new: 'Create your profile', prof_new_h: 'Friends and chat see your name. People find you by @username.', name: 'Name (change anytime)', uname: 'Username for friends (once a week)', ava: 'Avatar', google_ph: 'Google photo', group: 'Your group', share: 'Friends see my own added classes', save: 'Save', logout: 'Log out', login: 'Sign in with Google', login_h: 'Sign in to create a profile and add friends.',
               u_bad: '3–20 chars: a–z, 0–9, _ and dot', u_taken: 'This username is taken', u_free: 'Username is free', u_week: 'You can change it after', n_bad: 'Name: 1–30 characters', bad_word: 'No offensive words, please', saved: 'Profile saved', err: 'Error: ',
               friends_t: 'Friends', search_ph_u: '@username', search_ph_n: 'Name', by_u: '@user', by_n: 'Name', add: 'Add', sent: 'Request sent', pending: 'pending', incoming: 'Friend requests', accept: 'Accept', decline: 'Decline', my_friends: 'My friends', no_friends: 'No one yet. Find a friend by @username or name.', not_found: 'Nobody found', you: 'that’s you', already: 'already friends',
               view: 'Schedule', remove: 'Remove', remove_q: 'Remove from friends', gaps: 'Shared breaks', no_gaps: 'no shared breaks this week', both_free: 'both free', viewing: 'Viewing', back_mine: '← mine', fav_add: 'Add to favourites', fav_del: 'Remove from favourites', min: 'min', h: 'h', added_fr: 'is now your friend', cloud: 'Schedule from the shared database', need_profile: 'Create a profile first' }
